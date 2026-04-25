@@ -1,0 +1,3575 @@
+
+
+
+
+How can I have named tuples in Rust?
+
+You’re effectively asking for:
+
+“How do I get tuple-like positional access and named fields in Rust?”
+
+This touches on data modeling choices, not just syntax. Rust deliberately separates:
+
+Tuples → positional, lightweight, anonymous
+
+Structs → named, explicit, extensible
+
+There is no built-in “named tuple” type like Python’s namedtuple or OCaml’s labeled tuples—but you can achieve equivalent (and often better) designs using a few patterns.
+
+🧠 Design Considerations
+Before jumping into syntax, think about what you actually want:
+
+Requirement	Best Rust Construct
+Named fields, readable	struct
+Tuple-like compactness	tuple struct
+Pattern matching + names	struct
+Interop / lightweight	tuple or tuple struct
+Python-style namedtuple	struct + destructuring
+Rust pushes you toward clarity over brevity, so most “named tuple” use cases map cleanly to struct.
+
+✅ Option 1 — Regular Struct (Idiomatic Rust)
+This is the canonical solution.
+
+struct Point {
+    x: i32,
+    y: i32,
+}
+
+let p = Point { x: 10, y: 20 };
+
+println!("{}", p.x);
+Why this is usually best
+Self-documenting
+
+Works with pattern matching
+
+Easy to extend later
+
+Zero runtime cost
+
+Destructuring (tuple-like feel)
+let Point { x, y } = p;
+✅ Option 2 — Tuple Struct (Hybrid)
+If you want tuple syntax + type name, use a tuple struct:
+
+struct Point(i32, i32);
+
+let p = Point(10, 20);
+println!("{}", p.0);
+Tradeoffs
+✔ lightweight
+
+✔ newtype-friendly
+
+✘ no field names (.0, .1 only)
+
+✅ Option 3 — Struct + impl Accessors (Encapsulation)
+If you want both names and controlled access:
+
+struct Point(i32, i32);
+
+impl Point {
+    fn x(&self) -> i32 { self.0 }
+    fn y(&self) -> i32 { self.1 }
+}
+
+let p = Point(10, 20);
+println!("{}", p.x());
+This gives:
+
+tuple storage
+
+named API
+
+✅ Option 4 — Pattern Matching Alias (Closest to Named Tuple Feel)
+You can destructure inline to simulate named tuples:
+
+let (x, y) = (10, 20);
+println!("{x}, {y}");
+Or:
+
+let point = (10, 20);
+let (x, y) = point;
+This is the closest to “named tuple variables” but:
+
+names exist only locally
+
+not part of the type
+
+⚙️ Option 5 — Macros / Crates (Python-style namedtuple)
+There are crates that mimic named tuples:
+
+named_tuple
+
+tuple_struct
+
+derive_more
+
+Example (conceptually):
+
+named_tuple!(Point { x: i32, y: i32 });
+
+let p = Point { x: 1, y: 2 };
+Tradeoffs
+✔ concise
+
+✘ adds dependency
+
+✘ not idiomatic Rust
+
+✘ less flexible than structs
+
+🧩 Option 6 — Type Alias for Tuple (Not Truly Named)
+type Point = (i32, i32);
+Usage:
+
+let p: Point = (10, 20);
+But:
+
+❌ no field names
+
+❌ no safety improvement
+
+🧠 Architectural Guidance
+Given your broader work (compilers, VMs, IRs, etc.), here’s how to think about it:
+
+Use struct when:
+Modeling AST nodes
+
+IR representations
+
+VM state
+
+Anything evolving over time
+
+Use tuple structs when:
+Newtype wrappers (e.g., Address(u32))
+
+Performance-critical tight representations
+
+Use tuples when:
+Temporary return values
+
+Small local transformations
+
+⚖️ Comparison Summary
+Feature	Tuple	Tuple Struct	Struct
+Named fields	❌	❌	✅
+Lightweight	✅	✅	✅
+Readability	❌	⚠️	✅
+Extensible	❌	❌	✅
+Pattern matching	✅	✅	✅
+🚀 Practical Recommendation
+For your use cases (compilers, IR, MLPL, COR24 tooling):
+
+Default to struct unless you have a very specific reason not to.
+
+If you want “named tuple ergonomics,” combine:
+
+struct
+
+destructuring
+
+short field names
+
+🧪 Example (Compiler IR Style)
+struct Add {
+    lhs: u32,
+    rhs: u32,
+}
+
+let Add { lhs, rhs } = node;
+This gives you:
+
+named semantics
+
+tuple-like unpacking
+
+future extensibility (e.g., add metadata)
+
+If you want something closer to OCaml
+Rust intentionally avoids:
+
+(x=1, y=2)
+But you can approximate with:
+
+struct Point { x: i32, y: i32 }
+and destructuring.
+
+👍 Bottom line
+Rust doesn’t have “named tuples” because:
+
+struct is the named tuple—just more powerful.
+
+If you want, I can show:
+
+how to design IR nodes using struct vs tuple tradeoffs
+
+or how to build a macro that generates named-tuple-like types with zero boilerplate
+
+
+Consider the following discussion and propose a corresponding Rust example 
+imagine we have a verb that takes 4 inputs, it expects an x, y coordinate, as well as a color, and also a transparency, and it reuturns a Boolean result of success or failure. 
+i will show you the signature of this verb:
+ plot⠀⎛x y  color  transparency⎠⠀───‣⠀⎛successˀ⎠ 
+⠀
+marc f. — 2:22 PM
+⠀
+now lets mint a tuple variable:
+ ▪coord₂ ───‣ ⎛x y⎠ 
+
+this tuple variable is actually a verb that pushes its own local vars onto the stack for us whenever invoked.
+
+note that subscript "2" that suffixes the name of the tuple variable, this is to inform both compiler and reader that this verb outputs 2 values.
+
+
+side note:
+ALL verbs will ALWAYS have the mapping operator (this guy: "───‣") in their signature.
+so macros, functions, operators, etc. always have "───‣" in their signatures.
+
+
+we could also have minted and initialized the coord₂ variable in one stroke this way:
+▪coord₂ ───‣ ⎛x y⎠  ⟵  3 , 9
+
+
+or seperately:
+▪coord₂ ───‣ ⎛x y⎠
+coord₂ ⟵ 3 , 9
+
+
+because it is a true tuple var, we can easily do this:
+a , b  ⟵  coord₂
+
+
+
+me thinks you get the idea.
+⠀
+⠀
+now lets put all this to practical use.
+
+
+watch the magic:
+⠀
+Mike@work — 2:24 PM
+continue; brb
+marc f. — 2:25 PM
+⠀
+coord₂  ⟵  3 , 9
+
+plot⎛coord₂ Red 50%⎠
+⠀
+
+⠀
+we can visually see that the verb plot is having FOUR values passed to it, even though only 3 names appear in the parm list of its invocation.
+and we can have as much refinement of control/expression as we please.
+for example, i could make a tuple that has the coordinate as well as the color, or with the transparency too.
+so:
+⠀
+plot⎛point₄⎠
+⠀
+notice that i didn't have to overload the plot function.
+i just use it willy-nilly.
+Mike@work — 2:28 PM
+or coord3 for x y z
+
+Thought for a couple of seconds
+You want a Rust analogue of:
+
+plot ⎛x y color transparency⎠ ───‣ ⎛successˀ⎠
+
+coord₂ ───‣ ⎛x y⎠
+coord₂ ⟵ 3 , 9
+
+plot⎛coord₂ Red 50%⎠
+Rust does not have automatic tuple-splicing in function calls, so this will not work directly:
+
+plot(coord2, Color::Red, 0.5); // not the same as plot(x, y, color, alpha)
+But Rust can model the idea cleanly with named tuple-like structs and a trait that converts different “point descriptions” into the canonical four plotting arguments.
+
+Rust version: tuple variables as “argument bundles”
+#[derive(Debug, Clone, Copy)]
+struct Coord2 {
+    x: i32,
+    y: i32,
+}
+
+#[derive(Debug, Clone, Copy)]
+struct Coord3 {
+    x: i32,
+    y: i32,
+    z: i32,
+}
+
+#[derive(Debug, Clone, Copy)]
+enum Color {
+    Red,
+    Green,
+    Blue,
+}
+
+#[derive(Debug, Clone, Copy)]
+struct Transparency(f32);
+
+impl Transparency {
+    fn percent(value: f32) -> Self {
+        Self(value / 100.0)
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+struct Point4 {
+    x: i32,
+    y: i32,
+    color: Color,
+    transparency: Transparency,
+}
+Now define a trait meaning:
+
+“This thing can be expanded into the arguments needed by plot.”
+
+trait IntoPlotArgs {
+    fn into_plot_args(self) -> Point4;
+}
+Implement it for a full point:
+
+impl IntoPlotArgs for Point4 {
+    fn into_plot_args(self) -> Point4 {
+        self
+    }
+}
+And for a coordinate plus extra values:
+
+impl IntoPlotArgs for (Coord2, Color, Transparency) {
+    fn into_plot_args(self) -> Point4 {
+        let (coord, color, transparency) = self;
+
+        Point4 {
+            x: coord.x,
+            y: coord.y,
+            color,
+            transparency,
+        }
+    }
+}
+Now plot accepts anything that can become plotting arguments:
+
+fn plot(args: impl IntoPlotArgs) -> bool {
+    let Point4 {
+        x,
+        y,
+        color,
+        transparency,
+    } = args.into_plot_args();
+
+    println!(
+        "plot x={x}, y={y}, color={color:?}, transparency={}",
+        transparency.0
+    );
+
+    true
+}
+Usage:
+
+fn main() {
+    let coord2 = Coord2 { x: 3, y: 9 };
+
+    // Equivalent to: plot⎛coord₂ Red 50%⎠
+    let success = plot((coord2, Color::Red, Transparency::percent(50.0)));
+
+    println!("success = {success}");
+
+    // Equivalent to: point₄ ───‣ ⎛x y color transparency⎠
+    let point4 = Point4 {
+        x: 3,
+        y: 9,
+        color: Color::Blue,
+        transparency: Transparency::percent(25.0),
+    };
+
+    // Equivalent to: plot⎛point₄⎠
+    let success = plot(point4);
+
+    println!("success = {success}");
+}
+Important Rust distinction
+In the original language idea, this:
+
+plot⎛coord₂ Red 50%⎠
+means coord₂ contributes two stack values.
+
+In Rust, values do not automatically expand into multiple arguments. Instead, we usually make the grouping explicit:
+
+plot((coord2, Color::Red, Transparency::percent(50.0)));
+That outer tuple is the “argument bundle.”
+
+More direct positional version
+You can also keep the canonical low-level function separate:
+
+fn plot_raw(x: i32, y: i32, color: Color, transparency: Transparency) -> bool {
+    println!("plot x={x}, y={y}, color={color:?}, transparency={}", transparency.0);
+    true
+}
+Then use a wrapper trait:
+
+fn plot(args: impl IntoPlotArgs) -> bool {
+    let p = args.into_plot_args();
+    plot_raw(p.x, p.y, p.color, p.transparency)
+}
+That maps nicely to your conceptual model:
+
+coord₂ ───‣ x y
+point₄ ───‣ x y color transparency
+plot consumes x y color transparency
+For coord₃
+A 3D coordinate can be modeled separately:
+
+#[derive(Debug, Clone, Copy)]
+struct Coord3 {
+    x: i32,
+    y: i32,
+    z: i32,
+}
+Then either:
+
+fn plot3d(coord: Coord3, color: Color, transparency: Transparency) -> bool {
+    println!(
+        "plot3d x={}, y={}, z={}, color={:?}, transparency={}",
+        coord.x, coord.y, coord.z, color, transparency.0
+    );
+
+    true
+}
+Or create another trait:
+
+trait IntoPlot3dArgs {
+    fn into_plot3d_args(self) -> (Coord3, Color, Transparency);
+}
+Bottom line
+The Rust equivalent of your tuple-verb idea is usually:
+
+struct Coord2 { x: i32, y: i32 }
+struct Point4 { x: i32, y: i32, color: Color, transparency: Transparency }
+
+trait IntoPlotArgs {
+    fn into_plot_args(self) -> Point4;
+}
+
+fn plot(args: impl IntoPlotArgs) -> bool { ... }
+This gives you most of the expressive benefit:
+
+plot((coord2, Color::Red, Transparency::percent(50.0)));
+plot(point4);
+without overloading plot, and while staying idiomatic Rust.
+
+
+How can you take this discussion and produce equivalent APL?
+watch this:
+instead of functions, for us, the verbs for obtaining the max and min are binary operators;
+these guys ───‣  ⋏ and  ⋎
+
+so:    a ⋏ b    would be   max(a, b)  in other PLs.
+but, we can overload for the outputs, and do this:
+⠀
+q , r  ⟵  a ⋏₂ b
+⠀
+
+which would guarantee that q be bigger or same size as r.
+we can sort a and b this way:
+⠀
+a , b  ⟵  a ⋎₂ b
+⠀
+
+so that a is guaranteed to now be smaller (or same size) as b
+so we can have verbs that return a single value, or a tuple of values.
+Mike@work — 2:36 PM
+3 ⌈ 5 in APL (going back to your max) 
+marc f. — 2:37 PM
+⠀
+quotient ⟵ a ÷ b
+
+integer , fractional  ⟵  a ÷₂ b
+⠀
+
+
+see what i mean Vern?
+
+Thought for a couple of seconds
+You can model this in APL, but with one important caveat:
+
+APL functions return one array value, but that value may itself be a vector, nested vector, matrix, namespace, etc.
+
+So “multiple return values” are usually represented as a single structured result that you destructure by assignment.
+
+Max / min in APL
+APL already has scalar max and min:
+
+3 ⌈ 5   ⍝ max → 5
+3 ⌊ 5   ⍝ min → 3
+So your notation:
+
+a ⋏ b      ⟹ max(a,b)
+a ⋎ b      ⟹ min(a,b)
+maps naturally to:
+
+a ⌈ b
+a ⌊ b
+Returning both values: “sort two values”
+Your:
+
+q , r ⟵ a ⋏₂ b
+meaning:
+
+q ≥ r
+can be written as an APL function returning a two-element vector:
+
+Max2 ← { (⍺⌈⍵) (⍺⌊⍵) }
+Usage:
+
+q r ← 3 Max2 5
+q
+⍝ 5
+
+r
+⍝ 3
+Similarly, your:
+
+a , b ⟵ a ⋎₂ b
+meaning:
+
+a ≤ b
+can be:
+
+Min2 ← { (⍺⌊⍵) (⍺⌈⍵) }
+Usage:
+
+a b ← 3 Min2 5
+a
+⍝ 3
+
+b
+⍝ 5
+Quotient vs quotient-and-remainder style
+APL already has division:
+
+quotient ← a ÷ b
+For integer and fractional parts:
+
+Div2 ← {
+    q ← ⌊⍺÷⍵
+    f ← (⍺÷⍵) - q
+    q f
+}
+Usage:
+
+integer fractional ← 7 Div2 3
+integer
+⍝ 2
+
+fractional
+⍝ 0.3333333333
+But if you mean integer quotient and remainder, then this is closer:
+
+DivRem ← {
+    q ← ⌊⍺÷⍵
+    r ← ⍺ - ⍵×q
+    q r
+}
+Usage:
+
+q r ← 7 DivRem 3
+q
+⍝ 2
+
+r
+⍝ 1
+The APL idea
+So this language idea:
+
+q , r ⟵ a ⋏₂ b
+a , b ⟵ a ⋎₂ b
+integer , fractional ⟵ a ÷₂ b
+maps to idiomatic APL as:
+
+q r ← a Max2 b
+a b ← a Min2 b
+integer fractional ← a Div2 b
+Compact version
+Max2   ← { (⍺⌈⍵) (⍺⌊⍵) }
+Min2   ← { (⍺⌊⍵) (⍺⌈⍵) }
+Div2   ← { q←⌊⍺÷⍵ ⋄ q ((⍺÷⍵)-q) }
+DivRem ← { q←⌊⍺÷⍵ ⋄ q (⍺-⍵×q) }
+The closest APL equivalent to “a verb that returns a tuple” is:
+
+result ← function arguments
+x y z ← result
+or directly:
+
+x y z ← function arguments
+APL does not need special suffix syntax like ⋏₂; you can just name the variant Max2, or in an APL-like language, define ⌈₂ as a distinct glyph/operator meaning “return both max and min.”
+
+
+Does APL2 make this easier, more concise?
+
+Short answer: APL2 doesn’t change the core model, but it does make this style cleaner and more expressive thanks to nested arrays and strand assignment.
+
+🧠 Restating the goal
+You want this conceptual pattern:
+
+q , r ⟵ a ⋏₂ b      ⍝ return (max, min)
+a , b ⟵ a ⋎₂ b      ⍝ return (min, max)
+integer , fractional ⟵ a ÷₂ b
+i.e., verbs that can return multiple values (tuples) and destructure them naturally.
+
+🧩 What APL2 adds
+Compared to classic APL:
+
+1. First-class nested arrays
+You can return structured results cleanly.
+
+2. Strand assignment
+You can destructure directly:
+
+q r ← result
+3. Cleaner composition (no hacks needed)
+✅ APL2 version (clean and concise)
+Max + Min together
+Max2 ← { (⍺⌈⍵) (⍺⌊⍵) }
+Usage:
+
+q r ← 3 Max2 5
+That’s already quite close to your idea.
+
+Even more APL-ish: avoid recomputing
+Max2 ← {
+    hi ← ⍺⌈⍵
+    lo ← ⍺⌊⍵
+    hi lo
+}
+Sorting two values
+Sort2 ← { (⍺⌊⍵) (⍺⌈⍵) }
+
+a b ← 5 Sort2 3
+⍝ a=3, b=5
+🔢 Division variants
+Integer + fractional
+Div2 ← {
+    q ← ⌊⍺÷⍵
+    f ← (⍺÷⍵) - q
+    q f
+}
+i f ← 7 Div2 3
+Quotient + remainder (more common)
+DivRem ← {
+    q ← ⌊⍺÷⍵
+    r ← ⍺ - ⍵×q
+    q r
+}
+q r ← 7 DivRem 3
+✨ Making it feel like your “⋏₂” idea
+APL2 doesn’t support glyph overloading like ⋏₂, but you can get close:
+
+Naming convention
+⌈2 ← { (⍺⌈⍵) (⍺⌊⍵) }
+⌊2 ← { (⍺⌊⍵) (⍺⌈⍵) }
+Usage:
+
+q r ← 3 ⌈2 5
+a b ← 3 ⌊2 5
+This is very close to your notation:
+
+a ⋏₂ b
+a ⋎₂ b
+🧠 Why this works in APL2
+APL2 treats:
+
+(⍺⌈⍵) (⍺⌊⍵)
+as a vector (strand) of results, which is exactly your “tuple.”
+
+Then:
+
+q r ← ...
+is parallel assignment (destructuring).
+
+⚖️ Comparison to your model
+Concept	Your language	APL2
+multi-return verb	⋏₂	function returning vector
+tuple	⎛x y⎠	strand / vector
+destructuring	q , r ⟵	q r ←
+overload arity	suffix _2	naming convention
+🚀 Idiomatic APL2 takeaway
+APL2 already naturally supports your idea:
+
+Max2 ← { (⍺⌈⍵) (⍺⌊⍵) }
+q r ← a Max2 b
+No special syntax needed.
+
+💡 Deeper insight (important)
+What you’re designing:
+
+verbs that return multiple values
+
+In APL thinking becomes:
+
+verbs return arrays; arrays can represent multiple values
+
+That’s why APL doesn’t need special tuple-return syntax.
+
+👍 Final answer
+Yes — APL2 makes this easier and more natural, not by adding tuple-return syntax, but because:
+
+Nested arrays act as tuples
+
+Strand assignment gives clean destructuring
+
+Functions returning vectors are idiomatic
+
+So your idea maps almost directly to:
+
+q r ← (⍺⌈⍵) (⍺⌊⍵)
+wrapped in a function.
+
+If you want, I can push this further into:
+
+tacit (point-free) APL style
+
+operator-based versions (closer to your “verb modifiers”)
+
+or how this maps into your MLPL language design cleanly
+
+
+A programming language designer claims that no programming language has named tuples.  What does this mean?
+
+Let’s unpack the claim carefully, because it’s not literally true, but it can be true depending on how the designer is defining terms.
+
+🧠 Restating the claim
+“No programming language has named tuples.”
+
+This usually means:
+
+What people call “named tuples” are actually something else (typically structs/records), not true tuples with names.
+
+So the argument hinges on what counts as a tuple.
+
+🧩 Step 1 — What is a “tuple” (strict sense)?
+In a strict, type-theoretic / PL design sense:
+
+A tuple is:
+
+Ordered
+
+Positional
+
+Anonymous field access
+
+Identified by arity and types only
+
+Example (Rust / many languages):
+
+let t: (i32, i32) = (3, 9);
+Access:
+
+t.0
+t.1
+Key property:
+
+The meaning of each element is determined by position, not name.
+
+🧩 Step 2 — What is a “named tuple”?
+In many languages (Python, C#, Swift, etc.), a “named tuple” looks like:
+
+Point(x=3, y=9)
+or:
+
+(int x, int y) p = (3, 9);
+These give you:
+
+Positional structure
+
+Named field access (p.x, p.y)
+
+🧨 The designer’s argument
+The claim is usually:
+
+The moment you give tuple elements names, it is no longer a tuple — it becomes a record/struct.
+
+Because:
+
+1. Names change identity semantics
+Compare:
+
+(i32, i32)
+vs:
+
+{x: i32, y: i32}
+In many type systems:
+
+(i32, i32) ≠ (y: i32, x: i32) (if names matter)
+
+But {x: i32, y: i32} = {y: i32, x: i32} (order doesn’t matter)
+
+So:
+
+Named fields imply record semantics, not tuple semantics.
+
+2. Access mode changes
+Tuple:
+
+t.0
+Named tuple:
+
+p.x
+That’s no longer positional—it’s field-based access.
+
+3. Evolution behavior differs
+Tuples:
+
+Fragile to change (add/remove/reorder breaks everything)
+
+Records:
+
+Can evolve (add fields, reorder, defaults, etc.)
+
+So:
+
+Named tuples behave like lightweight records, not tuples.
+
+⚖️ So what languages call “named tuples”?
+Python — collections.namedtuple
+Point = namedtuple('Point', ['x', 'y'])
+Internally:
+
+It's basically a tuple subclass + attribute access
+
+But semantically:
+
+Acts like a record
+
+C#
+(int x, int y) p = (3, 9);
+Names:
+
+Are mostly compile-time sugar
+
+Can be erased or ignored
+
+So:
+
+It’s still fundamentally a tuple
+
+Names are optional metadata
+
+Rust
+No named tuples.
+
+You must use:
+
+struct Point { x: i32, y: i32 }
+Rust’s stance is effectively:
+
+If you want names, use a struct.
+
+Swift
+let p = (x: 3, y: 9)
+But:
+
+Type identity is still positional
+
+Names are partially cosmetic
+
+🧠 The deeper philosophical point
+The designer is likely asserting:
+
+There are only two real categories:
+
+Tuples → positional, anonymous
+
+Records/structs → named, semantic
+
+And “named tuples” are:
+
+either
+
+tuples with cosmetic labels
+
+or records pretending to be tuples
+
+🧩 Mapping to your earlier language ideas
+Your system:
+
+⎛x y⎠
+is interesting because:
+
+It is a tuple
+
+But you’re associating names with positions
+
+And allowing destructuring:
+
+a , b ⟵ coord₂
+So your design is closer to:
+
+tuples with semantic labels that don’t change positional identity
+
+That’s actually rare.
+
+⚖️ Summary
+The claim:
+
+“No programming language has named tuples”
+
+means:
+
+In a strict sense, you must choose:
+
+positional tuples
+
+or named records
+
+but not both simultaneously without changing semantics.
+
+👍 Practical takeaway
+Most languages that “have named tuples” are:
+
+either adding labels to tuples (cosmetic)
+
+or providing lightweight structs
+
+Truly combining:
+
+positional semantics
+
+named access
+
+interchangeable usage
+
+is non-trivial and uncommon
+
+🚀 Your design insight (important)
+What you’re exploring:
+
+coord₂ ───‣ ⎛x y⎠
+plot⎛coord₂ Red 50%⎠
+is actually pushing toward:
+
+first-class tuple decomposition + argument splicing + semantic labeling
+
+That goes beyond what most mainstream languages support.
+
+If you want, I can:
+
+classify languages by how “real” their named tuples are
+
+or show how to design a type system that truly supports your model without ambiguity
+
+
+So this can be added to which languages and how. e.g. Rust via traits, possibly macros; lisp via macros, Forth via words (perhaps), others?  How would you add what is missing to "popular" languages/
+
+Thought for a few seconds
+You’re asking how to add the missing pieces:
+
+named tuple bundles
+
+tuple destructuring
+
+argument expansion / splicing
+
+verbs that accept either raw args or bundled args
+
+optionally, arity-signaling names like coord₂, point₄, ÷₂
+
+Most popular languages already have some of this. The hard part is combining all of it cleanly.
+
+Core pattern
+Your model can be described as:
+
+coord₂ ───‣ x y
+plot   ⟵  x y color transparency ───‣ successˀ
+
+plot(coord₂ Red 50%)
+Meaning:
+
+coord₂ expands into two arguments at the call site.
+Most languages lack that exact automatic expansion. They usually require either:
+
+plot(coord.x, coord.y, red, alpha)
+or:
+
+plot(coord, red, alpha)
+or:
+
+plot((*coord, red, alpha))     ⍝ pseudo
+Rust
+Rust can approximate this well with structs + traits + macros.
+
+Trait approach
+#[derive(Clone, Copy)]
+struct Coord2 {
+    x: i32,
+    y: i32,
+}
+
+#[derive(Clone, Copy)]
+enum Color {
+    Red,
+    Green,
+    Blue,
+}
+
+#[derive(Clone, Copy)]
+struct Transparency(f32);
+
+struct PlotArgs {
+    x: i32,
+    y: i32,
+    color: Color,
+    transparency: Transparency,
+}
+
+trait IntoPlotArgs {
+    fn into_plot_args(self) -> PlotArgs;
+}
+
+impl IntoPlotArgs for PlotArgs {
+    fn into_plot_args(self) -> PlotArgs {
+        self
+    }
+}
+
+impl IntoPlotArgs for (Coord2, Color, Transparency) {
+    fn into_plot_args(self) -> PlotArgs {
+        let (coord, color, transparency) = self;
+
+        PlotArgs {
+            x: coord.x,
+            y: coord.y,
+            color,
+            transparency,
+        }
+    }
+}
+
+fn plot(args: impl IntoPlotArgs) -> bool {
+    let args = args.into_plot_args();
+
+    println!(
+        "plot {}, {}, {:?}, {}",
+        args.x,
+        args.y,
+        args.color,
+        args.transparency.0
+    );
+
+    true
+}
+Usage:
+
+let coord2 = Coord2 { x: 3, y: 9 };
+
+plot((coord2, Color::Red, Transparency(0.5)));
+This is not automatic splicing, but semantically close.
+
+Macro approach
+A macro can make the call look closer:
+
+macro_rules! plot {
+    (($coord:expr), $color:expr, $alpha:expr) => {
+        plot_raw($coord.x, $coord.y, $color, $alpha)
+    };
+    ($x:expr, $y:expr, $color:expr, $alpha:expr) => {
+        plot_raw($x, $y, $color, $alpha)
+    };
+}
+
+fn plot_raw(x: i32, y: i32, color: Color, alpha: Transparency) -> bool {
+    true
+}
+Usage:
+
+plot!((coord2), Color::Red, Transparency(0.5));
+plot!(3, 9, Color::Red, Transparency(0.5));
+Rust verdict
+Rust is good for this when the “tuple bundle” is part of a typed API. Traits are better for libraries. Macros are better for DSL-like surface syntax.
+
+Lisp / Scheme / Racket
+Lisp is one of the easiest places to add this because code is data.
+
+You can define a macro that expands:
+
+(plot coord2 red 0.5)
+into:
+
+(plot-raw x y red 0.5)
+depending on whether coord2 is known to be a bundle.
+
+Conceptually:
+
+(defmacro plot (&rest args)
+  ;; inspect args, expand tuple bundles, emit call to plot-raw
+  ...)
+A simple version could use lists:
+
+(defparameter coord2 '(3 9))
+
+(defun plot-raw (x y color alpha)
+  (format t "plot ~A ~A ~A ~A~%" x y color alpha)
+  t)
+
+(defun plot (coord color alpha)
+  (destructuring-bind (x y) coord
+    (plot-raw x y color alpha)))
+Usage:
+
+(plot coord2 'red 0.5)
+With macros, you can go further and make coord₂ expand syntactically.
+
+Lisp verdict
+Lisp is excellent for this. Macros can add the missing call-splicing syntax directly.
+
+Forth
+Forth is conceptually very close because stack effects already describe this world:
+
+\ plot ( x y color alpha -- success )
+\ coord2 ( -- x y )
+A tuple variable can literally be a word that pushes two values:
+
+: coord2  3 9 ;
+
+: plot  ( x y color alpha -- success )
+  \ consume alpha color y x
+  TRUE
+;
+Usage:
+
+coord2 RED 50PCT plot
+This is almost exactly the model.
+
+If you want assignable tuple variables, you can define storage plus a word that pushes both fields:
+
+VARIABLE coord-x
+VARIABLE coord-y
+
+: coord2!  ( x y -- )
+  coord-y ! coord-x ! ;
+
+: coord2   ( -- x y )
+  coord-x @ coord-y @ ;
+Usage:
+
+3 9 coord2!
+coord2 RED 50PCT plot
+Forth verdict
+Forth naturally supports this. Stack effects are already multi-output signatures. Named tuple variables-as-words are idiomatic.
+
+Python
+Python already has named tuples and dataclasses, but not automatic argument expansion from partial bundles unless you use *.
+
+from dataclasses import dataclass
+
+@dataclass
+class Coord2:
+    x: int
+    y: int
+
+def plot(x, y, color, transparency):
+    print(x, y, color, transparency)
+    return True
+
+coord2 = Coord2(3, 9)
+
+plot(coord2.x, coord2.y, "red", 0.5)
+You can add tuple expansion:
+
+@dataclass
+class Coord2:
+    x: int
+    y: int
+
+    def __iter__(self):
+        yield self.x
+        yield self.y
+
+plot(*coord2, "red", 0.5)
+That gets very close:
+
+plot(*coord2, "red", 0.5)
+Python also supports:
+
+q, r = max(a, b), min(a, b)
+or:
+
+def max2(a, b):
+    return max(a, b), min(a, b)
+
+q, r = max2(a, b)
+Python verdict
+Python already has the pieces. The missing thing is automatic splicing without *.
+
+JavaScript / TypeScript
+JavaScript supports destructuring and spread.
+
+type Coord2 = [x: number, y: number];
+
+function plot(
+  x: number,
+  y: number,
+  color: string,
+  transparency: number,
+): boolean {
+  console.log(x, y, color, transparency);
+  return true;
+}
+
+const coord2: Coord2 = [3, 9];
+
+plot(...coord2, "red", 0.5);
+TypeScript has labeled tuple elements:
+
+type Coord2 = [x: number, y: number];
+But those labels are mostly documentation/type tooling, not runtime fields.
+
+You can also do object records:
+
+type Coord2 = {
+  x: number;
+  y: number;
+};
+
+function plotPoint(
+  coord: Coord2,
+  color: string,
+  transparency: number,
+): boolean {
+  return plot(coord.x, coord.y, color, transparency);
+}
+TypeScript verdict
+TypeScript is one of the closest mainstream examples:
+
+plot(...coord2, "red", 0.5);
+That is almost your plot⎛coord₂ Red 50%⎠.
+
+C / C++
+C has structs but no argument splicing.
+
+typedef struct {
+    int x;
+    int y;
+} Coord2;
+
+bool plot_raw(int x, int y, Color color, float alpha);
+
+bool plot_coord2(Coord2 c, Color color, float alpha) {
+    return plot_raw(c.x, c.y, color, alpha);
+}
+C++ can do better with templates:
+
+struct Coord2 {
+    int x;
+    int y;
+};
+
+bool plot_raw(int x, int y, Color color, float alpha);
+
+bool plot(Coord2 c, Color color, float alpha) {
+    return plot_raw(c.x, c.y, color, alpha);
+}
+With structured bindings:
+
+auto [x, y] = coord2;
+With std::tuple:
+
+auto coord2 = std::tuple{3, 9};
+std::apply(
+    [&](auto x, auto y) {
+        plot_raw(x, y, Color::Red, 0.5);
+    },
+    coord2
+);
+C++ verdict
+C++ can express it, but syntax gets heavy unless you write wrappers.
+
+C#
+C# has named tuples:
+
+(int x, int y) coord2 = (3, 9);
+
+bool Plot(int x, int y, Color color, double transparency) {
+    return true;
+}
+But it does not automatically splice:
+
+Plot(coord2.x, coord2.y, Color.Red, 0.5);
+You can write overloads:
+
+bool Plot((int x, int y) coord, Color color, double transparency) {
+    return Plot(coord.x, coord.y, color, transparency);
+}
+Usage:
+
+Plot(coord2, Color.Red, 0.5);
+C# verdict
+Good named tuple support. Missing automatic spreading.
+
+Swift
+Swift has labeled tuples:
+
+let coord2 = (x: 3, y: 9)
+
+func plot(_ x: Int, _ y: Int, _ color: Color, _ transparency: Double) -> Bool {
+    true
+}
+But no automatic spreading:
+
+plot(coord2.x, coord2.y, .red, 0.5)
+You can overload:
+
+func plot(_ coord: (x: Int, y: Int), _ color: Color, _ transparency: Double) -> Bool {
+    plot(coord.x, coord.y, color, transparency)
+}
+Usage:
+
+plot(coord2, .red, 0.5)
+Swift verdict
+Very close conceptually, but no tuple splicing.
+
+Haskell / ML / OCaml / F#
+These languages already treat tuples and pattern matching seriously.
+
+OCaml
+let coord2 = (3, 9)
+
+let plot x y color transparency =
+  true
+
+let x, y = coord2
+let success = plot x y Red 0.5
+Or wrapper:
+
+let plot_coord2 (x, y) color transparency =
+  plot x y color transparency
+Usage:
+
+let success = plot_coord2 coord2 Red 0.5
+OCaml records give names:
+
+type coord2 = { x : int; y : int }
+But tuples themselves are positional.
+
+F#
+F# has tuples, records, destructuring, and currying.
+
+let coord2 = (3, 9)
+
+let plot x y color transparency = true
+
+let plotCoord2 (x, y) color transparency =
+    plot x y color transparency
+Usage:
+
+plotCoord2 coord2 Red 0.5
+Verdict
+Functional languages make destructuring easy, but generally avoid automatic splicing because it complicates type inference and currying.
+
+APL / J / BQN
+APL-family languages already think in arrays and multiple values can be represented as arrays.
+
+coord2 ← 3 9
+plot coord2 red 0.5
+But whether this means “three arguments” or “one vector plus two scalars” depends on the language design.
+
+APL traditionally has monadic/dyadic function calling, so true multi-argument functions are usually represented by arrays or namespaces.
+
+For your language, APL-style tuple bundles are plausible:
+
+coord2 ← 3 9
+plot coord2 red 0.5
+But this is an extension beyond conventional APL call rules.
+
+Verdict
+APL makes tuple values natural, but not ordinary multi-argument call splicing.
+
+How to add this to a language
+The missing feature can be decomposed into four levels.
+
+Level 1 — Tuple return
+Already common.
+
+q, r = max2(a, b)
+Easy to add almost anywhere.
+
+Level 2 — Named tuple bundles
+Common via:
+
+structs
+
+records
+
+dataclasses
+
+labeled tuples
+
+typed dictionaries
+
+objects
+
+Level 3 — Destructuring assignment
+Common in:
+
+Python
+
+JS/TS
+
+Rust
+
+ML-family
+
+Swift
+
+C#
+
+modern C++
+
+Level 4 — Argument splicing from named bundles
+This is the rare part.
+
+Examples:
+
+plot(coord₂ Red 50%)
+meaning:
+
+plot(x, y, Red, 50%)
+To add this safely, the compiler needs to know:
+
+coord₂ has arity 2
+coord₂ expands as x y
+Possible mechanisms:
+
+Mechanism	Best language families
+Macro expansion	Lisp, Rust, Scala, Nim
+Trait/typeclass expansion	Rust, Haskell, Scala
+Spread operator	Python, JS/TS
+Stack effects	Forth, Factor, concatenative languages
+Compiler intrinsic	new language design
+Function overload wrappers	C#, Swift, C++
+Recommended implementation by language family
+Language	Best way to add it
+Rust	traits for semantics, macros for syntax
+Lisp	macros
+Forth	words with stack effects
+Python	__iter__ + *args
+TypeScript	labeled tuples + spread
+C#	named tuples + overloads
+Swift	labeled tuples + overloads
+C++	structs + overloads or std::apply
+OCaml/F#	records/tuples + wrapper functions
+Haskell	typeclasses + pattern matching
+APL-like language	nested arrays / strands + custom call grammar
+Practical design for your own language
+I’d separate the concept into two things:
+
+1. Tuple-valued verbs
+coord₂ ───‣ ⎛x y⎠
+This says:
+
+coord₂ produces two values.
+Equivalent Forth stack effect:
+
+coord2 ( -- x y )
+2. Spliceable invocation
+plot⎛coord₂ Red 50%⎠
+The compiler expands it as:
+
+plot⎛x y Red 50%⎠
+This is not overloading plot. It is call-site expansion.
+
+That distinction matters.
+
+Key warning
+Automatic splicing can become confusing when nested tuples appear:
+
+plot⎛point₄⎠
+plot⎛coord₂ color₂⎠
+plot⎛coord₂ style₂⎠
+You need rules for:
+
+Does a tuple pass as one value or expand into many?
+I would strongly recommend one of these designs:
+
+Option A — Tuple verbs always splice in call context
+Simple and Forth-like.
+
+plot⎛coord₂ Red 50%⎠
+But passing a tuple as one value requires boxing:
+
+plot⎛⎛coord₂⎠ Red 50%⎠
+Option B — Explicit splice marker
+Safer:
+
+plot⎛...coord₂ Red 50%⎠
+Like Python/JS spread.
+
+Option C — Arity-directed expansion
+The compiler knows plot needs four values, so it expands coord₂ only as needed.
+
+Elegant but can become ambiguous.
+
+My recommendation
+For your language design, I’d use:
+
+coord₂ ───‣ ⎛x y⎠
+point₄ ───‣ ⎛x y color transparency⎠
+And allow:
+
+plot⎛coord₂ Red 50%⎠
+plot⎛point₄⎠
+But also define an explicit no-splice form:
+
+plot⎛box coord₂ Red 50%⎠
+or explicit splice form:
+
+plot⎛⌽coord₂ Red 50%⎠
+In mainstream languages, the cleanest analogues are:
+
+plot((coord2, Color::Red, Transparency(0.5)));
+plot(*coord2, "red", 0.5)
+plot(...coord2, "red", 0.5)
+coord2 RED 50PCT plot
+The Forth version is the purest match. The Rust version is the safest typed-library match. The Lisp version is the easiest syntax-extension match.
+
+
+So Lisp is the closest?  The objection to this is the use of postfix notation, so how to do this using infix via Lisp macros?
+
+Yes. Lisp is probably the closest mainstream family for adding this kind of syntax because macros can rewrite a custom surface language into normal Lisp.
+
+But one correction:
+
+Lisp itself is not postfix.
+Lisp is usually prefix: (+ a b), (plot coord₂ red 50%).
+
+Your desired style is closer to infix / mixfix, e.g.:
+
+q , r ⟵ a ⋏₂ b
+plot⎛coord₂ Red 50%⎠
+In Lisp, you can add that with a macro that treats the body as a tiny DSL.
+
+Simple Common Lisp sketch
+Use ordinary Lisp symbols as stand-ins:
+
+(defmacro infix (&body tokens)
+  (compile-infix tokens))
+Then allow forms like:
+
+(infix q , r <- a max2 b)
+(infix plot (coord2 red 50%))
+The macro expands to ordinary Lisp:
+
+(multiple-value-bind (q r)
+    (max2 a b)
+  ...)
+
+(plot-expanded coord2 red 50%)
+Example: multiple-value return
+Common Lisp already has real multiple values:
+
+(defun max2 (a b)
+  (if (>= a b)
+      (values a b)
+      (values b a)))
+
+(defun min2 (a b)
+  (if (<= a b)
+      (values a b)
+      (values b a)))
+Usage in normal Lisp:
+
+(multiple-value-bind (q r)
+    (max2 a b)
+  ...)
+Your DSL could make that look like:
+
+(infix q , r <- a max2 b)
+Example macro expansion idea
+A tiny illustrative macro:
+
+(defmacro let-infix2 (lhs1 comma lhs2 arrow a op b &body body)
+  (declare (ignore comma arrow))
+  `(multiple-value-bind (,lhs1 ,lhs2)
+       (,op ,a ,b)
+     ,@body))
+Usage:
+
+(let-infix2 q , r <- 3 max2 5
+  (format t "q=~A r=~A~%" q r))
+Expands conceptually to:
+
+(multiple-value-bind (q r)
+    (max2 3 5)
+  (format t "q=~A r=~A~%" q r))
+Tuple-splicing call example
+Common Lisp can model coord₂ as a function returning multiple values:
+
+(defun coord2 ()
+  (values 3 9))
+
+(defun plot (x y color transparency)
+  (format t "plot ~A ~A ~A ~A~%" x y color transparency)
+  t)
+A helper macro can splice those returned values:
+
+(defmacro plot-call (coord color transparency)
+  `(multiple-value-call #'plot
+     (,coord)
+     (values ,color ,transparency)))
+Usage:
+
+(plot-call coord2 'red 0.5)
+This behaves like:
+
+plot⎛coord₂ Red 50%⎠
+because coord2 contributes two values.
+
+More Lisp-y version
+(defmacro call-splicing (fn &rest parts)
+  `(multiple-value-call #',fn
+     ,@(mapcar (lambda (part)
+                 (if (and (consp part) (eq (first part) 'splice))
+                     `(,(second part))
+                     `(values ,part)))
+               parts)))
+Usage:
+
+(call-splicing plot
+  (splice coord2)
+  'red
+  0.5)
+Expands conceptually to:
+
+(multiple-value-call #'plot
+  (coord2)
+  (values 'red)
+  (values 0.5))
+To get closer to infix
+You could wrap the DSL:
+
+(lang
+  q , r <- a max2 b
+  plot (splice coord2 red 0.5))
+and have lang parse those tokens.
+
+That is very feasible in Lisp, but it is no longer “normal Lisp syntax.” It is a macro-hosted language.
+
+Why Lisp is strong here
+Feature you want	Common Lisp support
+tuple-returning verbs	native multiple values
+destructuring	multiple-value-bind, destructuring-bind
+call splicing	multiple-value-call
+new syntax	macros / reader macros
+infix DSL	macro parses token list
+So the closest Common Lisp primitives are:
+
+(values ...)
+(multiple-value-bind ...)
+(multiple-value-call ...)
+(defmacro ...)
+Main caution
+Infix syntax inside Lisp is possible, but you usually pay with one of these:
+
+A macro-hosted DSL
+Example: (infix q , r <- a max2 b)
+
+Reader macros
+Example: custom syntax before Lisp even parses it
+
+A full parser
+Best for a serious new language implemented in Lisp
+
+For experimentation, I’d start with:
+
+(infix ...)
+Then only move to reader macros if the notation proves valuable.
+
+
+I mispoke. prefix is objected to by others; solution sought using infix
+
+Yes — the objection is to prefix, and the desired solution is infix / mixfix syntax hosted by Lisp.
+
+Practical answer
+Lisp can still be the implementation substrate, but you probably don’t want users writing raw Lisp. You want a small infix language that compiles into Lisp forms.
+
+For example, your surface language:
+
+q , r ⟵ a ⋏₂ b
+plot⎛coord₂ Red 50%⎠
+could compile to Common Lisp like:
+
+(multiple-value-bind (q r)
+    (max2 a b)
+  ...)
+and:
+
+(multiple-value-call #'plot
+  (coord2)
+  (values 'red)
+  (values 0.5))
+Architecture
+The usual Lisp-based approach is:
+
+infix source text
+   ↓
+reader/parser
+   ↓
+AST
+   ↓
+macro expansion / compiler
+   ↓
+ordinary Lisp
+So Lisp is not the user syntax. Lisp is the compiler target and macro engine.
+
+Small concrete example
+You can start with a macro-hosted DSL:
+
+(lang
+  q , r <- a max2 b
+  plot (splice coord2 red 0.5))
+Where lang rewrites the first line into:
+
+(multiple-value-bind (q r)
+    (max2 a b)
+  ...)
+And the second into:
+
+(multiple-value-call #'plot
+  (coord2)
+  (values red)
+  (values 0.5))
+But to get closer to your actual notation:
+
+q , r ⟵ a ⋏₂ b
+plot⎛coord₂ Red 50%⎠
+you likely need either:
+
+Reader macros in Common Lisp
+
+A custom parser written in Lisp
+
+Racket #lang, which is probably the cleanest route for a serious language experiment
+
+Best option: Racket #lang
+Racket is Lisp-family, but it is designed for building new languages.
+
+You could make a file start with:
+
+#lang tupleverbs
+Then allow syntax like:
+
+q , r <- a max2 b
+plot(coord2 Red 50%)
+or eventually:
+
+q , r ⟵ a ⋏₂ b
+plot⎛coord₂ Red 50%⎠
+The implementation parses that syntax and expands to ordinary Racket.
+
+Why this solves the prefix objection
+Users see:
+
+a ⋏₂ b
+q , r ⟵ ...
+plot⎛coord₂ Red 50%⎠
+The compiler sees:
+
+(max2 a b)
+(multiple-value-bind ...)
+(multiple-value-call ...)
+So you keep Lisp’s macro power without forcing Lisp notation on users.
+
+Bottom line
+Lisp is still a strong implementation choice, but the user-facing solution should be:
+
+an infix DSL compiled by Lisp macros or a Racket #lang, not raw Lisp with prettier operators.
+
+For a serious prototype, I’d use Racket #lang first, then lower the AST into ordinary Racket functions using multiple values.
+
+
+So how could one create a new programming language (infix notation) with the desired support for "named" tuples.  Which implementation languages would be good for this new language PoC?  Perhaps FORTH? How?
+
+Thought for a couple of seconds
+You want a new infix language where “named tuples” are really multi-output value bundles that can be destructured and optionally spliced into calls:
+
+coord₂ ───‣ ⎛x y⎠
+coord₂ ⟵ 3 , 9
+
+plot⎛coord₂ Red 50%⎠
+Meaning:
+
+plot⎛3 9 Red 50%⎠
+Core language design
+I would separate the design into five features.
+
+1. Values vs value streams
+A normal expression returns one value:
+
+a ⋏ b ───‣ max
+A tuple expression returns a value stream:
+
+coord₂ ───‣ x y
+So coord₂ is not just a record. It is closer to a zero-argument verb that emits two stack/result values.
+
+2. Tuple declarations
+▪coord₂ ───‣ ⎛x y⎠
+coord₂ ⟵ 3 , 9
+Compiler stores:
+
+name: coord₂
+arity: 2
+fields: x, y
+types: inferred or declared
+3. Destructuring assignment
+a , b ⟵ coord₂
+Compiles to:
+
+a ← coord₂.x
+b ← coord₂.y
+or, in stack-machine form:
+
+coord₂  → pushes x y
+store b
+store a
+4. Call-site splicing
+plot⎛coord₂ Red 50%⎠
+The compiler expands coord₂ to two arguments because coord₂ has arity 2.
+
+Equivalent lowered form:
+
+plot⎛coord₂.x coord₂.y Red 50%⎠
+5. Multi-output verbs
+q , r ⟵ a ⋏₂ b
+where:
+
+⋏₂ ───‣ ⎛larger smaller⎠
+Lowering:
+
+tmp1 ← max(a,b)
+tmp2 ← min(a,b)
+q ← tmp1
+r ← tmp2
+Best implementation languages for a PoC
+1. Forth — best conceptual match
+Forth is the closest to the model because Forth words already have stack effects:
+
+coord2  ( -- x y )
+plot    ( x y color alpha -- success )
+max2    ( a b -- hi lo )
+Your notation maps almost directly:
+
+coord₂ ───‣ ⎛x y⎠
+to:
+
+: coord2  3 9 ;
+and:
+
+plot⎛coord₂ Red 50%⎠
+to:
+
+coord2 red 50pct plot
+Forth PoC architecture
+Use Forth as the execution model, but write an infix parser in front of it.
+
+your infix language
+   ↓
+parser
+   ↓
+stack-effect checked IR
+   ↓
+Forth words
+   ↓
+Forth VM / native Forth
+Example source:
+
+coord₂ ⟵ 3 , 9
+successˀ ⟵ plot⎛coord₂ Red 50%⎠
+q , r ⟵ a ⋏₂ b
+Could lower to Forth-like IR:
+
+3 9 coord2!
+coord2 RED 50PCT plot success!
+a @ b @ max2 r ! q !
+Minimal Forth-style representation
+VARIABLE coord-x
+VARIABLE coord-y
+
+: coord2!  ( x y -- )
+  coord-y ! coord-x ! ;
+
+: coord2   ( -- x y )
+  coord-x @ coord-y @ ;
+
+: max2     ( a b -- hi lo )
+  2DUP < IF SWAP THEN ;
+
+: min2     ( a b -- lo hi )
+  2DUP > IF SWAP THEN ;
+
+: plot     ( x y color alpha -- success )
+  \ consume four values
+  TRUE ;
+Then:
+
+3 9 coord2!
+coord2 RED 50PCT plot
+This is essentially your semantics.
+
+Why Forth is good
+Pros:
+
+Multi-output words are natural.
+
+Stack effects match your signatures.
+
+Tuple splicing is automatic because everything is already stack-based.
+
+Small interpreter/compiler can be built quickly.
+
+Very good fit for COR24 or other educational VMs.
+
+Cons:
+
+Infix parsing must be added.
+
+Type checking is not native unless you build it.
+
+Error messages can be poor unless you design a typed IR first.
+
+Verdict: Best for a small, elegant PoC.
+
+2. Racket — best for language experimentation
+Racket is probably the best “serious language laboratory.”
+
+You can build:
+
+#lang tupleverbs
+Then allow user syntax like:
+
+q , r <- a max2 b
+plot(coord2 Red 50%)
+or eventually your full notation.
+
+Racket gives you:
+
+macros
+
+parser tooling
+
+hygienic expansion
+
+modules
+
+good error reporting
+
+fast iteration
+
+Racket architecture
+source text
+   ↓
+reader
+   ↓
+syntax objects
+   ↓
+macro expansion
+   ↓
+ordinary Racket
+Multi-output verbs map naturally to Racket’s values:
+
+(define (max2 a b)
+  (if (>= a b)
+      (values a b)
+      (values b a)))
+Destructuring maps to:
+
+(define-values (q r) (max2 a b))
+Spliced calls can map to:
+
+(call-with-values
+  (lambda () (coord2))
+  (lambda (x y)
+    (plot x y 'Red 0.5)))
+or:
+
+(call-with-values coord2
+  (lambda (x y)
+    (plot x y Red 0.5)))
+Why Racket is good
+Pros:
+
+Excellent for new syntax.
+
+Multiple values are built in.
+
+Cleaner than Common Lisp reader macros.
+
+Better tooling for DSLs.
+
+Cons:
+
+Less aligned with your COR24 / embedded direction.
+
+Runtime model is higher-level.
+
+You may later need to port the compiler.
+
+Verdict: Best if the goal is to test the notation and semantics quickly.
+
+3. Rust — best for a durable compiler implementation
+Rust is not ideal for creating new syntax quickly, but it is excellent for building a real parser, compiler, interpreter, or VM.
+
+Architecture:
+
+lexer
+parser
+AST
+name resolver
+arity/type checker
+IR
+interpreter or code generator
+Rust crates that fit:
+
+logos for lexing
+
+chumsky, pest, or lalrpop for parsing
+
+custom IR for stack effects
+
+optional bytecode VM
+
+Rust lowering example
+Source:
+
+q , r ⟵ a ⋏₂ b
+AST:
+
+Assign {
+    lhs: TuplePattern(["q", "r"]),
+    rhs: Binary {
+        op: Max2,
+        lhs: Var("a"),
+        rhs: Var("b"),
+    }
+}
+IR:
+
+PushVar("a")
+PushVar("b")
+Call("max2")       // stack effect: 2 -> 2
+Store("r")
+Store("q")
+Function metadata:
+
+struct VerbSig {
+    name: String,
+    inputs: Vec<NameType>,
+    outputs: Vec<NameType>,
+}
+Example:
+
+VerbSig {
+    name: "plot".into(),
+    inputs: vec![
+        field("x", Type::Int),
+        field("y", Type::Int),
+        field("color", Type::Color),
+        field("transparency", Type::Percent),
+    ],
+    outputs: vec![field("success?", Type::Bool)],
+}
+Why Rust is good
+Pros:
+
+Excellent for a long-lived compiler.
+
+Strong typing helps model arity and stack effects.
+
+Easy to emit bytecode, WASM, COR24 assembly, or C.
+
+Good fit for your existing toolchain.
+
+Cons:
+
+More boilerplate than Racket or Forth.
+
+Syntax experiments are slower.
+
+Unicode parsing needs care.
+
+Verdict: Best for the second PoC, once semantics settle.
+
+4. OCaml — best for compiler implementation ergonomics
+OCaml is a strong compiler-writing language.
+
+Pros:
+
+Algebraic data types make AST/IR clean.
+
+Pattern matching is excellent.
+
+Parser tooling is mature.
+
+Good for type inference experiments.
+
+Example AST shape:
+
+type expr =
+  | Var of string
+  | Int of int
+  | Binary of op * expr * expr
+  | Call of string * expr list
+  | Tuple of expr list
+
+type pattern =
+  | PVar of string
+  | PTuple of pattern list
+This is elegant for implementing:
+
+arity inference
+
+tuple destructuring
+
+operator precedence
+
+lowering to stack IR
+
+Cons:
+
+Less aligned with your Rust/COR24 ecosystem.
+
+Tooling/deployment may be less convenient.
+
+Verdict: Best if you want a clean academic/compiler prototype.
+
+Recommended PoC path
+Phase 1: Forth-style semantic core
+Implement the execution model first:
+
+word signatures
+stack effects
+multi-output verbs
+tuple variables as words
+Example internal words:
+
+coord2 : -- x y
+plot   : x y color transparency -- success
+max2   : a b -- hi lo
+min2   : a b -- lo hi
+div2   : a b -- integer fractional
+This proves the idea.
+
+Phase 2: Infix parser
+Parse:
+
+q , r ⟵ a ⋏₂ b
+plot⎛coord₂ Red 50%⎠
+into stack IR.
+
+For a PoC, support a tiny grammar:
+
+statement  ::= assignment | call
+assignment ::= pattern "⟵" expr
+pattern    ::= name | name "," name | name "," name "," name ...
+expr       ::= binary | call | name | literal | tuple
+binary     ::= expr operator expr
+call       ::= name "⎛" arglist "⎠"
+arglist    ::= expr*
+Phase 3: Arity checker
+Every expression has an output arity:
+
+3              arity 1
+Red            arity 1
+coord₂         arity 2
+a ⋏ b          arity 1
+a ⋏₂ b         arity 2
+plot⎛...⎠      arity 1
+Then verify:
+
+q , r ⟵ a ⋏₂ b     OK: 2 = 2
+q ⟵ a ⋏₂ b         Error: 1 target, 2 outputs
+plot⎛coord₂ Red 50%⎠ OK: 2+1+1 = 4 inputs
+Phase 4: Lower to Forth-like bytecode
+Example:
+
+coord₂ ⟵ 3 , 9
+plot⎛coord₂ Red 50%⎠
+Lowering:
+
+PUSH 3
+PUSH 9
+STORE_TUPLE coord₂
+
+LOAD_TUPLE coord₂   ; pushes x y
+PUSH Red
+PUSH 0.5
+CALL plot
+Best practical choice
+For your PoC, I’d choose one of these two paths:
+
+Fastest conceptual PoC
+Use Forth or a tiny Forth-like VM.
+
+Why:
+
+tuple variable = word that pushes N values
+verb signature = stack effect
+argument splicing = natural stack behavior
+multi-return = natural stack behavior
+This is the cleanest semantic match.
+
+Best serious language PoC
+Use Rust to implement a Forth-like stack IR plus an infix parser.
+
+Why:
+
+You get the Forth semantics.
+
+You keep Rust maintainability.
+
+You can later target COR24, WASM, or a browser demo.
+
+You avoid being locked into an existing Forth syntax.
+
+A minimal Rust-based PoC architecture
+src/
+  lexer.rs
+  parser.rs
+  ast.rs
+  arity.rs
+  ir.rs
+  vm.rs
+  builtins.rs
+Core types:
+
+#[derive(Debug, Clone)]
+enum Expr {
+    Name(String),
+    Int(i64),
+    Percent(f64),
+    Binary {
+        op: String,
+        left: Box<Expr>,
+        right: Box<Expr>,
+    },
+    Call {
+        verb: String,
+        args: Vec<Expr>,
+    },
+}
+
+#[derive(Debug, Clone)]
+enum Pattern {
+    Name(String),
+    Tuple(Vec<String>),
+}
+
+#[derive(Debug, Clone)]
+enum Stmt {
+    Assign {
+        pattern: Pattern,
+        expr: Expr,
+    },
+    Expr(Expr),
+}
+
+#[derive(Debug, Clone)]
+struct VerbSig {
+    name: String,
+    input_arity: usize,
+    output_arity: usize,
+}
+Builtin signatures:
+
+plot:  4 -> 1
+⋏:     2 -> 1
+⋎:     2 -> 1
+⋏₂:    2 -> 2
+⋎₂:    2 -> 2
+÷:     2 -> 1
+÷₂:    2 -> 2
+coord₂: 0 -> 2
+That is exactly the core semantic model.
+
+Why Forth is especially attractive here
+Your language idea is almost a beautified, typed, infix-facing Forth:
+
+Your concept	Forth concept
+verb	word
+───‣ signature	stack effect
+tuple variable emits values	word pushes multiple stack values
+multi-output verb	word leaves multiple values
+plot⎛coord₂ Red 50%⎠	coord2 red 50pct plot
+destructuring assignment	stack stores
+So yes: Forth is not just plausible; it is probably the semantic ancestor of this idea.
+
+But because people object to postfix, the trick is:
+
+Use Forth internally, but expose an infix surface syntax.
+
+That gives you:
+
+friendly syntax outside
+stack-machine elegance inside
+My recommendation:
+
+Infix language → stack-effect checker → Forth-like IR → interpreter/codegen
+That is the cleanest PoC path.
+
+
+Could I use OCaml for the parser and generate FORTH (or an IR used by a FORTH runtime)?
+
+Thought for a couple of seconds
+Yes. OCaml is a very good choice for the parser/compiler front-end, and Forth or a Forth-like IR is a very good execution target for this language.
+
+The architecture would be:
+
+infix tuple-language source
+        ↓
+OCaml lexer/parser
+        ↓
+AST
+        ↓
+name + arity checker
+        ↓
+stack-effect IR
+        ↓
+Forth code or Forth-runtime bytecode
+Why OCaml fits well
+OCaml is strong at the parts that are awkward in Forth:
+
+Concern	OCaml fit
+Parsing infix syntax	Excellent
+AST representation	Excellent
+Pattern matching	Excellent
+Arity/type checking	Excellent
+Error messages	Good
+Code generation	Good
+Forth is strong at the runtime model:
+
+Concern	Forth fit
+Multi-output verbs	Natural
+Stack effects	Natural
+Tuple variables as words	Natural
+Tiny runtime	Excellent
+Embedded VM	Excellent
+So the split is attractive:
+
+OCaml = civilized compiler front-end
+Forth = compact execution model
+Core idea
+Your source:
+
+coord₂ ⟵ 3 , 9
+q , r ⟵ a ⋏₂ b
+successˀ ⟵ plot⎛coord₂ Red 50%⎠
+could lower to Forth-like code:
+
+3 9 coord2!
+a @ b @ max2 r ! q !
+coord2 RED 50PCT plot success !
+Or to a more explicit IR:
+
+PUSH_INT 3
+PUSH_INT 9
+STORE_TUPLE coord₂ 2
+
+LOAD a
+LOAD b
+CALL ⋏₂        ; stack: -- hi lo
+STORE r
+STORE q
+
+LOAD_TUPLE coord₂
+PUSH_COLOR Red
+PUSH_PERCENT 50
+CALL plot
+STORE successˀ
+Suggested OCaml AST
+type name = string
+
+type op =
+  | Max
+  | Min
+  | Max2
+  | Min2
+  | Div
+  | Div2
+  | CustomOp of string
+
+type expr =
+  | EName of name
+  | EInt of int
+  | EPercent of float
+  | EBinary of expr * op * expr
+  | ECall of name * expr list
+  | ETuple of expr list
+
+type pattern =
+  | PName of name
+  | PTuple of name list
+
+type stmt =
+  | SAssign of pattern * expr
+  | SExpr of expr
+  | SVerbSig of name * name list * name list
+Example:
+
+q , r ⟵ a ⋏₂ b
+becomes:
+
+SAssign
+  (PTuple ["q"; "r"],
+   EBinary (EName "a", Max2, EName "b"))
+The critical compiler pass: arity checking
+Every expression should have an output arity.
+
+Examples:
+
+3                       arity 1
+Red                     arity 1
+50%                     arity 1
+coord₂                  arity 2
+a ⋏ b                   arity 1
+a ⋏₂ b                  arity 2
+plot⎛coord₂ Red 50%⎠    arity 1
+The checker validates:
+
+q , r ⟵ a ⋏₂ b
+because:
+
+lhs arity = 2
+rhs arity = 2
+It rejects:
+
+q ⟵ a ⋏₂ b
+because:
+
+lhs arity = 1
+rhs arity = 2
+For calls:
+
+plot⎛coord₂ Red 50%⎠
+the checker sees:
+
+coord₂   → 2
+Red      → 1
+50%      → 1
+total    → 4
+and checks that plot consumes 4 inputs.
+
+Recommended IR
+I would not generate raw Forth immediately. Generate a small stack IR first.
+
+type instr =
+  | IPushInt of int
+  | IPushFloat of float
+  | IPushSymbol of string
+  | ILoad of name
+  | IStore of name
+  | ILoadTuple of name * int
+  | IStoreTuple of name * int
+  | ICall of name
+Then you can have multiple backends:
+
+stack IR → printable Forth
+stack IR → bytecode VM
+stack IR → COR24 assembly later
+stack IR → browser visualizer
+This also makes debugging much easier.
+
+Forth output style
+Tuple variable
+Source:
+
+coord₂ ⟵ 3 , 9
+Forth lowering:
+
+3 9 coord2!
+Runtime definitions:
+
+VARIABLE coord-x
+VARIABLE coord-y
+
+: coord2!  ( x y -- )
+  coord-y ! coord-x ! ;
+
+: coord2   ( -- x y )
+  coord-x @ coord-y @ ;
+Multi-output max
+Source:
+
+q , r ⟵ a ⋏₂ b
+Forth lowering:
+
+a @ b @ max2 r ! q !
+Definition:
+
+: max2  ( a b -- hi lo )
+  2DUP < IF SWAP THEN ;
+Plot call
+Source:
+
+successˀ ⟵ plot⎛coord₂ Red 50%⎠
+Forth lowering:
+
+coord2 RED 50PCT plot success !
+Definition:
+
+: plot  ( x y color transparency -- success )
+  \ implementation here
+  TRUE ;
+Parser options in OCaml
+For a PoC, choose one:
+
+Tool	Good for
+ocamllex + menhir	Serious grammar, good errors
+angstrom	Parser combinators, flexible
+sedlex	Unicode lexing
+Hand-written Pratt parser	Best for custom infix operators
+Given your notation includes Unicode operators like:
+
+⟵
+───‣
+⎛ ⎠
+⋏₂
+⋎₂
+÷₂
+I would probably use:
+
+sedlex + Pratt parser
+or:
+
+sedlex + menhir
+For early experimentation, a Pratt parser may be simpler because operator precedence is central.
+
+Design recommendation
+Use OCaml to build:
+
+frontend:
+  lexer
+  parser
+  AST
+  arity checker
+  stack IR generator
+
+runtime:
+  Forth-like stack VM
+Then optionally emit real Forth later.
+
+Why not emit raw Forth first?
+Because direct Forth generation makes it harder to:
+
+produce good errors
+
+visualize compilation
+
+test arity expansion
+
+retarget to COR24
+
+support optimization
+
+inspect stack effects
+
+A stack IR gives you a clean middle layer.
+
+Minimal milestone plan
+Milestone 1: arithmetic and tuples
+Support:
+
+a ⟵ 3
+b ⟵ 9
+q , r ⟵ a ⋏₂ b
+Milestone 2: tuple variables
+Support:
+
+coord₂ ⟵ 3 , 9
+a , b ⟵ coord₂
+Milestone 3: call splicing
+Support:
+
+successˀ ⟵ plot⎛coord₂ Red 50%⎠
+Milestone 4: explicit signatures
+Support:
+
+plot ⎛x y color transparency⎠ ───‣ ⎛successˀ⎠
+coord₂ ───‣ ⎛x y⎠
+Milestone 5: backend split
+Support both:
+
+--emit-ir
+--emit-forth
+--run-vm
+Bottom line
+Yes:
+
+OCaml parser/compiler + Forth-like runtime
+is one of the best combinations for this idea.
+
+I’d implement it as:
+
+infix source
+  → OCaml AST
+  → arity-checked stack IR
+  → Forth code or Forth VM bytecode
+That gives you Lisp-like language-building power, Forth-like multi-value semantics, and a clean path toward COR24 or browser visualization later.
+
+
+Note this sample syntax (inside a lisp comment; ignore the semi-colons)
+;                             ;         ⎧ 1 →
+;;   • Power (n : ℤ  e : ℤ) → (p : ℤ) ← ⎨ loop e times    iff e is positive
+;;                                      ⎩ n (×) →
+;
+
+Noted. This sample adds a few important syntax/design clues:
+
+• Power (n : ℤ  e : ℤ) → (p : ℤ) ← ⎧ 1 →
+                                  ⎨ loop e times    iff e is positive
+                                  ⎩ n (×) →
+The apparent meaning is:
+
+Power takes:
+  n : integer
+  e : integer
+
+Power returns:
+  p : integer
+and the implementation is roughly:
+
+if e is positive:
+    start with 1
+    loop e times multiplying by n
+A corresponding conventional pseudocode reading:
+
+Power(n : ℤ, e : ℤ) -> p : ℤ =
+    p ← 1
+    repeat e times:
+        p ← p × n
+    return p
+Or in Rust-ish form:
+
+fn power(n: i64, e: i64) -> i64 {
+    assert!(e >= 0);
+
+    let mut p = 1;
+
+    for _ in 0..e {
+        p *= n;
+    }
+
+    p
+}
+For your language design, this suggests the syntax has:
+
+Syntax	Likely role
+• Power	function/verb definition
+(n : ℤ e : ℤ)	named typed input tuple
+→ (p : ℤ)	named typed output tuple
+←	definition/body introducer
+⎧ ⎨ ⎩	guarded alternatives / structured body
+iff e is positive	guard / condition
+n (×) →	repeated reduction / multiplication pipeline
+The interesting connection to the earlier tuple discussion is that both the input side and output side are already named tuples:
+
+(n : ℤ  e : ℤ) → (p : ℤ)
+So a compiler could treat this as:
+
+Power : ⎛n : ℤ, e : ℤ⎠ ───‣ ⎛p : ℤ⎠
+and lower it to a stack effect:
+
+Power  ( n e -- p )
+This fits the OCaml-front-end / Forth-like-IR design very naturally.
+
+
+create instructions for an AI Coding agent sufficient for it to produce docs/{architecture,prd,design,plan}.md documents.
+
+Thought for a couple of seconds
+Below is a ready-to-paste instruction set for an AI coding agent.
+
+# Task: Create Initial Project Documentation
+
+Create the following documentation files:
+
+```text
+docs/
+  architecture.md
+  prd.md
+  design.md
+  plan.md
+The project is a proof-of-concept programming language with infix notation, named tuple-like multi-value bundles, multi-output verbs, and a compiler pipeline that may use OCaml as the parser/compiler front-end and a Forth-like stack IR/runtime as the execution model.
+
+Core Language Concept
+The language should support syntax and semantics inspired by examples like:
+
+plot ⎛x y color transparency⎠ ───‣ ⎛successˀ⎠
+
+coord₂ ───‣ ⎛x y⎠
+coord₂ ⟵ 3 , 9
+
+a , b ⟵ coord₂
+
+plot⎛coord₂ Red 50%⎠
+Meaning:
+
+coord₂ expands to two values: x y
+plot receives four values: x y color transparency
+Also support multi-output verbs:
+
+q , r ⟵ a ⋏₂ b
+where ⋏₂ returns two values, e.g. larger and smaller.
+
+APL-like examples:
+
+a ⋏ b       means max(a,b)
+a ⋎ b       means min(a,b)
+
+q , r ⟵ a ⋏₂ b
+a , b ⟵ a ⋎₂ b
+Power function sample syntax:
+
+• Power (n : ℤ  e : ℤ) → (p : ℤ) ← ⎧ 1 →
+                                      ⎨ loop e times    iff e is positive
+                                      ⎩ n (×) →
+Interpret this as a named, typed input tuple and named, typed output tuple:
+
+Power : ⎛n : ℤ, e : ℤ⎠ ───‣ ⎛p : ℤ⎠
+Lowering naturally to a stack effect:
+
+Power ( n e -- p )
+Required Documents
+docs/prd.md
+Write a Product Requirements Document.
+
+Include:
+
+Purpose
+Describe the language PoC as an experimental infix programming language exploring:
+
+named tuple-like multi-value bundles
+
+tuple destructuring
+
+argument splicing
+
+multi-output verbs
+
+Forth-like stack-effect semantics
+
+OCaml compiler front-end
+
+Forth-like IR/runtime backend
+
+Target Users
+Include at least:
+
+language designers
+
+compiler implementers
+
+Forth/APL/Lisp/OCaml enthusiasts
+
+educators building compiler visualizations
+
+people experimenting with multi-value function semantics
+
+Goals
+Include:
+
+readable infix syntax
+
+explicit verb signatures
+
+named input/output tuples
+
+arity checking
+
+tuple destructuring
+
+call-site argument expansion
+
+lowering to stack IR
+
+optional generation of Forth code
+
+Non-goals
+Include:
+
+not a production language initially
+
+not a full Hindley-Milner type system initially
+
+not a replacement for OCaml/Forth/Rust
+
+not optimizing for runtime performance in the first PoC
+
+not requiring full Unicode syntax in the very first prototype if ASCII aliases are easier
+
+Example User Stories
+Include stories such as:
+
+define a tuple variable coord₂
+
+destructure it into x , y
+
+call plot⎛coord₂ Red 50%⎠
+
+define multi-output verbs like ⋏₂
+
+compile source to stack IR
+
+emit Forth-like code
+
+inspect arity errors
+
+MVP
+Define a minimal version supporting:
+
+integer literals
+
+identifiers
+
+assignment
+
+tuple assignment
+
+binary operators
+
+function/verb calls
+
+tuple-valued variables
+
+arity checking
+
+stack IR output
+
+docs/architecture.md
+Write a high-level architecture document.
+
+Include this architecture:
+
+source code
+  ↓
+lexer
+  ↓
+parser
+  ↓
+AST
+  ↓
+name resolution
+  ↓
+arity/type checking
+  ↓
+stack-effect IR
+  ↓
+backend(s)
+      ├── interpreter
+      ├── Forth code generator
+      └── future COR24/WASM backend
+Describe each layer.
+
+Implementation Language Recommendation
+Recommend OCaml for the parser/compiler front-end because of:
+
+algebraic data types
+
+pattern matching
+
+parser tooling
+
+clean AST modeling
+
+good fit for compiler construction
+
+Recommend a Forth-like IR/runtime because:
+
+multi-output words are natural
+
+stack effects map directly to verb signatures
+
+tuple variables can compile to words that push multiple values
+
+call-site splicing becomes stack concatenation
+
+Important Semantic Model
+Document that every expression has an output arity:
+
+3                       arity 1
+Red                     arity 1
+50%                     arity 1
+coord₂                  arity 2
+a ⋏ b                   arity 1
+a ⋏₂ b                  arity 2
+plot⎛coord₂ Red 50%⎠    arity 1
+Document that function calls check total argument arity:
+
+plot⎛coord₂ Red 50%⎠
+is valid because:
+
+coord₂ = 2 outputs
+Red    = 1 output
+50%    = 1 output
+total  = 4 inputs
+Backends
+Describe:
+
+stack IR interpreter
+
+Forth code emission
+
+possible COR24 assembly backend
+
+possible browser visualization backend
+
+docs/design.md
+Write the lower-level design document.
+
+Include concrete data structures and grammar sketches.
+
+Syntax
+Document both Unicode and possible ASCII aliases.
+
+Examples:
+
+⟵    <-
+───‣  ->
+⋏     max
+⋎     min
+⋏₂    max2
+⋎₂    min2
+⎛ ⎠   ( )
+Grammar Sketch
+Include a rough grammar:
+
+program     ::= statement*
+statement   ::= assignment | verb_decl | expr
+assignment  ::= pattern assign_op expr
+pattern     ::= identifier | identifier "," identifier+
+expr        ::= literal
+              | identifier
+              | tuple_expr
+              | call_expr
+              | binary_expr
+call_expr   ::= identifier call_open arglist call_close
+arglist     ::= expr*
+binary_expr ::= expr operator expr
+verb_decl   ::= "•"? identifier input_tuple arrow output_tuple body?
+AST Sketch in OCaml
+Include something like:
+
+type name = string
+
+type typ =
+  | TInt
+  | TBool
+  | TColor
+  | TPercent
+  | TNamed of string
+  | TUnknown
+
+type op =
+  | Max
+  | Min
+  | Max2
+  | Min2
+  | Div
+  | Div2
+  | Mul
+  | CustomOp of string
+
+type expr =
+  | EName of name
+  | EInt of int
+  | EBool of bool
+  | EPercent of float
+  | EBinary of expr * op * expr
+  | ECall of name * expr list
+  | ETuple of expr list
+
+type pattern =
+  | PName of name
+  | PTuple of name list
+
+type stmt =
+  | SAssign of pattern * expr
+  | SExpr of expr
+  | SVerbSig of verb_sig
+
+and field = {
+  field_name : name;
+  field_type : typ;
+}
+
+and verb_sig = {
+  verb_name : name;
+  inputs : field list;
+  outputs : field list;
+}
+IR Sketch
+Include a stack IR:
+
+type instr =
+  | IPushInt of int
+  | IPushBool of bool
+  | IPushPercent of float
+  | IPushSymbol of string
+  | ILoad of name
+  | IStore of name
+  | ILoadTuple of name * int
+  | IStoreTuple of name * int
+  | ICall of name
+Arity Checking
+Document rules for:
+
+literals
+
+scalar variables
+
+tuple variables
+
+binary operators
+
+multi-output operators
+
+function calls
+
+assignment patterns
+
+Include examples of valid and invalid programs.
+
+Valid:
+
+q , r ⟵ a ⋏₂ b
+successˀ ⟵ plot⎛coord₂ Red 50%⎠
+Invalid:
+
+q ⟵ a ⋏₂ b
+plot⎛coord₂ Red⎠
+Explain why.
+
+Forth Lowering
+Show examples:
+
+Source:
+
+coord₂ ⟵ 3 , 9
+Forth-like lowering:
+
+3 9 coord2!
+Source:
+
+a , b ⟵ coord₂
+Lowering:
+
+coord2 b ! a !
+Source:
+
+successˀ ⟵ plot⎛coord₂ Red 50%⎠
+Lowering:
+
+coord2 RED 50PCT plot success !
+docs/plan.md
+Write an implementation plan.
+
+Use phased milestones.
+
+Phase 0: Project skeleton
+create repo structure
+
+create docs
+
+create basic test harness
+
+decide on OCaml build tooling
+
+Phase 1: Lexer
+Support:
+
+identifiers
+
+integer literals
+
+percent literals
+
+commas
+
+assignment operator
+
+call delimiters
+
+binary operators
+
+Unicode and ASCII aliases where practical
+
+Phase 2: Parser
+Support:
+
+assignment
+
+tuple assignment
+
+binary expressions
+
+call expressions
+
+tuple expressions
+
+simple verb signatures
+
+Phase 3: AST and pretty-printer
+parse source into AST
+
+pretty-print AST for debugging
+
+add golden tests
+
+Phase 4: Symbol table and arity checker
+register scalar variables
+
+register tuple variables
+
+register builtin verbs
+
+check assignment arity
+
+check call input arity
+
+check output arity
+
+Phase 5: Stack IR generation
+generate IR from AST
+
+support tuple loading/storing
+
+support builtins
+
+support call splicing
+
+Phase 6: Interpreter
+implement simple stack VM
+
+execute generated IR
+
+support builtin operations:
+
+max
+
+min
+
+max2
+
+min2
+
+div
+
+div2
+
+plot mock
+
+Phase 7: Forth code generator
+emit readable Forth-like code
+
+include runtime word assumptions
+
+generate stack comments
+
+Phase 8: Tests and demos
+Include demo programs:
+
+coord₂ ⟵ 3 , 9
+a , b ⟵ coord₂
+q , r ⟵ 3 ⋏₂ 5
+successˀ ⟵ plot⎛coord₂ Red 50%⎠
+• Power (n : ℤ  e : ℤ) → (p : ℤ)
+Risks
+Include:
+
+Unicode parsing complexity
+
+operator precedence ambiguity
+
+tuple splicing ambiguity
+
+difference between tuple-as-one-value and tuple-as-splice
+
+premature type-system complexity
+
+backend coupling
+
+Success Criteria
+The PoC succeeds when:
+
+sample programs parse
+
+arity errors are detected
+
+stack IR is generated
+
+simple programs execute in the interpreter
+
+Forth-like output can be emitted
+
+docs explain the language model clearly
+
+Style Requirements
+Write the documents in clear technical Markdown.
+
+Use:
+
+headings
+
+concise explanations
+
+examples
+
+tables where useful
+
+code blocks
+
+diagrams using plain text where appropriate
+
+Do not overbuild. The documents should describe a practical PoC, not a full production language.
+
+Prefer concrete examples over abstract claims.
+
+Be explicit about uncertain or future work.
+
+
+need a catchy code-name for this unnamed PoC language, perhaps emphasizing the first-class named tuples aspect.  Suggest names
+
+You’re looking for a codename that captures the essence:
+
+first-class named tuples / bundles
+
+multi-output verbs
+
+argument splicing
+
+infix readability
+
+underlying flow / stream / stack semantics
+
+I’ll group suggestions by conceptual angle so you can pick based on what you want to emphasize.
+
+🔷 Tuple / Bundle–centric names (most on-point)
+These highlight your core differentiator.
+
+Strong, direct
+Tuplex – tuple + express
+
+Tuplar – feels like a system/language
+
+Tuplix – compact, modern
+
+Tuplex – clean and memorable
+
+Tuplon – “unit of tuples”
+
+Tuplet – musical + grouping metaphor (nice!)
+
+Tuplify – dynamic, maybe too playful
+
+Tuplexion – heavier, more “engine-like”
+
+Named / semantic bundles
+Nameda – named + data
+
+Ntuple – but already used in math/data
+
+Nomial – naming + structure vibe
+
+NomTuple – explicit but less catchy
+
+Bindle – a literal bundle (quirky but memorable)
+
+Bundlex – strong fit
+
+Bundl – modern minimal
+
+Bundra – stylized
+
+🔷 Multi-value / flow / expansion
+These capture the splicing / multi-output nature.
+
+Multa – multi-values
+
+Valence – chemistry metaphor (arity!)
+
+Arity – very on-the-nose, but strong
+
+Aris – shorter version
+
+Ario – smoother
+
+Emit – values emitted (Forth-like)
+
+Emitter – less language-like
+
+Outflow – multi-output semantics
+
+Splice – very relevant concept
+
+Splicon – more “language-y”
+
+Splicia – softer variant
+
+Unfold – tuple expansion idea
+
+Expandra – expansion theme
+
+🔷 APL / math / symbolic vibe
+Fits your notation style (⋏₂, ⎛ ⎠, etc.)
+
+Glyph – minimal and powerful
+
+Glypha – language-like
+
+Glyphix – glyph + infix
+
+Sigil – symbolic language feel
+
+Sigilx
+
+Vectra – vector/tuple vibe
+
+Arrayon
+
+Strand – APL strand concept
+
+Strandl
+
+Strandra
+
+Dyadix – APL dyadic inspiration
+
+Monadia – counterpart
+
+Arithex – arithmetic + structure
+
+🔷 Forth / stack / execution model
+Highlights your underlying semantics.
+
+Stackra
+
+Stacklet
+
+Stackon
+
+Flowstack
+
+Stackflow
+
+Pushpop (fun, but toy-like)
+
+Concata – concatenative inspiration
+
+Concatrix
+
+Flowth – flow + Forth (nice hybrid)
+
+Forthix – direct homage
+
+Stacklisp – hybrid vibe
+
+🔷 Infix / readability angle
+If you want to emphasize syntax instead of semantics:
+
+Infixa
+
+Infixor
+
+Infixia
+
+Mixfix – technically accurate term
+
+Mixfixa
+
+Midfix
+
+Readable (too generic)
+
+Clarity
+
+Clearix
+
+🔷 “Named tuple as first-class value stream” (deep concept)
+More abstract but very aligned:
+
+Streama
+
+Streamix
+
+ValStream
+
+Flowval
+
+FlowTuple
+
+TupleFlow
+
+TupleStream ← very descriptive
+
+Strim (stream + trim)
+
+EmitTuple
+
+TupleEmit
+
+🔷 My top picks (balanced)
+If I had to narrow it down to the strongest candidates:
+
+🥇 Best overall
+Tuplet – elegant, memorable, subtly perfect metaphor
+
+TupleFlow – very descriptive of your semantics
+
+Bundlex – strong, modern, intuitive
+
+🥈 Very strong
+Valence – captures arity beautifully
+
+Splice / Splicon – directly tied to your key feature
+
+Glyphix – fits your symbolic syntax style
+
+Flowth – if you want to hint at Forth roots
+
+🥉 More experimental
+Strandra
+
+Tuplon
+
+Aris
+
+EmitTuple
+
+🚀 Recommendation
+If you want something:
+
+clean, memorable, and not overly technical → Tuplet
+
+descriptive of the core innovation → TupleFlow
+
+modern / “language brand” feel → Bundlex
+
+If you want, I can:
+
+check name collisions (GitHub, crates, domains)
+
+generate logo / branding directions
+
+align naming with your repo/org naming conventions (sw-*)
+
+or propose names specifically tailored to COR24 / MLPL ecosystem
+
+
+Tuplet works
+
+Good choice—Tuplet is strong: short, memorable, and it subtly communicates “grouping” without sounding overly technical.
+
+Here’s how you can anchor it for your PoC:
+
+🚀 Tuplet — Positioning
+Tagline ideas:
+
+Tuplet: first-class value bundles in an infix language
+
+Tuplet: infix programming with multi-value verbs
+
+Tuplet: named tuple streams, not structs
+
+Tuplet: where functions return flows, not just values
+
+🧠 One-line definition
+Tuplet is an infix language where expressions can emit multiple named values, and those values flow directly into other expressions.
+
+🧩 Core identity (use this in docs)
+Named tuple-like bundles → coord₂
+
+Multi-output verbs → ⋏₂, ÷₂
+
+Destructuring assignment → a , b ⟵ coord₂
+
+Call-site expansion → plot⎛coord₂ Red 50%⎠
+
+Explicit signatures → ⎛x y⎠ ───‣ ⎛successˀ⎠
+
+Stack semantics underneath → Forth-like execution
+
+📁 Suggested repo naming
+Since you’ve used sw-* patterns:
+
+sw-tuplet
+
+sw-tuplet-lang
+
+sw-tuplet-poc
+
+sw-tuplet-compiler
+
+web-sw-tuplet-demo (for Yew/WASM later)
+
+🧪 File extensions
+Pick something simple:
+
+.tup ← clean and obvious
+
+.tpl ← shorter but ambiguous
+
+.tuplet ← explicit but longer
+
+Recommendation: .tup
+
+🔤 ASCII fallback syntax (early PoC)
+Even if Unicode is the goal, define ASCII early:
+
+<-      instead of ⟵
+->      instead of ───‣
+( )     instead of ⎛ ⎠
+max2    instead of ⋏₂
+min2    instead of ⋎₂
+Example:
+
+coord2 <- 3, 9
+q, r <- a max2 b
+success <- plot(coord2 Red 50%)
+🧭 CLI naming
+tuplet → main CLI
+
+tupletc → compiler
+
+tupletr → interpreter/runtime
+
+Example usage:
+
+tuplet run example.tup
+tuplet compile example.tup --emit-ir
+tuplet compile example.tup --emit-forth
+🧱 Internal naming alignment
+Map your concepts cleanly:
+
+Tuplet concept	Internal name
+verb	Verb
+signature	VerbSig
+tuple variable	TupleVar
+arity	arity
+expansion	splice
+stack IR	StackIR
+🎯 Elevator pitch (use everywhere)
+Tuplet is an experimental infix programming language where values are not just single results—expressions can emit multiple named values that flow directly into other expressions, combining the readability of infix syntax with the power of stack-based execution.
+
+If you want next steps, I can:
+
+generate a README.md
+
+scaffold a repo structure
+
+create a logo concept prompt
+
+or define the first 20 example programs for Tuplet demos
+
+
+
+

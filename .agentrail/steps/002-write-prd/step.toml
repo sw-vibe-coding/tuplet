@@ -1,0 +1,11 @@
+number = 2
+slug = "write-prd"
+status = "pending"
+description = """
+# Step: write-prd
+
+Write `docs/prd.md` — a concise Product Requirements Doc..."""
+role = "production"
+context_files = []
+created_at = "2026-04-24T18:45:27"
+commits = []

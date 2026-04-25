@@ -1,0 +1,11 @@
+number = 1
+slug = "bootstrap-commit"
+status = "in-progress"
+description = """
+# Step: bootstrap-commit
+
+Commit the untracked seed files so the project has ..."""
+role = "production"
+context_files = []
+created_at = "2026-04-24T18:45:22"
+commits = []
