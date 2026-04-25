@@ -64,7 +64,31 @@ REG_RS_DATA_DIR=work/reg-rs reg-rs run -p tuplet_ocaml_smoke
 
 ### tuplet_forth_smoke
 
-Not yet created. Covered by the next saga step (`forth-smoke-test`).
+Proves the `sw-cor24-forth` toolchain runs a Forth program end-to-
+end on the COR24 emulator.
+
+- Source: `tests/smoke/forth_hello.input` -- `65 EMIT\n`.
+- Expected output (after preprocess): `UART output: A ok` plus
+  emulator summary lines.
+
+The reg-rs preprocess filter keeps only the lines from `UART
+output:` forward, so per-instruction UART RX/TX trace lines (which
+can shift with emulator version) don't break the baseline.
+
+Invocation:
+
+```
+PP="grep -A 100 '^UART output:' || true"
+cor24-run --run ~/github/sw-embed/sw-cor24-forth/forth.s \
+  -u "$(cat tests/smoke/forth_hello.input)" \
+  --speed 0 -n 5000000 2>&1 | eval "$PP"
+```
+
+Re-run:
+
+```
+REG_RS_DATA_DIR=work/reg-rs reg-rs run -p tuplet_forth_smoke
+```
 
 ## Blocked
 

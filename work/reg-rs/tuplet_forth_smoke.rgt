@@ -1,0 +1,5 @@
+command = 'cor24-run --run /Users/mike/github/sw-embed/sw-cor24-forth/forth.s -u "$(cat /Users/mike/github/sw-vibe-coding/tuplet/tests/smoke/forth_hello.input)" --speed 0 -n 5000000 2>&1'
+timeout = 30
+preprocess = "grep -A 100 '^UART output:' || true"
+exit_code = 0
+desc = "sw-cor24-forth wiring smoke -- 65 EMIT prints A"
