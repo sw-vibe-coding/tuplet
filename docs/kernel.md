@@ -226,9 +226,10 @@ arranges otherwise (e.g. `if/then/else` uses the literal Forth
 `IF/ELSE/THEN` to skip the unwanted branch at *runtime*).
 
 For `-> verb`-form templates, each slot is wrapped as `{ ... }`
-(an anonymous verb literal) and its xt is passed as a value. This
-form *does* require anonymous verbs and is the path for
-higher-order user code.
+(an anonymous verb literal) and its xt is passed as a value.
+Anonymous verbs lower to kernel `:NONAME ... ;` (available since
+`sw-embed/sw-cor24-forth#5`); this is the path for higher-order
+user code.
 
 ### Matching policy
 
@@ -334,11 +335,12 @@ Reshapes from prior plan:
   be rewritten. Plan for `sw-cor24-ocaml` to reveal real gaps
   (efficient string compare, mutable maps); file upstream issues
   if encountered.
-- **`:NONAME` absent.** `sw-cor24-forth` does not currently
-  provide `:NONAME` (filed as enhancement issue
-  `sw-embed/sw-cor24-forth#5`). Anonymous verbs in mechanism (2)
-  use synthetic-name colon definitions until that lands; this
-  bloats the dictionary but is otherwise functionally equivalent.
+- **~~`:NONAME` absent.~~ Resolved.**
+  `sw-embed/sw-cor24-forth#5` is closed (commit `ff7b43d`);
+  `:NONAME ( -- xt )` is now a kernel primitive. Anonymous verbs
+  in mechanism (2) lower directly to `:NONAME ... ;`; the
+  synthetic-name fallback is no longer needed. Verified locally
+  via reg-rs baseline `tuplet_forth_noname_smoke`.
 - **Mixfix ambiguity.** Longest-match + first-declared-wins is a
   PoC compromise. Real solution needs precedence levels per
   template. Defer.

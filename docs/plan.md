@@ -176,10 +176,10 @@ thunks per `docs/kernel.md`.
 - `tests/ir/*.tup` + `*.expected.ir`.
 
 **Primary risks.**
-- IR ergonomics for thunks; the synthetic-name strategy
-  documented in `docs/kernel.md` (until
-  `sw-embed/sw-cor24-forth#5` lands `:NONAME`) needs a stable
-  naming scheme.
+- IR ergonomics for thunks. `:NONAME` is now available
+  (`sw-embed/sw-cor24-forth#5` closed), so thunks lower
+  directly without the synthetic-name fallback originally
+  planned.
 
 ### 5. `tuplet-interp`
 
@@ -233,11 +233,11 @@ reg-rs, compare against the interpreter.
 - `work/generated/` (gitignored output dir).
 
 **Primary risks.**
-- Synthetic-name dictionary bloat from anonymous verbs; track
-  count, file `sw-embed/sw-cor24-forth#5` followup if it bites.
 - Per-instruction RX/TX trace lines from `cor24-run` shifting
   with emulator version; existing grep-preprocess pattern from
   `tuplet_forth_smoke` is the template.
+- Anonymous verbs use kernel `:NONAME` (verified via
+  `tuplet_forth_noname_smoke`).
 
 ### 7. `tuplet-prelude` (the bootstrap-proof saga)
 
@@ -329,8 +329,6 @@ Per `docs/prd.md` non-goals; not revisited in this plan:
 
 ## Future work (Phase 9+, not planned)
 
-- `:NONAME` once `sw-embed/sw-cor24-forth#5` lands; remove
-  synthetic-name fallback.
 - Mixfix precedence levels (Agda-style) replacing
   longest-match.
 - Hygienic macros.

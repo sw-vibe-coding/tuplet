@@ -64,6 +64,24 @@ Re-run:
 REG_RS_DATA_DIR=work/reg-rs reg-rs run -p tuplet_ocaml_smoke
 ```
 
+### tuplet_forth_noname_smoke
+
+Proves the `:NONAME` primitive (added in `sw-embed/sw-cor24-forth#5`,
+commit `ff7b43d`) works on this machine. The Tuplet emitter's
+anonymous-verb path (mechanism 2 in `docs/kernel.md`) depends on
+this primitive.
+
+- Source: `tests/smoke/forth_noname.input` -- `:NONAME 65 EMIT 10
+  EMIT ; EXECUTE`.
+- Expected output (post-preprocess): `UART output: A` then a
+  newline, then ` ok`.
+
+Re-run:
+
+```
+REG_RS_DATA_DIR=work/reg-rs reg-rs run -p tuplet_forth_noname_smoke
+```
+
 ### tuplet_forth_smoke
 
 Proves the `sw-cor24-forth` toolchain runs a Forth program end-to-
