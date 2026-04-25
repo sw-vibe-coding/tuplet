@@ -1,0 +1,11 @@
+number = 1
+slug = "build-skeleton"
+status = "in-progress"
+description = """
+# Step: build-skeleton
+
+Lay down the minimum project skeleton needed to run a..."""
+role = "production"
+context_files = []
+created_at = "2026-04-25T12:08:35"
+commits = []

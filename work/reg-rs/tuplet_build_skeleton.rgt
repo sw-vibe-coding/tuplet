@@ -1,0 +1,4 @@
+command = "bash /Users/mike/github/sw-vibe-coding/tuplet/scripts/run-ml.sh /Users/mike/github/sw-vibe-coding/tuplet/src/lex_main.ml"
+timeout = 60
+exit_code = 0
+desc = 'tuplet build skeleton -- prints "tuplet-lexer skeleton" via sw-cor24-ocaml'

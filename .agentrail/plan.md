@@ -1,78 +1,90 @@
-# Saga: tuplet-scaffold
+# Saga: tuplet-lexer
 
 ## Goal
 
-Bring up the Tuplet PoC language — an infix programming language with
-first-class named tuple bundles (`coord2`), multi-output verbs (`max2`,
-`div2`), destructuring assignment, and call-site argument splicing,
-grounded in Forth-like stack semantics underneath — far enough that a
-follow-up saga can begin implementing the lexer.
+Build a hand-written lexer for `.tup` source. Implementation
+language: the OCaml subset hosted by `sw-cor24-ocaml` (ints,
+bools, strings, lists, pairs, options, pattern matching,
+`let rec`, `read_line`, qualified names). The lexer must support
+**dynamic registration of new literal tokens** so the parser can
+extend the keyword set as it processes `syntax` declarations
+(per `docs/kernel.md`).
 
-See `docs/research.txt` for the language motivation and sketches.
-Tagline: "Tuplet: first-class value bundles in an infix language."
+## Source of truth
 
-## Targets
+- `docs/grammar.md` -- lexical rules and Unicode alias table.
+- `docs/kernel.md` -- the parser/lexer extension contract;
+  literal tokens registered at runtime.
+- `docs/plan.md` -- saga 1 entrance/exit criteria.
 
-- Parser host: `~/github/sw-embed/sw-cor24-ocaml` — an integer-subset
-  OCaml interpreter (strings, lists, pairs, options, pattern matching)
-  running on the COR24 P-code VM. The Tuplet parser will be written as
-  an OCaml program that runs in this interpreter.
-- Runtime / test environment: `~/github/sw-embed/sw-cor24-forth` — DTC
-  Forth on COR24. Generated Tuplet code will be lowered to Forth words
-  and executed here.
-- Regression testing: `reg-rs` (golden-output tool) for both the parser
-  and the Forth runtime.
+## In scope
 
-## Phased arc (for orientation; only Phase 0 is in this saga)
+- Tokenizing every form documented in `docs/grammar.md`:
+  identifiers (including arity-suffix digits and trailing `?`),
+  integer literals, percent literals, comma, parens, `<-`,
+  `->`, `_` (template slot), `{` `}` (anonymous-verb literal),
+  `#` line comments, the symbolic `+ - *` operators, named
+  operators (`max`, `min`, `div`, `max2`, `min2`, `div2`).
+- Folding the Unicode aliases from `docs/grammar.md`'s table to
+  their ASCII canonical forms before the parser sees them.
+- A `Lexer.add_literal` (or equivalent) hook that the parser
+  can call to register a new literal token; subsequent re-lexing
+  of source treats that string as a literal token, not as an
+  identifier.
+- A `tuplet lex <file>` CLI mode (or test-only equivalent) that
+  emits a deterministic token-per-line dump for reg-rs baselines.
+- reg-rs baselines under `work/reg-rs/tuplet_lex_*` for each
+  meaningful lexer scenario.
 
-- **Phase 0: project skeleton** — THIS saga
-- Phase 1: lexer
-- Phase 2: parser
-- Phase 3: AST + pretty-printer
-- Phase 4: symbol table + arity checker
-- Phase 5: stack IR
-- Phase 6: reference interpreter
-- Phase 7: Forth code generator
-- Phase 8: tests and demos
+## Out of scope
 
-## This saga's scope (Phase 0)
-
-1. Commit the existing seed docs and `.agentrail/` into git so the
-   project has a clean tracked baseline.
-2. Write a concise `docs/prd.md` for Tuplet distilled from
-   `docs/research.txt`.
-3. Fix an ASCII fallback surface grammar in `docs/grammar.md` (with
-   Unicode aliases noted). Target extension: `.tup`.
-4. Smoke-test the `sw-cor24-ocaml` toolchain: run a trivial `.ml`
-   program and capture a `reg-rs` baseline that proves the parser host
-   is wired up on this machine.
-5. Smoke-test the `sw-cor24-forth` toolchain: run a trivial Forth
-   program on `cor24-run` and capture a `reg-rs` baseline.
-6. Sketch AST + stack IR in `docs/design.md`.
-7. Document Forth lowering rules in `docs/lowering.md` — how tuple
-   assignment, destructuring, calls-with-splicing lower to Forth words.
-8. Write `docs/plan.md` with the phased plan above, split into
-   follow-up sagas.
+- Parsing, AST, IR, semantics. Token stream only.
+- Full UTF-8 codec; the alias table is small and ASCII-canonical
+  post-fold, so byte-pattern matching suffices.
+- Performance tuning. Correctness first.
+- Generated Forth output.
 
 ## Hard rules
 
-- **Do not edit files outside this repo.** All Tuplet code, docs, and
-  tests live in `~/github/sw-vibe-coding/tuplet`.
-- **If `sw-cor24-ocaml` or `sw-cor24-forth` is missing a feature or has
-  a bug**, file a GitHub issue against the upstream repo
-  (`sw-embed/sw-cor24-ocaml` or `sw-embed/sw-cor24-forth`) via `gh
-  issue create`, then mark the current step blocked with `agentrail
-  abort --reason "blocked on <repo>#<issue>"`. Do not work around
-  upstream bugs or missing features in this repo.
-- Never use `.agentrail/` with anything other than `agentrail`
-  subcommands.
+- **Do not edit outside this repo.**
+- Missing OCaml-subset features in `sw-cor24-ocaml` are GitHub
+  issues (`gh issue create --repo sw-embed/sw-cor24-ocaml`),
+  never local workarounds. If a step is blocked, file the issue
+  and `agentrail abort --reason "blocked on
+  sw-embed/sw-cor24-ocaml#<n>"`.
+- Push every commit in the same session.
+- Stage the full `.agentrail/` delta with each step's commit
+  (per `CLAUDE.md` section 4).
+- `markdown-checker` clean on every changed `.md`.
+- reg-rs: track `*.rgt` and `*.out`; ignore `*.tdb` and `*.lock`
+  (already in `.gitignore`).
+- Every new lexer scenario gets a reg-rs baseline before the
+  step closes.
+
+## Phased breakdown
+
+Phase 1.0 -- build skeleton and the token data type.
+Phase 1.1 -- trivia and comments.
+Phase 1.2 -- numeric literals (int, percent).
+Phase 1.3 -- identifiers (ASCII, arity suffix, trailing `?`).
+Phase 1.4 -- punctuation and ASCII operators.
+Phase 1.5 -- Unicode alias folding.
+Phase 1.6 -- dynamic literal registry + parser callback contract.
+Phase 1.7 -- CLI / test-driver wiring; reg-rs baselines.
+
+Each phase becomes one or more steps; the phases above are the
+intended grain, not a binding step list.
 
 ## End state
 
-- All seed + generated docs committed on `main`.
-- `docs/prd.md`, `docs/grammar.md`, `docs/design.md`,
-  `docs/lowering.md`, `docs/plan.md` all present and concise.
-- `reg-rs` baselines for the OCaml and Forth hello-world smoke tests
-  captured.
-- The next saga (`tuplet-lexer`) can start from a clean, documented
-  foundation.
+- `src/` contains the lexer source, runnable via
+  `bash ~/github/sw-embed/sw-cor24-ocaml/scripts/run-ocaml.sh
+  src/lex_main.ml` (or a wrapping script in this repo).
+- `tests/lexer/` contains representative `.tup` inputs and
+  `.expected.tokens` files.
+- `work/reg-rs/tuplet_lex_*` baselines pass.
+- The `Lexer.add_literal` contract is documented in a short
+  `docs/lexer.md` (or appended to `docs/design.md`) so the
+  parser saga can rely on it.
+- `docs/plan.md` saga-index status flips `tuplet-lexer` from
+  `upcoming` to `done`.
