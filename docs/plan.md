@@ -4,6 +4,13 @@
 > kernel/prelude split decided there shapes every saga below.
 > If this plan disagrees with `docs/kernel.md`, the kernel doc
 > wins; raise the disagreement and update this file.
+>
+> **PoC milestone:** `docs/poc-goals.md` defines the single
+> demoable target for this project: a REPL where the user types
+> a `syntax` declaration that adds `do..while` and uses it. The
+> milestone lands inside saga 6 (`tuplet-forth-emit`) plus a
+> small REPL driver -- *not* at the end of saga 8. Sagas 7-8
+> exist to thicken the language; the PoC proves the mechanism.
 
 ## Arc summary
 
@@ -211,7 +218,9 @@ an oracle for the Forth emitter -- not a target itself.
 **Goal.** Emit Forth from IR per `docs/lowering.md`, into
 `work/generated/<basename>.fs`. Concatenate kernel `forth.s` +
 generated file, run under `cor24-run`, capture UART output via
-reg-rs, compare against the interpreter.
+reg-rs, compare against the interpreter. **PoC milestone lands
+here**: the saga's exit also delivers a `tuplet repl` driver
+sufficient to demonstrate `docs/poc-goals.md`.
 
 **Entrance criteria.**
 - `tuplet-ir` and `tuplet-interp` complete.
@@ -229,8 +238,12 @@ reg-rs, compare against the interpreter.
 
 **Key deliverables.**
 - `src/emit.ml`.
-- `bin/tuplet` (the CLI).
+- `bin/tuplet` (the CLI; `tuplet compile`, `tuplet run`,
+  `tuplet repl`).
 - `work/generated/` (gitignored output dir).
+- `work/reg-rs/tuplet_poc_dowhile.{rgt,out}` -- scripted REPL
+  session per `docs/poc-goals.md` acceptance criteria.
+- `docs/poc-demo.md` -- the PoC walkthrough.
 
 **Primary risks.**
 - Per-instruction RX/TX trace lines from `cor24-run` shifting
