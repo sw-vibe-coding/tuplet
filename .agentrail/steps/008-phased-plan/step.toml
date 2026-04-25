@@ -1,0 +1,11 @@
+number = 8
+slug = "phased-plan"
+status = "pending"
+description = """
+# Step: phased-plan
+
+Write `docs/plan.md` -- the durable phased plan for Tupl..."""
+role = "legacy"
+context_files = []
+created_at = "2026-04-24T20:06:51"
+commits = []

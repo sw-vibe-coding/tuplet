@@ -18,13 +18,15 @@ before starting any compiler work in a fresh session.
 
 reg-rs test databases live in `work/reg-rs/`. Committed files:
 
-- `*.rgt` -- test definition + golden baseline output.
+- `*.rgt` -- test definition (command, timeout, preprocess, desc).
+- `*.out` -- captured run output; the golden baseline that `.rgt`
+  compares against on re-run. Both are needed on a fresh clone
+  for tests to have a baseline without re-running.
 
 Gitignored (transient):
 
-- `*.tdb` -- legacy db format.
-- `*.tdb.lock` -- concurrency lock.
-- `*.out` -- latest run output.
+- `*.tdb` -- reg-rs internal state (regenerated on run).
+- `*.lock` -- concurrency lock.
 
 ## Rebasing
 

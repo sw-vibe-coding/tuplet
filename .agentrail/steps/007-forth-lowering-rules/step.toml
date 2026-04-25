@@ -1,6 +1,6 @@
 number = 7
 slug = "forth-lowering-rules"
-status = "in-progress"
+status = "completed"
 description = """
 # Step: forth-lowering-rules
 
@@ -8,4 +8,5 @@ Write `docs/lowering.md` -- the rule-by-rule ma..."""
 role = "legacy"
 context_files = []
 created_at = "2026-04-24T20:02:39"
-commits = []
+completed_at = "2026-04-24T20:06:51"
+commits = ["5ed788a461adfbc7ba33d1d58e54a6916594fe2e"]

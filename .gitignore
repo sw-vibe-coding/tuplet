@@ -1,8 +1,9 @@
-# reg-rs runtime cache -- keep .rgt (test definition + baseline),
-# drop transient runtime files.
+# reg-rs runtime cache.
+# Track: *.rgt (test definition), *.out (captured run output -- golden
+# baseline companion to .rgt). Matches sw-cor24-ocaml convention.
+# Ignore: *.tdb (transient db) and *.lock (concurrency lock).
 work/reg-rs/*.tdb
-work/reg-rs/*.tdb.lock
-work/reg-rs/*.out
+work/reg-rs/*.lock
 
 # Generated Forth output from the Tuplet emitter.
 work/generated/
