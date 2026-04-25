@@ -22,8 +22,12 @@ while IFS= read -r line || [ -n "${line}" ]; do
     expected+="> ${line}"
 done < "${src_path}"
 
-if [ "${raw#${expected}}" != "${raw}" ]; then
-    raw="${raw#${expected}}"
+# Use literal length-based strip rather than ${var#pattern}: the
+# expected prefix contains parens, brackets, and other glob specials
+# that ${var#pat} would interpret as a pattern.
+exp_len=${#expected}
+if [ ${#raw} -ge "${exp_len}" ] && [ "${raw:0:${exp_len}}" = "${expected}" ]; then
+    raw="${raw:${exp_len}}"
 fi
 
 printf '%s\n' "${raw}"

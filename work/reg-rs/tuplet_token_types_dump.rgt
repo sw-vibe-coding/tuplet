@@ -1,0 +1,4 @@
+command = "bash /Users/mike/github/sw-vibe-coding/tuplet/scripts/run-ml.sh /Users/mike/github/sw-vibe-coding/tuplet/src/token_test.ml"
+timeout = 60
+exit_code = 0
+desc = "token type + dump_tokens; representative list including MINT"

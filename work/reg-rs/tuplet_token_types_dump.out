@@ -1,0 +1,16 @@
+MINT
+IDENT  coord2
+RARROW
+LPAREN
+IDENT  x
+IDENT  y
+RPAREN
+LARROW
+INT    3
+COMMA
+INT    9
+LIT    if
+USCORE
+HASH   comment text
+EOF
+0

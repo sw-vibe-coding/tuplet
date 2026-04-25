@@ -1,0 +1,1 @@
+build skeleton: src/, scripts/run-ml.sh wrapper that strips runtime echo prefix, baseline tuplet_build_skeleton; docs/lexer.md stub with OCaml-subset notes
