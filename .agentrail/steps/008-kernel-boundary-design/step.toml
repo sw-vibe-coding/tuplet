@@ -1,6 +1,6 @@
 number = 8
 slug = "kernel-boundary-design"
-status = "in-progress"
+status = "completed"
 description = """
 # Step: kernel-boundary-design
 
@@ -8,4 +8,5 @@ Write `docs/kernel.md` -- the explicit kernel..."""
 role = "production"
 context_files = []
 created_at = "2026-04-24T20:40:03"
-commits = []
+completed_at = "2026-04-24T20:45:00"
+commits = ["aff4760d98f270f499779e9a6337b3475f56baad"]

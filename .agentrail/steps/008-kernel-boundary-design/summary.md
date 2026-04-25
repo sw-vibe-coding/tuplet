@@ -1,0 +1,1 @@
+wrote docs/kernel.md; defined the kernel/prelude boundary and reshaped the saga arc to 8 sagas with tuplet-prelude
