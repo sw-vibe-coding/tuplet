@@ -1,0 +1,1 @@
+sw-cor24-forth wiring verified; reg-rs baseline captured
