@@ -1,0 +1,1 @@
+wrote docs/plan.md per docs/kernel.md (eight sagas, registry-based parser/checker, tuplet-prelude inserted); tuplet-scaffold saga exit criteria met
