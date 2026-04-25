@@ -4,6 +4,9 @@ work/reg-rs/*.tdb
 work/reg-rs/*.tdb.lock
 work/reg-rs/*.out
 
+# Generated Forth output from the Tuplet emitter.
+work/generated/
+
 # OS files
 .DS_Store
 

@@ -1,0 +1,1 @@
+drafted docs/design.md with AST, stack IR, and worked example

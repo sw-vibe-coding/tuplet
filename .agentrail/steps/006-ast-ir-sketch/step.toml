@@ -1,6 +1,6 @@
 number = 6
 slug = "ast-ir-sketch"
-status = "in-progress"
+status = "completed"
 description = """
 # Step: ast-ir-sketch
 
@@ -8,4 +8,5 @@ Write `docs/design.md` -- the low-level design for Tup..."""
 role = "legacy"
 context_files = []
 created_at = "2026-04-24T19:59:29"
-commits = []
+completed_at = "2026-04-24T20:02:38"
+commits = ["122d1c33ad7fcf722f42c27b1415a253e23c271c"]
