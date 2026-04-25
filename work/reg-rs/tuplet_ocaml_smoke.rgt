@@ -1,0 +1,4 @@
+command = "bash ~/github/sw-embed/sw-cor24-ocaml/scripts/run-ocaml.sh /Users/mike/github/sw-vibe-coding/tuplet/tests/smoke/ocaml_hello.ml"
+timeout = 60
+exit_code = 0
+desc = "sw-cor24-ocaml wiring smoke -- prints 42"

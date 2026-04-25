@@ -1,0 +1,12 @@
+# reg-rs runtime cache -- keep .rgt (test definition + baseline),
+# drop transient runtime files.
+work/reg-rs/*.tdb
+work/reg-rs/*.tdb.lock
+work/reg-rs/*.out
+
+# OS files
+.DS_Store
+
+# Editor files
+*.swp
+*~

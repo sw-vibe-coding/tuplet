@@ -1,6 +1,6 @@
 number = 3
 slug = "define-ascii-grammar"
-status = "pending"
+status = "completed"
 description = """
 # Step: define-ascii-grammar
 
@@ -8,4 +8,5 @@ Write `docs/grammar.md` — the Tuplet surface ..."""
 role = "production"
 context_files = []
 created_at = "2026-04-24T18:45:31"
-commits = []
+completed_at = "2026-04-24T18:56:03"
+commits = ["c8f3db250a9a830fa6293df4eff9665dd2edb3ff"]

@@ -1,6 +1,6 @@
 number = 4
 slug = "ocaml-smoke-test"
-status = "pending"
+status = "in-progress"
 description = """
 # Step: ocaml-smoke-test
 
