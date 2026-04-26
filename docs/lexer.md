@@ -23,6 +23,32 @@ REG_RS_DATA_DIR=work/reg-rs reg-rs run -p tuplet_build_skeleton
   new literal tokens at runtime as `syntax` declarations are
   processed.
 
+## Lexing model: byte stream
+
+The lexer is a byte-stream consumer. Input arrives via `getc`
+(one byte at a time, 0..255); output token payload bytes are
+emitted via `putc` (one byte at a time). This matches the
+host's natural API and Forth's `KEY` / `EMIT` convention -- the
+runtime is a byte-oriented system end-to-end.
+
+### EOF sentinel
+
+`getc` blocks at end of input rather than returning a sentinel.
+The lexer uses `\x03` (ETX, ASCII 3) as the in-band EOF marker.
+Every fixture file ends with one ETX byte; the lexer's main
+loop returns when `getc` yields 3.
+
+The choice of ETX is arbitrary but stable: it is not a valid
+character anywhere in Tuplet source and survives shell variable
+round-tripping (which would strip `\x00`).
+
+### Driver
+
+`scripts/run-lexer-fixture.sh <fixture.input>` feeds a fixture
+file's bytes via `OCAML_STDIN`, runs `src/lexer.ml`, strips the
+Pascal runtime's source-echo prefixes, and prints just the
+emitted tokens. reg-rs baselines drive this script per fixture.
+
 ## Token representation
 
 The PoC uses idiomatic OCaml variants -- now supported upstream
@@ -78,24 +104,24 @@ naturally. Confirmed:
 
 ## Open upstream limitations
 
-These remain; workarounds noted are still applied and small
-enough to not pollute the host code:
+These are absent; the lexer's byte-stream design avoids needing
+them, but they would simplify future work:
 
-- **No string `\n` escapes** (`sw-embed/sw-cor24-ocaml#4`).
-  Backslash-n in a literal is two literal chars; LF in a string
-  terminates the source line. Workaround: per-line
-  `print_endline` for any "newline-separated" output.
-- **No 3+ element tuples** (`sw-embed/sw-cor24-ocaml#4`).
-  Workaround: nested pairs `(a, (b, c))` if ever needed; with
-  variants now available, rarely needed.
+- **`String.get` / `s.[i]` / `String.sub` / `Char.chr` /
+  `Char.code` / `print_string`** -- per-character string access
+  and char/int interop. The lexer side-steps the gap by reading
+  bytes via `getc` and emitting via `putc`, never assembling
+  strings from bytes nor pulling characters out of strings.
 - **No string literals in match patterns.** `match x with "foo"
-  -> ...` does not parse. With variants now available,
-  workarounds are rarely needed -- use a variant constructor
-  instead of a string tag. Not separately filed yet; if we hit
-  a real need, file then.
-- **No `(* ... *)` block comments.** Use `# ...` or a comment
-  variant if needed inside Tuplet; OCaml host code uses no
+  -> ...` does not parse. With variants available, the lexer
+  uses variant constructors for tag dispatch instead.
+- **No `(* ... *)` block comments.** OCaml host code uses no
   comments for now.
+
+`sw-embed/sw-cor24-ocaml#4` (string `\n` escapes; 3+ element
+tuples) was actually resolved by upstream fixes verified via
+re-probing today; the issue may not yet be marked closed but
+the runtime accepts both.
 
 ## Implementation pattern (current)
 
