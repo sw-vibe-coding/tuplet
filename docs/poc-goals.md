@@ -40,6 +40,22 @@ The transcript above is the **acceptance scenario**. If the REPL
 can produce that output, with the user typing all of it
 (including the `syntax` declaration), the PoC is met.
 
+## What the PoC actually proves
+
+Even `if/then/else` is meant to be **user-minted**, not built
+in -- it lives in `lib/std.tup` (the prelude, saga 7) as a
+`*syntax` declaration, not in the compiler. The same is true
+for `while`, `match`, every operator, and every conditional
+family. The PoC demonstrates the **mechanism** by exercising
+`do..while`; once the mechanism works, sealed conditionals
+like `if/then/else` and user-defined variants
+(`if-approx`, `if-close?`, math-style `_ if _ else _`)
+all become "just more `*syntax`" entries in `.tup` files.
+
+See `docs/dsl-examples.md` for a catalog of the kinds of
+extensions DSL users are expected to write, and the design
+questions those examples surface.
+
 ## Why `do..while` and not `if..then..else`
 
 `do..while` is a strictly smaller demo target than

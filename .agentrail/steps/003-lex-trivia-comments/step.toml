@@ -1,0 +1,11 @@
+number = 3
+slug = "lex-trivia-comments"
+status = "pending"
+description = """
+# Step: lex-trivia-comments
+
+The first actual lexing function. Inputs: a stri..."""
+role = "legacy"
+context_files = []
+created_at = "2026-04-25T14:33:57"
+commits = []

@@ -1,6 +1,6 @@
 number = 2
 slug = "token-types-and-pp"
-status = "in-progress"
+status = "completed"
 description = """
 # Step: token-types-and-pp
 
@@ -8,4 +8,5 @@ Define the token algebraic data type covering eve..."""
 role = "legacy"
 context_files = []
 created_at = "2026-04-25T13:32:20"
-commits = []
+completed_at = "2026-04-25T14:33:57"
+commits = ["386064571166eeef7f0c2cbb22222118915ec4e0"]
