@@ -1,6 +1,6 @@
 number = 4
 slug = "lex-numeric-literals"
-status = "pending"
+status = "in-progress"
 description = """
 # Step: lex-numeric-literals
 

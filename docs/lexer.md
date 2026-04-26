@@ -79,11 +79,35 @@ constructors have none. Dispatch via `match`.
 
 ### Dump format
 
-`src/token_test.ml` prints one token per line via repeated
-`print_endline` (because string `\n` escapes are still absent
--- `sw-embed/sw-cor24-ocaml#4` open). Each variant maps to a
-fixed-width name plus optional payload. See `dump_tok` in
-`src/token_test.ml` for the full table.
+`src/lexer.ml`'s `dump_tok` writes each token on its own line
+via `putc` byte-by-byte: a fixed-width prefix for the kind
+(stored as an `int list` of byte values, e.g. `[73; 78; 84;
+32; 32; 32; 32]` is `"INT    "`), the payload bytes (for
+`THash`) or the integer rendered as decimal digits (for
+`TInt`/`TPct`), and a final `putc 10` for LF. Examples:
+
+```
+HASH    hello world
+INT    42
+PCT    50
+MINUS
+UNK     <byte-int>
+EOF
+```
+
+### Numeric lexing
+
+Digits accumulate into the integer directly via `n * 10 + (b -
+48)` while `is_digit b` holds. The terminating non-digit byte
+is returned alongside the number; the main loop threads it
+back as the next token's leading byte (one-byte lookahead via
+a `pre` parameter, with `0` as the "no pending byte" sentinel
+since `0x00` is not a valid Tuplet source byte). If the
+post-digit byte is `%` (37) the token is `TPct`, otherwise
+`TInt` and the lookahead byte starts the next token.
+
+`-` (`TMinus`) is its own single-byte token; the parser later
+folds `TMinus` followed by `TInt` into a negative literal.
 
 ## OCaml-subset notes (current)
 

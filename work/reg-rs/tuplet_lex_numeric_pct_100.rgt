@@ -1,0 +1,4 @@
+command = "bash /Users/mike/github/sw-vibe-coding/tuplet/scripts/run-lexer-fixture.sh /Users/mike/github/sw-vibe-coding/tuplet/tests/lexer/numeric_pct_100.input"
+timeout = 60
+exit_code = 0
+desc = "tuplet lex_numeric: pct_100"
