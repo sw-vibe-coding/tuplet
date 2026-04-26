@@ -1,0 +1,86 @@
+;;; tuplet-input.el --- Quail input method for Tuplet glyphs
+;;;
+;;; Example file. Copy to ~/.emacs.d/tuplet-input.el and load
+;;; from your init.el. See docs/emacs-inputs.md.
+
+(require 'quail)
+
+(quail-define-package
+ "Tuplet" "Tuplet" "T" t
+ "Input method for the Tuplet language.
+Type the leading slash to enable, e.g. \\mint -> bullet (U+2022)."
+ nil t t t t nil nil nil nil nil t)
+
+(quail-define-rules
+ ;; Kernel
+ ("\\mint"     ?•)   ; U+2022 bullet (mint)
+ ("\\msq"      ?▪)   ; U+25AA black small square (mint alias)
+ ("\\la"       ?←)   ; U+2190 leftwards arrow (assign)
+ ("\\ra"       ?→)   ; U+2192 rightwards arrow (map)
+ ("\\to"       ?→)
+ ("\\Ra"       ?⇒)   ; U+21D2 rightwards double arrow (test arrow)
+ ("\\("        ?⎛)   ; U+239B shell-bracket left
+ ("\\)"        ?⎞)   ; U+239E shell-bracket right
+ ("\\{"        ?⎧)   ; U+23A7 curly-hook block start
+ ("\\}"        ?⎫)   ; U+23AB curly-hook block end
+
+ ;; Math relations
+ ("\\approx"   ?≈)   ; U+2248
+ ("\\neq"      ?≠)   ; U+2260
+ ("\\leq"      ?≤)   ; U+2264
+ ("\\geq"      ?≥)   ; U+2265
+ ("\\pm"       ?±)   ; U+00B1
+ ("\\inf"      ?∞)   ; U+221E
+
+ ;; Operators
+ ("\\times"    ?×)   ; U+00D7
+ ("\\div"      ?÷)   ; U+00F7
+ ("\\max"      ?⋏)   ; U+22CF curly logical and (max wedge)
+ ("\\min"      ?⋎)   ; U+22CE curly logical or  (min wedge)
+ ("\\and"      ?∧)   ; U+2227
+ ("\\or"       ?∨)   ; U+2228
+ ("\\not"      ?¬)   ; U+00AC
+
+ ;; Subscripts (arity)
+ ("_2"         ?₂)   ; U+2082
+ ("_3"         ?₃)   ; U+2083
+ ("_4"         ?₄)   ; U+2084
+ ("_5"         ?₅)   ; U+2085
+
+ ;; Type symbols
+ ("\\Z"        ?ℤ)   ; U+2124 double-struck Z
+ ("\\R"        ?ℝ)   ; U+211D
+ ("\\N"        ?ℕ)   ; U+2115
+ ("\\C"        ?ℂ)   ; U+2102
+ ("\\in"       ?∈)   ; U+2208
+
+ ;; Boolean suffix
+ ("\\?"        ?ˀ)   ; U+02C0 modifier letter glottal stop
+
+ ;; Greek lowercase
+ ("\\alpha"    ?α)   ; U+03B1
+ ("\\beta"     ?β)
+ ("\\gamma"    ?γ)
+ ("\\delta"    ?δ)
+ ("\\epsilon"  ?ε)
+ ("\\rho"      ?ρ)
+ ("\\lambda"   ?λ)
+ ("\\mu"       ?μ)
+ ("\\sigma"    ?σ)
+ ("\\pi"       ?π)
+ ("\\phi"      ?φ)
+ ("\\theta"    ?θ)
+ ("\\omega"    ?ω)
+
+ ;; Greek uppercase
+ ("\\Sigma"    ?Σ)   ; U+03A3
+ ("\\Pi"       ?Π)
+ ("\\Lambda"   ?Λ)
+ ("\\Omega"    ?Ω)
+ ("\\Phi"      ?Φ)
+ ("\\Theta"    ?Θ)
+ ("\\Delta"    ?Δ))
+
+(provide 'tuplet-input)
+
+;;; tuplet-input.el ends here

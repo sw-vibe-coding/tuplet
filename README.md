@@ -59,6 +59,12 @@ the arc and `docs/poc-goals.md` for the demo target.
   for what comes after the PoC.
 - [`docs/tooling-smoke.md`](docs/tooling-smoke.md) -- how to
   rerun the wiring-confidence tests.
+- [`docs/glyphs.md`](docs/glyphs.md) -- the alphabet of
+  Tuplet glyphs (minimal + suggested).
+- [`docs/emacs-inputs.md`](docs/emacs-inputs.md) -- entering
+  Tuplet glyphs in Emacs (TeX, Agda, custom Quail).
+- [`docs/cli-inputs.md`](docs/cli-inputs.md) -- entering
+  glyphs anywhere via Espanso, XCompose, AHK, etc.
 - [`demos/`](demos/) -- aspirational `.tup` examples.
 
 ## Project layout

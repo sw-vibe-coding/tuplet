@@ -1,0 +1,33 @@
+# tuplet-XCompose -- Tuplet glyph sequences for the X
+# Compose key. Append the body of this file to your
+# ~/.XCompose, then restart your X11/Wayland apps.
+#
+# Trigger style: <Compose> followed by a short ASCII chord
+# that mnemonically matches the glyph.
+
+include "%L"   # base; pulls in system defaults
+
+# Tuplet kernel
+<Multi_key> <m> <i> <n> <t>     : "•"   U2022   # mint
+<Multi_key> <l> <a>             : "←"   U2190   # assign
+<Multi_key> <r> <a>             : "→"   U2192   # map
+<Multi_key> <R> <a>             : "⇒"   U21D2   # test arrow
+
+# Math relations
+<Multi_key> <approxequal>       : "≈"   U2248
+<Multi_key> <less> <equal>      : "≤"   U2264
+<Multi_key> <greater> <equal>   : "≥"   U2265
+<Multi_key> <plus> <minus>      : "±"   U00B1
+<Multi_key> <slash> <equal>     : "≠"   U2260
+
+# Subscripts (arity)
+<Multi_key> <minus> <2>         : "₂"   U2082
+<Multi_key> <minus> <3>         : "₃"   U2083
+<Multi_key> <minus> <4>         : "₄"   U2084
+
+# Greek (selected)
+<Multi_key> <g> <a>             : "α"   U03B1
+<Multi_key> <g> <r>             : "ρ"   U03C1
+<Multi_key> <g> <l>             : "λ"   U03BB
+<Multi_key> <g> <S>             : "Σ"   U03A3
+<Multi_key> <g> <m>             : "μ"   U03BC

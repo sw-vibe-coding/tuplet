@@ -1,0 +1,85 @@
+# tuplet-espanso.yml -- Espanso match file for Tuplet glyphs.
+#
+# Drop this in your Espanso config dir, e.g.:
+#   $(espanso path config)/match/tuplet.yml
+#
+# Each entry: type the trigger, get the replacement.
+# Conventions used here (mirrors emacs-inputs.md):
+#   :mint  for the kernel mint operator
+#   :la    for assign (left arrow)
+#   :ra    for map (right arrow)
+#   :gN    for Greek lower (e.g. :galpha)
+#   :GN    for Greek upper
+#   :sN    for subscript
+#   :tN    for type symbols (Z, R, N, C)
+# Adjust to your taste; the lexer doesn't care -- it folds
+# Unicode glyphs to ASCII at lex time.
+
+matches:
+  # Kernel
+  - trigger: ":mint"     ; replace: "•"   # U+2022 bullet
+  - trigger: ":msq"      ; replace: "▪"   # U+25AA black small square (mint alias)
+  - trigger: ":la"       ; replace: "←"   # U+2190 leftwards arrow (assign)
+  - trigger: ":ra"       ; replace: "→"   # U+2192 rightwards arrow (map)
+  - trigger: ":Ra"       ; replace: "⇒"   # U+21D2 rightwards double arrow (test arrow)
+  - trigger: ":(("       ; replace: "⎛"   # U+239B shell-bracket left
+  - trigger: ":))"       ; replace: "⎞"   # U+239E shell-bracket right
+  - trigger: ":{{"       ; replace: "⎧"   # U+23A7 curly-hook block start
+  - trigger: ":}}"       ; replace: "⎫"   # U+23AB curly-hook block end
+
+  # Math relations
+  - trigger: ":approx"   ; replace: "≈"   # U+2248
+  - trigger: ":neq"      ; replace: "≠"   # U+2260
+  - trigger: ":leq"      ; replace: "≤"   # U+2264
+  - trigger: ":geq"      ; replace: "≥"   # U+2265
+  - trigger: ":pm"       ; replace: "±"   # U+00B1
+  - trigger: ":inf"      ; replace: "∞"   # U+221E
+
+  # Operators
+  - trigger: ":times"    ; replace: "×"   # U+00D7
+  - trigger: ":div"      ; replace: "÷"   # U+00F7
+  - trigger: ":max"      ; replace: "⋏"   # U+22CF curly logical and
+  - trigger: ":min"      ; replace: "⋎"   # U+22CE curly logical or
+  - trigger: ":and"      ; replace: "∧"   # U+2227
+  - trigger: ":or"       ; replace: "∨"   # U+2228
+  - trigger: ":not"      ; replace: "¬"   # U+00AC
+
+  # Subscripts (arity)
+  - trigger: ":s2"       ; replace: "₂"   # U+2082
+  - trigger: ":s3"       ; replace: "₃"   # U+2083
+  - trigger: ":s4"       ; replace: "₄"   # U+2084
+  - trigger: ":s5"       ; replace: "₅"   # U+2085
+
+  # Type symbols
+  - trigger: ":tZ"       ; replace: "ℤ"   # U+2124
+  - trigger: ":tR"       ; replace: "ℝ"   # U+211D
+  - trigger: ":tN"       ; replace: "ℕ"   # U+2115
+  - trigger: ":tC"       ; replace: "ℂ"   # U+2102
+  - trigger: ":in"       ; replace: "∈"   # U+2208
+
+  # Boolean suffix
+  - trigger: ":?"        ; replace: "ˀ"   # U+02C0 modifier letter glottal stop
+
+  # Greek lowercase
+  - trigger: ":galpha"   ; replace: "α"   # U+03B1
+  - trigger: ":gbeta"    ; replace: "β"
+  - trigger: ":ggamma"   ; replace: "γ"
+  - trigger: ":gdelta"   ; replace: "δ"
+  - trigger: ":gepsilon" ; replace: "ε"
+  - trigger: ":grho"     ; replace: "ρ"
+  - trigger: ":glambda"  ; replace: "λ"
+  - trigger: ":gmu"      ; replace: "μ"
+  - trigger: ":gsigma"   ; replace: "σ"
+  - trigger: ":gpi"      ; replace: "π"
+  - trigger: ":gphi"     ; replace: "φ"
+  - trigger: ":gtheta"   ; replace: "θ"
+  - trigger: ":gomega"   ; replace: "ω"
+
+  # Greek uppercase
+  - trigger: ":GSigma"   ; replace: "Σ"   # U+03A3
+  - trigger: ":GPi"      ; replace: "Π"
+  - trigger: ":GLambda"  ; replace: "Λ"
+  - trigger: ":GOmega"   ; replace: "Ω"
+  - trigger: ":GPhi"     ; replace: "Φ"
+  - trigger: ":GTheta"   ; replace: "Θ"
+  - trigger: ":GDelta"   ; replace: "Δ"
