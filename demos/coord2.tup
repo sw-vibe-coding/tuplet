@@ -1,0 +1,7 @@
+# coord2.tup -- tuple-var declaration and destructuring.
+
+*coord2 -> (x y)        # mint a 2-output tuple variable
+coord2 <- 3, 9          # store both fields at once
+a, b <- coord2          # destructure into local scalars
+
+# expected stack/scalar values: a = 3, b = 9

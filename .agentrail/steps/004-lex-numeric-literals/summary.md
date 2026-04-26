@@ -1,0 +1,1 @@
+TInt + TPct + TMinus + TUnknown; digits accumulated via byte-stream (n*10 + b-48), no string conversion; 7 reg-rs baselines green; one-byte lookahead via pre parameter

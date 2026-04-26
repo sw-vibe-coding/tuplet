@@ -1,0 +1,18 @@
+# power.tup -- the example from research.txt.
+# Mints two variants: lower-case `power` (no guard) and
+# upper-case `Power` (asserts non-negative exponent).
+
+*power (n e) -> (p) <-
+  if e <= 0 then
+    1
+  else
+    n * power n (e - 1)
+  end
+
+*Power (n e) -> (p) <-
+  assert (e >= 0)
+  power n e
+
+*p1 <- power 2 10           # expected: 1024
+*p2 <- Power 3 4            # expected: 81
+*p3 <- Power 5 (-3)         # expected: assertion failure

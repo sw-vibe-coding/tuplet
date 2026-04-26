@@ -1,0 +1,14 @@
+# plot_splice.tup -- call-site argument splicing.
+# A 2-output tuple variable contributes both values to a 4-
+# argument call WITHOUT the caller writing coord2.x, coord2.y.
+
+*plot (x y color transparency) -> (success?)
+  # body: builtin in the prelude, prints the four args.
+
+*coord2 -> (x y)
+coord2 <- 3, 9
+
+*success? <- plot (coord2 Red 50%)
+# coord2 contributes 2 values; Red and 50% contribute 1 each;
+# plot consumes 4. The user did NOT have to call
+# plot (coord2.x coord2.y Red 50%).
