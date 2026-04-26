@@ -92,15 +92,26 @@ supports enough of OCaml to host nontrivial parser code
 naturally. Confirmed:
 
 - **Top-level `let X = E` declarations** persist across lines
-  (`sw-embed/sw-cor24-ocaml#3`, fixed in `9449a05`). Helpers
-  defined once, reused freely.
+  (`sw-embed/sw-cor24-ocaml#3`).
 - **User-defined variant types** with payload constructors
-  (`sw-embed/sw-cor24-ocaml#2`, fixed in `17732be`).
+  (`sw-embed/sw-cor24-ocaml#2`).
+- **Multi-file modules**: filename `math.ml` becomes module
+  `Math`, accessed cross-file as `Math.add`. Multiple files
+  passed as args: `run-ocaml.sh math.ml main.ml`. Top-level
+  `let` in each file becomes a member of that module.
+- **String escapes (`\n`, `\t`, `\\`, `\"`)** and **3+ element
+  tuples** (`sw-embed/sw-cor24-ocaml#4`).
 - Function-shorthand `let f x = ...` works.
 - `let rec`, lists, pairs, options, pattern matching, qualified
   names (`List.length`, `List.rev`).
 - `print_endline`, `print_int`, `string_of_int`, string concat
-  via `^`.
+  via `^`, `int_of_string`.
+- Byte I/O: `getc : unit -> int`, `putc : int -> unit`,
+  `read_line : unit -> string`.
+
+The Tuplet lexer chooses the byte-stream `getc`/`putc` path
+because it matches the host's natural API and the Forth runtime
+target -- not because of a missing string-stdlib feature.
 
 ## Open upstream limitations
 

@@ -1,0 +1,1 @@
+TWhite + THash via byte-stream getc/putc; ETX EOF sentinel; 4 reg-rs baselines for empty/ws/one-comment/mixed all green

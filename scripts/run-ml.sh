@@ -14,23 +14,30 @@
 #
 set -euo pipefail
 
-src_path="${1:?usage: run-ml.sh <path/to/file.ml>}"
-[ -r "${src_path}" ] || { echo "run-ml.sh: cannot read ${src_path}" >&2; exit 2; }
+(( $# >= 1 )) || { echo "usage: run-ml.sh <file1.ml> [file2.ml ...]" >&2; exit 1; }
+for p in "$@"; do
+  [ -r "${p}" ] || { echo "run-ml.sh: cannot read ${p}" >&2; exit 2; }
+done
 
-raw="$(bash "${HOME}/github/sw-embed/sw-cor24-ocaml/scripts/run-ocaml.sh" "${src_path}")"
+raw="$(bash "${HOME}/github/sw-embed/sw-cor24-ocaml/scripts/run-ocaml.sh" "$@")"
 
-# For each source line, strip one occurrence of "> <line>" plus
-# optional trailing newline. Skips blank source lines.
+# For each line of every source file, strip one occurrence of
+# "> <line>" plus optional trailing newline. The runtime also
+# emits an internal `let __module = "..."` line per multi-file
+# unit; strip that too. Skips blank source lines.
 clean="$(printf '%s' "${raw}" | perl -e '
 my $raw;
 { local $/; $raw = <STDIN>; }
-open(my $fh, "<", $ARGV[0]) or die "cannot open $ARGV[0]: $!";
-while (my $line = <$fh>) {
-    chomp $line;
-    next if $line eq "";
-    $raw =~ s/\Q> $line\E\n?//;
+for my $path (@ARGV) {
+  open(my $fh, "<", $path) or die "cannot open $path: $!";
+  while (my $line = <$fh>) {
+      chomp $line;
+      next if $line eq "";
+      $raw =~ s/\Q> $line\E\n?//;
+  }
 }
+$raw =~ s/^> let __module = "[^"]*"\n//gm;
 print $raw;
-' "${src_path}")"
+' "$@")"
 
 printf '%s\n' "${clean}"

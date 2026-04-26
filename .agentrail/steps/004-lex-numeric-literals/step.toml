@@ -1,0 +1,11 @@
+number = 4
+slug = "lex-numeric-literals"
+status = "pending"
+description = """
+# Step: lex-numeric-literals
+
+Extend `src/lexer.ml` to recognize integer lite..."""
+role = "legacy"
+context_files = []
+created_at = "2026-04-25T21:20:39"
+commits = []
