@@ -24,11 +24,25 @@ the research notation.
 - **Percent literals.** An integer literal immediately followed by
   `%`. Examples: `50%`, `100%`.
 - **Punctuation.** `,` `(` `)`
+- **Mint operator.** Canonical Unicode: `BULLET` (U+2022).
+  Aliases also recognized by the lexer: `BLACK SMALL
+  SQUARE` (U+25AA). ASCII fallback **proposed `*`**
+  (small filled mark; needs user confirmation -- alternatives:
+  `!`, `mint `, `def `). The mint operator must precede every
+  NEW name binding: tuple-var declaration, verb signature,
+  user-defined verb body, `syntax` declaration. Example:
+  `*coord2 -> (x y)` mints the tuple variable; subsequent
+  `coord2 <- 3, 9` is an ordinary assignment. Without the mint
+  operator, references to unbound names are errors. This is
+  the construct the DSL user reaches for whenever they want
+  to extend the language.
 - **Assignment.** `<-`
 - **Mapping (signature arrow).** `->`
-- **Binary operators.** Symbolic: `+`, `-`, `*`. Named: `max`,
-  `min`, `div`, `max2`, `min2`, `div2`. Named operators follow
-  identifier rules lexically.
+- **Binary operators.** Symbolic: `+`, `-`, `*` (caveat: `*` may
+  alias the mint operator depending on the chosen ASCII fallback;
+  context-sensitive lexing or a different fallback resolves it).
+  Named: `max`, `min`, `div`, `max2`, `min2`, `div2`. Named
+  operators follow identifier rules lexically.
 
 ## Unicode aliases
 
@@ -36,10 +50,13 @@ Accepted by the lexer as exact synonyms for their ASCII forms:
 
 | ASCII  | Unicode |
 |--------|---------|
-| `<-`   | `left-arrow`            (U+27F5 or U+2190) |
+| `*` (TBD) | mint operator: BULLET (U+2022) -- also accepts BLACK SMALL SQUARE (U+25AA) |
+| `<-`   | LEFTWARDS ARROW         (U+27F5 or U+2190) |
 | `->`   | heavy mapping arrow     (U+2500 x3 + U+2023) |
 | `(`    | shell-bracket left      (U+239B or U+2983) |
 | `)`    | shell-bracket right     (U+239E or U+2984) |
+| `{`    | LEFT CURLY BRACKET UPPER HOOK  (U+23A7) -- block start (TBD) |
+| `}`    | RIGHT CURLY BRACKET UPPER HOOK (U+23AB) -- block end (TBD)   |
 | `max`  | wedge up                (U+22CF) |
 | `min`  | wedge down              (U+22CE) |
 | `max2` | wedge up + subscript 2  (U+22CF U+2082) |
@@ -64,10 +81,11 @@ statement    ::= comment
 
 comment      ::= "#" { any-char }
 
-declaration  ::= name "->" "(" field-list ")" [ "<-" expr-list ]
+declaration  ::= mint name "->" "(" field-list ")" [ "<-" expr-list ]
 field-list   ::= name { name }
 
-signature    ::= name "(" [ field-list ] ")" "->" "(" field-list ")"
+signature    ::= mint name "(" [ field-list ] ")" "->" "(" field-list ")" [ "<-" expr ]
+mint         ::= "*" | "U+2022" | "U+25AA"   (* mint operator *)
 
 assignment   ::= lvalue "<-" expr
 lvalue       ::= name { "," name }
@@ -150,9 +168,9 @@ in the PoC.
 
 ```
 # 1. Tuple init + destructuring.
-coord2 -> (x y)
-coord2 <- 3, 9
-a, b <- coord2
+*coord2 -> (x y)        # mint the tuple variable
+coord2 <- 3, 9          # ordinary assignment to existing
+a, b <- coord2          # destructure
 ```
 
 ```
@@ -167,10 +185,22 @@ integer, fractional <- 7 div2 3
 
 ```
 # 4. Call-site splice.
-plot(x y color transparency) -> (success?)
-coord2 -> (x y)
+*plot(x y color transparency) -> (success?)   # mint verb signature
+*coord2 -> (x y)                               # mint tuple var
 coord2 <- 3, 9
 success? <- plot(coord2 Red 50%)
+```
+
+```
+# 5. User-defined verb (mint with body).
+*add(a b) -> (sum) <- a + b
+n <- add(2 3)            # n = 5
+```
+
+```
+# 6. Mint a syntax extension (the heart of the PoC).
+*syntax do _ while _ end expand
+  prim/forth "BEGIN" _1 _2 prim/forth "UNTIL"
 ```
 
 ## Invalid programs
@@ -187,7 +217,12 @@ plot(coord2 Red)        # arity 2 + 1 = 3, plot needs 4
 
 ```
 # 3. Tuple var mint with wrong field count for name arity.
-coord2 -> (x y z)       # name declares arity 2, fields list has 3
+*coord2 -> (x y z)      # name declares arity 2, fields list has 3
+```
+
+```
+# 5. Missing mint operator on first declaration.
+coord2 -> (x y)         # `coord2` not yet bound; mint required
 ```
 
 ```

@@ -15,11 +15,11 @@ Concretely:
 
 ```
 $ tuplet repl
-> n <- 0
-> syntax do _ while _ end expand
+> *n <- 0                                  # mint n; initialize
+> *syntax do _ while _ end expand
 .   prim/forth "BEGIN"  _1  _2  prim/forth "UNTIL"
 > do
-.   n <- n + 1
+.   n <- n + 1                             # ordinary assign (no mint)
 .   n prim/forth "."
 .   prim/forth "SPACE"
 . while  n < 3  end
@@ -28,6 +28,13 @@ $ tuplet repl
 3
 > #
 ```
+
+The `*` (canonical Unicode BULLET U+2022; alias BLACK SMALL
+SQUARE U+25AA) is the **mint operator** -- the user reaches
+for it whenever they add a new name or syntax to the language.
+Once the mint operator and the block delimiters (`{ }`, with
+Unicode aliases U+23A7/U+23AB) exist, nothing else in the
+language is privileged; everything else is user-extensible.
 
 The transcript above is the **acceptance scenario**. If the REPL
 can produce that output, with the user typing all of it
@@ -57,16 +64,19 @@ proven on the smaller case.
 Only the subset needed for the acceptance scenario above. Every
 form below has spec text in the existing scaffold docs.
 
-| Form                            | Why it's needed                       |
-|---------------------------------|---------------------------------------|
-| Integer literals                | The `0`, `1`, `3` in the scenario.    |
-| Identifier (ASCII letters + digits) | Variable name `n`.                |
-| Scalar assignment `name <- expr`| State updates (`n <- n + 1`).         |
-| Binary `+` and `<`              | Arithmetic and the loop test.         |
-| Bare expression statement       | The `n` line at the end (print scalar).|
-| `prim/forth "WORD"` raw escape  | Used inside the `syntax` expansion.   |
-| `syntax T expand E` declaration | The whole point of the demo.          |
-| Line comment `#`                | Quality-of-life only.                 |
+| Form                              | Why it's needed                                      |
+|-----------------------------------|------------------------------------------------------|
+| **Mint operator `*`** (Unicode U+2022) | Every new binding (`*n <- 0`, `*syntax ...`).   |
+| Integer literals                  | The `0`, `1`, `3` in the scenario.                   |
+| Identifier (ASCII letters + digits) | Variable name `n`.                                 |
+| Scalar mint+init `*name <- expr`  | First binding of a name with initial value.          |
+| Scalar assignment `name <- expr`  | Updates to an already-minted name (`n <- n + 1`).    |
+| Binary `+` and `<`                | Arithmetic and the loop test.                        |
+| Bare expression statement         | The `n` line at the end (print scalar).              |
+| `prim/forth "WORD"` raw escape    | Used inside the `syntax` expansion.                  |
+| `*syntax T expand E` declaration  | The whole point of the demo.                         |
+| Block delimiters `{` `}`          | Multi-statement loop body (the `do ... end` block).  |
+| Line comment `#`                  | Quality-of-life only.                                |
 
 Everything else from `docs/grammar.md` is **out of scope for the
 PoC milestone**, including:
