@@ -1,0 +1,4 @@
+command = "bash /Users/mike/github/sw-vibe-coding/tuplet/scripts/run-lexer-fixture.sh /Users/mike/github/sw-vibe-coding/tuplet/tests/lexer/comma_uscore.input"
+timeout = 60
+exit_code = 0
+desc = "tuplet lex_arrows: comma_uscore"

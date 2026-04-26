@@ -167,10 +167,16 @@ in the PoC.
 ## Valid programs
 
 ```
-# 1. Tuple init + destructuring.
+# 1a. Tuple var: mint and initialize separately.
 *coord2 -> (x y)        # mint the tuple variable
 coord2 <- 3, 9          # ordinary assignment to existing
 a, b <- coord2          # destructure
+```
+
+```
+# 1b. Tuple var: mint and initialize in one statement.
+*coord2 -> (x y) <- 3, 9
+```
 ```
 
 ```

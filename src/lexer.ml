@@ -1,66 +1,18 @@
-(* Tuplet lexer.
-
-   Byte-stream model: input via getc; token text payload
-   accumulated as int list and emitted via putc. ETX (3)
-   terminates input. See docs/lexer.md for the full design.
-
-   Each top-level let RHS stays on one physical line because
-   the host parses each top-level statement independently;
-   multi-line let-rec bodies parse-error. Multi-line `match`
-   is supported as long as the `match X with` opener is on
-   the same line as `let f y =`. *)
-
-type token =
-  | THash of int list
-  | TInt of int
-  | TPct of int
-  | TMinus
-  | TUnknown of int
-  | TEOF
-
-(* Emit each byte in a list via putc. *)
+type token = THash of int list | TInt of int | TPct of int | TMinus | TLArrow | TRArrow | TLParen | TRParen | TLBrace | TRBrace | TComma | TUnderscore | TMint | TUnknown of int | TEOF
 let rec emit_bytes bs = match bs with [] -> () | h :: t -> let _ = putc h in emit_bytes t
-
-(* Fixed-width prefixes for each token kind, composed from
-   char literals so the magic numbers don't appear here. *)
-let prefix_hash = [Char.code 'H'; Char.code 'A'; Char.code 'S'; Char.code 'H'; Char.code ' '; Char.code ' '; Char.code ' ']
-let prefix_int  = [Char.code 'I'; Char.code 'N'; Char.code 'T'; Char.code ' '; Char.code ' '; Char.code ' '; Char.code ' ']
-let prefix_pct  = [Char.code 'P'; Char.code 'C'; Char.code 'T'; Char.code ' '; Char.code ' '; Char.code ' '; Char.code ' ']
-let prefix_unk  = [Char.code 'U'; Char.code 'N'; Char.code 'K'; Char.code ' '; Char.code ' '; Char.code ' '; Char.code ' ']
-
-(* Decompose a non-negative integer into a list of ASCII digit
-   bytes, most significant first. n=0 emits ["0"]. *)
-let rec int_to_bytes_aux x acc = if x = 0 then acc else int_to_bytes_aux (x / 10) ((x mod 10 + Char.code '0') :: acc)
-let int_to_bytes n = if n = 0 then [Char.code '0'] else int_to_bytes_aux n []
-
-(* Emit a fixed prefix + a payload byte list + LF. *)
-let dump_with_prefix prefix bs = let _ = emit_bytes prefix in let _ = emit_bytes bs in putc (Char.code '\n')
-
-let dump_tok t = match t with
-  | TEOF       -> print_endline "EOF"
-  | TMinus     -> print_endline "MINUS"
-  | THash bs   -> dump_with_prefix prefix_hash bs
-  | TInt n     -> dump_with_prefix prefix_int (int_to_bytes n)
-  | TPct n     -> dump_with_prefix prefix_pct (int_to_bytes n)
-  | TUnknown b -> let _ = emit_bytes prefix_unk in let _ = print_int b in putc (Char.code '\n')
-
-let dump_tokens toks = List.iter dump_tok toks
-
-(* Character classes. *)
-let is_ws c = c = Char.code ' ' || c = Char.code '\t' || c = Char.code '\n' || c = Char.code '\r'
-let is_digit c = c >= Char.code '0' && c <= Char.code '9'
-
-(* Read bytes until LF or ETX; collect into reversed list, then reverse.
-   Used after the leading '#' has been consumed. *)
-let rec collect_comment acc = let c = getc () in if c = Char.code '\n' || c = 3 then List.rev acc else collect_comment (c :: acc)
-
-(* Accumulate a digit run into an int. Returns (n, next_byte) where
-   next_byte is the first non-digit byte (consumed from the stream). *)
-let rec lex_digits n = let b = getc () in if is_digit b then lex_digits (n * 10 + (b - Char.code '0')) else (n, b)
-
-(* Main lex loop. `pre` is a one-byte lookahead buffer:
-   0 means "no pending byte; call getc". The sentinel 0 is
-   safe because NUL is not a valid Tuplet source byte. *)
-let rec lex_loop pre acc = let b = if pre = 0 then getc () else pre in if b = 3 then List.rev (TEOF :: acc) else if is_ws b then lex_loop 0 acc else if b = Char.code '#' then let body = collect_comment [] in lex_loop 0 (THash body :: acc) else if b = Char.code '-' then lex_loop 0 (TMinus :: acc) else if is_digit b then let pair = lex_digits (b - Char.code '0') in let n = fst pair in let next = snd pair in if next = Char.code '%' then lex_loop 0 (TPct n :: acc) else lex_loop next (TInt n :: acc) else lex_loop 0 (TUnknown b :: acc)
-
+let prefix_hash = [72; 65; 83; 72; 32; 32; 32]
+let prefix_int = [73; 78; 84; 32; 32; 32; 32]
+let prefix_pct = [80; 67; 84; 32; 32; 32; 32]
+let prefix_unk = [85; 78; 75; 32; 32; 32; 32]
+let rec int_to_bytes_aux x acc = if x = 0 then acc else int_to_bytes_aux (x / 10) ((x mod 10 + 48) :: acc)
+let int_to_bytes n = if n = 0 then [48] else int_to_bytes_aux n []
+let dump_tok t = match t with TEOF -> print_endline "EOF" | TMinus -> print_endline "MINUS" | TLArrow -> print_endline "LARROW" | TRArrow -> print_endline "RARROW" | TLParen -> print_endline "LPAREN" | TRParen -> print_endline "RPAREN" | TLBrace -> print_endline "LBRACE" | TRBrace -> print_endline "RBRACE" | TComma -> print_endline "COMMA" | TUnderscore -> print_endline "USCORE" | TMint -> print_endline "MINT" | THash bs -> let _ = emit_bytes prefix_hash in let _ = emit_bytes bs in putc 10 | TInt n -> let _ = emit_bytes prefix_int in let _ = emit_bytes (int_to_bytes n) in putc 10 | TPct n -> let _ = emit_bytes prefix_pct in let _ = emit_bytes (int_to_bytes n) in putc 10 | TUnknown b -> let _ = emit_bytes prefix_unk in let _ = print_int b in putc 10
+let rec dump_tokens toks = match toks with [] -> () | h :: t -> let _ = dump_tok h in dump_tokens t
+let is_ws c = c = 32 || c = 9 || c = 10 || c = 13
+let is_digit c = c >= 48 && c <= 57
+let rec collect_comment acc = let c = getc () in if c = 10 then List.rev acc else if c = 3 then List.rev acc else collect_comment (c :: acc)
+let rec lex_digits n = let b = getc () in if is_digit b then lex_digits (n * 10 + (b - 48)) else (n, b)
+let lex_lt acc = let nxt = getc () in if nxt = 45 then (TLArrow :: acc, 0) else (TUnknown 60 :: acc, nxt)
+let lex_minus acc = let nxt = getc () in if nxt = 62 then (TRArrow :: acc, 0) else (TMinus :: acc, nxt)
+let rec lex_loop pre acc = let b = if pre = 0 then getc () else pre in if b = 3 then List.rev (TEOF :: acc) else if is_ws b then lex_loop 0 acc else if b = 35 then let body = collect_comment [] in lex_loop 0 (THash body :: acc) else if b = 60 then let pair = lex_lt acc in lex_loop (snd pair) (fst pair) else if b = 45 then let pair = lex_minus acc in lex_loop (snd pair) (fst pair) else if b = 40 then lex_loop 0 (TLParen :: acc) else if b = 41 then lex_loop 0 (TRParen :: acc) else if b = 123 then lex_loop 0 (TLBrace :: acc) else if b = 125 then lex_loop 0 (TRBrace :: acc) else if b = 44 then lex_loop 0 (TComma :: acc) else if b = 95 then lex_loop 0 (TUnderscore :: acc) else if b = 42 then lex_loop 0 (TMint :: acc) else if is_digit b then let pair = lex_digits (b - 48) in let n = fst pair in let next = snd pair in if next = 37 then lex_loop 0 (TPct n :: acc) else lex_loop next (TInt n :: acc) else lex_loop 0 (TUnknown b :: acc)
 let _ = dump_tokens (lex_loop 0 [])

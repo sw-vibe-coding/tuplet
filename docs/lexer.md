@@ -106,8 +106,39 @@ since `0x00` is not a valid Tuplet source byte). If the
 post-digit byte is `%` (37) the token is `TPct`, otherwise
 `TInt` and the lookahead byte starts the next token.
 
-`-` (`TMinus`) is its own single-byte token; the parser later
+## Multi-byte tokens (`<-`, `->`)
+
+Lookahead-driven. After reading `<` (60), peek the next byte;
+if it's `-` (45) emit `TLArrow`. Otherwise `<` is unknown and
+the lookahead byte is threaded back as the next token's
+leading byte.
+
+`-` is now lookahead-driven too: read the next byte; if it's
+`>` (62) emit `TRArrow`. Otherwise the token is `TMinus` and
+the read byte is the next leading byte. The parser later
 folds `TMinus` followed by `TInt` into a negative literal.
+
+## Single-byte punctuation
+
+| Byte | Char | Token        |
+|------|------|--------------|
+| 40   | `(`  | `TLParen`    |
+| 41   | `)`  | `TRParen`    |
+| 123  | `{`  | `TLBrace`    |
+| 125  | `}`  | `TRBrace`    |
+| 44   | `,`  | `TComma`     |
+| 95   | `_`  | `TUnderscore`|
+| 42   | `*`  | `TMint`      |
+
+## Source-ingestion vs runtime-input gotcha
+
+`getc` reads from the SAME UART stream that feeds source code
+to the runtime. After source ingestion completes (EOT, 0x04),
+runtime input begins. **The lexer driver `let _ = ... lex_loop
+...` MUST be the last top-level statement** in the file: any
+top-level statements after it would still be in the source
+stream, and `getc` would consume their bytes instead of
+runtime input. Discovered the hard way in step 005.
 
 ## OCaml-subset notes (current)
 
