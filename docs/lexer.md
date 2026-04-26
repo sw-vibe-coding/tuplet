@@ -25,103 +25,92 @@ REG_RS_DATA_DIR=work/reg-rs reg-rs run -p tuplet_build_skeleton
 
 ## Token representation
 
-Pending `sw-embed/sw-cor24-ocaml#2` (user-defined variants), the
-PoC encodes tokens as **nested pairs**:
+The PoC uses idiomatic OCaml variants -- now supported upstream
+since `sw-embed/sw-cor24-ocaml#2` was implemented (see commit
+`17732be` on `feat/wip`):
 
+```ocaml
+type token =
+  | TIdent of string
+  | TInt of int
+  | TPct of int
+  | TLArrow
+  | TRArrow
+  | TLParen
+  | TRParen
+  | TLBrace
+  | TRBrace
+  | TComma
+  | TUnderscore
+  | THash of string
+  | TLiteral of string
+  | TEOF
+  | TMint
 ```
-(kind_int, (int_payload, str_payload))
-```
 
-`kind_int` is a small integer code; the payload pair carries
-either an int (`TInt`, `TPct`) or a string (`TIdent`, `THash`,
-`TLiteral`) -- the unused slot is `0` or `""`. Nesting is needed
-because `sw-embed/sw-cor24-ocaml#4` (3+ element tuples) is also
-absent. Pattern match on `kind_int` to dispatch.
-
-### Kind codes
-
-| Code | Token         | Carries                     |
-|------|---------------|-----------------------------|
-| 0    | `TIdent`      | str = name                  |
-| 1    | `TInt`        | int = value                 |
-| 2    | `TPct`        | int = 0..100                |
-| 3    | `TLArrow`     | --                          |
-| 4    | `TRArrow`     | --                          |
-| 5    | `TLParen`     | --                          |
-| 6    | `TRParen`     | --                          |
-| 7    | `TLBrace`     | --                          |
-| 8    | `TRBrace`     | --                          |
-| 9    | `TComma`      | --                          |
-| 10   | `TUnderscore` | --                          |
-| 11   | `THash`       | str = comment text          |
-| 12   | `TLiteral`    | str = registered literal    |
-| 13   | `TEOF`        | --                          |
-| 14   | `TMint`       | -- (the minting glyph)      |
+Constructor payloads carry the relevant data; nullary
+constructors have none. Dispatch via `match`.
 
 ### Dump format
 
 `src/token_test.ml` prints one token per line via repeated
-`print_endline` (because string `\n` escapes are absent --
-`sw-embed/sw-cor24-ocaml#4`). Format:
+`print_endline` (because string `\n` escapes are still absent
+-- `sw-embed/sw-cor24-ocaml#4` open). Each variant maps to a
+fixed-width name plus optional payload. See `dump_tok` in
+`src/token_test.ml` for the full table.
 
-```
-IDENT  <name>
-INT    <int>
-PCT    <int>
-LARROW
-RARROW
-LPAREN
-RPAREN
-LBRACE
-RBRACE
-COMMA
-USCORE
-HASH   <text>
-LIT    <name>
-EOF
-MINT
-```
+## OCaml-subset notes (current)
 
-A trailing `0` line is the runtime printing the program's `()`
-return value as zero. Documented and accepted; not stripped.
+The `sw-cor24-ocaml` interpreter, since the recent fixes,
+supports enough of OCaml to host nontrivial parser code
+naturally. Confirmed:
 
-## OCaml-subset notes
+- **Top-level `let X = E` declarations** persist across lines
+  (`sw-embed/sw-cor24-ocaml#3`, fixed in `9449a05`). Helpers
+  defined once, reused freely.
+- **User-defined variant types** with payload constructors
+  (`sw-embed/sw-cor24-ocaml#2`, fixed in `17732be`).
+- Function-shorthand `let f x = ...` works.
+- `let rec`, lists, pairs, options, pattern matching, qualified
+  names (`List.length`, `List.rev`).
+- `print_endline`, `print_int`, `string_of_int`, string concat
+  via `^`.
 
-The `sw-cor24-ocaml` interpreter is more restrictive than full
-OCaml. Discovered constraints:
+## Open upstream limitations
 
-- Top-level `print_endline "..."` works.
-- `let () = ...` does **not** parse. Use top-level expressions
-  or `let _ = ...`.
-- **No top-level let bindings** without `in EXPR`. Each top-
-  level expression is independent; there is no cross-line
-  scope. Filed: `sw-embed/sw-cor24-ocaml#3`.
-- **No user-defined variant types.** `type t = A | B` does not
-  parse. Filed: `sw-embed/sw-cor24-ocaml#2`. Workaround: tagged
-  pairs with integer kind codes (above).
-- **No string `\n` escapes.** Backslash-n inside a string is
-  treated as a literal `\\n` and the LF terminates the source
-  line. Filed: `sw-embed/sw-cor24-ocaml#4`. Workaround: emit
-  per-line via repeated `print_endline`.
-- **No 3+ element tuples.** Pairs only. Filed:
-  `sw-embed/sw-cor24-ocaml#4`. Workaround: nested pairs.
-- **String literals in patterns parse-error.** Match on string
-  literals like `("INT", n)` is not supported. Workaround: use
-  integer kind codes for tags.
+These remain; workarounds noted are still applied and small
+enough to not pollute the host code:
 
-These all have workarounds in place; none block the PoC. The
-upstream issues are filed for visibility and so the workarounds
-can be unwound as the interpreter grows.
+- **No string `\n` escapes** (`sw-embed/sw-cor24-ocaml#4`).
+  Backslash-n in a literal is two literal chars; LF in a string
+  terminates the source line. Workaround: per-line
+  `print_endline` for any "newline-separated" output.
+- **No 3+ element tuples** (`sw-embed/sw-cor24-ocaml#4`).
+  Workaround: nested pairs `(a, (b, c))` if ever needed; with
+  variants now available, rarely needed.
+- **No string literals in match patterns.** `match x with "foo"
+  -> ...` does not parse. With variants now available,
+  workarounds are rarely needed -- use a variant constructor
+  instead of a string tag. Not separately filed yet; if we hit
+  a real need, file then.
+- **No `(* ... *)` block comments.** Use `# ...` or a comment
+  variant if needed inside Tuplet; OCaml host code uses no
+  comments for now.
 
-## Implementation pattern
+## Implementation pattern (current)
 
-Given the constraints above, every nontrivial source file under
-`src/` is **one giant single-line expression** built from nested
-`let rec NAME = fun ARG -> EXPR in NEXT` chains. Wrap helpers
-inline at the point of use. Document the pattern at the top of
-each file with a short comment block.
+Each source file under `src/` is a self-contained program in
+the natural OCaml style: top-level `type ...` declaration(s),
+top-level `let ...` bindings, then `let _ = ...` to drive the
+side-effects of the main flow. Multi-line, with each top-level
+declaration on its own line. See `src/token_test.ml` for a
+reference shape.
 
-When `sw-embed/sw-cor24-ocaml#3` (top-level lets) lands, source
-files can be split into per-line declarations and shared across
-files via copy-include or a future module system; until then,
-single-file giant-expression is the way.
+Match arms must currently fit on one line (no multi-line
+`match | ... | ...`); single-line dispatch via `match x with
+PAT1 -> ... | PAT2 -> ...` is the idiom even when the arm
+list is long.
+
+There is no module system / cross-file import. Each `.ml` file
+is its own program. Code that several test files would share
+is duplicated for now.

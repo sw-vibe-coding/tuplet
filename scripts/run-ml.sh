@@ -4,6 +4,12 @@
 # program's output. Strips the Pascal runtime's "> <source-line>"
 # echo prefixes that precede actual program output.
 #
+# As of sw-embed/sw-cor24-ocaml#3, multi-line source files are
+# supported with persistent top-level let declarations, and the
+# runtime echoes each top-level statement separately. The strip
+# uses perl literal substitution (\Q...\E) per source line so
+# parens/brackets in the source don't trip up regex specials.
+#
 # Usage: run-ml.sh <path/to/file.ml>
 #
 set -euo pipefail
@@ -13,21 +19,18 @@ src_path="${1:?usage: run-ml.sh <path/to/file.ml>}"
 
 raw="$(bash "${HOME}/github/sw-embed/sw-cor24-ocaml/scripts/run-ocaml.sh" "${src_path}")"
 
-# Build the expected echo prefix: each source line prepended with "> ",
-# concatenated without separators. The runtime emits the prefix as a
-# single block, then the program output begins with no intervening
-# newline on the join line.
-expected=""
-while IFS= read -r line || [ -n "${line}" ]; do
-    expected+="> ${line}"
-done < "${src_path}"
+# For each source line, strip one occurrence of "> <line>" plus
+# optional trailing newline. Skips blank source lines.
+clean="$(printf '%s' "${raw}" | perl -e '
+my $raw;
+{ local $/; $raw = <STDIN>; }
+open(my $fh, "<", $ARGV[0]) or die "cannot open $ARGV[0]: $!";
+while (my $line = <$fh>) {
+    chomp $line;
+    next if $line eq "";
+    $raw =~ s/\Q> $line\E\n?//;
+}
+print $raw;
+' "${src_path}")"
 
-# Use literal length-based strip rather than ${var#pattern}: the
-# expected prefix contains parens, brackets, and other glob specials
-# that ${var#pat} would interpret as a pattern.
-exp_len=${#expected}
-if [ ${#raw} -ge "${exp_len}" ] && [ "${raw:0:${exp_len}}" = "${expected}" ]; then
-    raw="${raw:${exp_len}}"
-fi
-
-printf '%s\n' "${raw}"
+printf '%s\n' "${clean}"
