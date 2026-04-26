@@ -1,6 +1,6 @@
 number = 5
 slug = "lex-arrows-and-punct"
-status = "in-progress"
+status = "completed"
 description = """
 # Step: lex-arrows-and-punct
 
@@ -8,4 +8,5 @@ Extend `src/lexer.ml` to recognize the remainin..."""
 role = "legacy"
 context_files = []
 created_at = "2026-04-26T07:13:53"
-commits = []
+completed_at = "2026-04-26T12:43:26"
+commits = ["e2d3b189e098646e235df787cb185226518dda50"]

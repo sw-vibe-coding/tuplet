@@ -1,0 +1,1 @@
+TLArrow/TRArrow via lookahead; TLParen/TRParen/TLBrace/TRBrace/TComma/TUnderscore/TMint singles; 9 reg-rs baselines; 25 of 25 green

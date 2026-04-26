@@ -130,6 +130,47 @@ folds `TMinus` followed by `TInt` into a negative literal.
 | 95   | `_`  | `TUnderscore`|
 | 42   | `*`  | `TMint`      |
 
+## Per-let if-chain depth limit
+
+Discovered while adding identifier dispatch: the host appears
+to silently truncate or fail to compile a `let` body whose
+top-level `if-then-else` chain has more than 14 branches.
+With 15 branches the function definition itself parses, but
+subsequent `let _ = ...` evaluations all return EVAL ERROR.
+
+Workaround: split a long dispatch into a helper function.
+`lex_loop` has 7 branches and routes the rest to `lex_other`
+(9 branches), each well within the limit. No upstream issue
+filed yet -- the symptom is "EVAL ERROR on a function
+defined with > 14 branches" but the failure mode might be
+something else entirely (memory, expression-tree size). If
+encountered again with a small repro, file then.
+
+## Identifier ambiguity rule
+
+A bare `_` followed by whitespace, EOF, or any non-ident-
+continuation byte is `TUnderscore` (template slot marker).
+A `_` followed by an ident-continuation byte (letter, digit,
+or `_`) starts an identifier whose first byte is `_`. Decided
+at lex time by `lex_uscore`: read the lookahead byte; if
+ident-cont, recurse into `lex_ident_after`; otherwise emit
+`TUnderscore` and thread the lookahead back as the next
+token's leading byte.
+
+## Identifier body
+
+Letters (`A`-`Z` or `a`-`z`), digits, and `_` form the
+continuation; trailing `?` is allowed once at the end. The
+parser later interprets a trailing digit run as an arity
+suffix (`coord2` -> arity 2).
+
+Pre-registration "keywords" (e.g., `if`, `then`, `else`,
+`while`) lex as `TIdent` -- the lexer doesn't know about
+keywords. Once a `*syntax T expand E` declaration registers
+a literal token, the parser tells the lexer to switch its
+classification (handled by the dynamic literal registry --
+that's a future step).
+
 ## Source-ingestion vs runtime-input gotcha
 
 `getc` reads from the SAME UART stream that feeds source code
