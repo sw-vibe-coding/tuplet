@@ -1,6 +1,6 @@
 number = 6
 slug = "lex-identifiers"
-status = "in-progress"
+status = "completed"
 description = """
 # Step: lex-identifiers
 
@@ -8,4 +8,5 @@ Recognize ASCII identifiers in the lexer: a letter o..."""
 role = "legacy"
 context_files = []
 created_at = "2026-04-26T12:43:26"
-commits = []
+completed_at = "2026-04-26T14:43:08"
+commits = ["1da824358fe3b7d61c292c942f7987740488cd26"]
