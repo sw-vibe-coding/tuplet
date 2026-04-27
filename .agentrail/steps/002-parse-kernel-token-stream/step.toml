@@ -1,6 +1,6 @@
 number = 2
 slug = "parse-kernel-token-stream"
-status = "pending"
+status = "in-progress"
 description = """
 # Step: parse-kernel-token-stream
 

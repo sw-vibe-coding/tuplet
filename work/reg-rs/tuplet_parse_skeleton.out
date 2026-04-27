@@ -1,10 +1,26 @@
 PROGRAM
-TOKEN  mint
-TOKEN  ident:coord2
-TOKEN  rarrow
-TOKEN  lparen
-TOKEN  ident:x
-TOKEN  ident:y
-TOKEN  rparen
-TOKEN  lit:if
+STMT
+ATOM   mint
+ENDSTMT
+STMT
+ATOM   ident:coord2
+ENDSTMT
+STMT
+ATOM   rarrow
+ENDSTMT
+STMT
+ATOM   lparen
+ENDSTMT
+STMT
+ATOM   ident:x
+ENDSTMT
+STMT
+ATOM   ident:y
+ENDSTMT
+STMT
+ATOM   rparen
+ENDSTMT
+STMT
+ATOM   lit:if
+ENDSTMT
 END
