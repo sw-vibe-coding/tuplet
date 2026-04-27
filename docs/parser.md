@@ -1,13 +1,17 @@
 # Tuplet Parser
 
 The parser saga starts with a minimal AST and token-stream
-consumer. It does not implement Tuplet grammar yet; this phase
-establishes file layout, source handoff, and deterministic AST
-or error dump output.
+consumer. It is moving toward a tuple-shaped AST: syntax
+declarations, function signatures, tuple values, and assignment
+patterns should preserve field/shape information instead of
+collapsing into permanent token lists. The current phase
+establishes file layout, source handoff, and deterministic AST or
+error dump output.
 
 ## Current Shape
 
-`src/ast.ml` defines the initial dumpable AST. A successful
+`src/ast.ml` defines the initial dumpable AST. Today it still uses
+scaffolding nodes such as `STMT`, `ATOM`, and `GROUP`. A successful
 kernel-form token stream dumps as statement nodes with structured
 children:
 
@@ -41,8 +45,8 @@ ERROR  unknown-token:64
 `src/parser_main.ml`, `src/parser_assign_main.ml`,
 `src/parser_syntax_main.ml`, and `src/parser_error_main.ml` are
 smoke drivers with test token streams. Later parser steps will
-replace these test streams with real lexer handoff and registry
-driven template parsing.
+replace these test streams with real lexer handoff, registry-driven
+template parsing, and tuple-shaped AST nodes.
 
 ## Token Stream Contract
 
@@ -70,8 +74,24 @@ The parser contract for this phase is:
   after it into `GROUP  expansion`; it does not register or apply
   the template yet.
 
+## Tuple-First Direction
+
+The scaffolding dump is not the final parser design. The parser
+should evolve toward named tuple-shaped nodes:
+
+- Function signatures are `input_tuple -> output_tuple` transforms.
+- Tuple literals and tuple type/signature groups preserve field
+  names and positional fields.
+- Assignment LHS forms are tuple patterns, not only identifier
+  lists.
+- Syntax declarations initially register template/expansion token
+  slices, but later macro work should store and rewrite tuple-shaped
+  AST where possible.
+- Compiler pass APIs can later carry tuple-shaped state such as
+  `(source, tokens, diagnostics, ast, ...)`.
+
 ## Boundaries
 
 This skeleton intentionally does not implement template matching,
-syntax declarations, checking, IR lowering, or Forth emission.
+checking, IR lowering, tuple-space coordination, or Forth emission.
 Those belong to later parser and downstream sagas.

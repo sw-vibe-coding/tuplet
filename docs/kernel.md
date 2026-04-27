@@ -305,8 +305,8 @@ The previously planned **seven** sagas become **eight**.
 | # | Saga                  | One-line goal                                                                       |
 |---|-----------------------|-------------------------------------------------------------------------------------|
 | 1 | `tuplet-lexer`        | tokenize `.tup` source, including template-literal tokens fed back from the parser. |
-| 2 | `tuplet-parser`       | parse statements; maintain the `syntax` registry; longest-match template matcher.   |
-| 3 | `tuplet-checker`      | arity-check against the registry. No hardcoded operator list.                       |
+| 2 | `tuplet-parser`       | parse tuple-shaped statements; maintain the `syntax` registry; longest-match template matcher. |
+| 3 | `tuplet-checker`      | tuple/arity-check against the registry. No hardcoded operator list.                 |
 | 4 | `tuplet-ir`           | lower AST to stack IR including `IPrimForth` opcodes; thunk-build for `{...}`.      |
 | 5 | `tuplet-interp`       | minimal reference interpreter over IR.                                              |
 | 6 | `tuplet-forth-emit`   | emit Forth from IR; `IPrimForth` -> literal token; `{...}` -> synthetic-name `:`.   |
@@ -319,6 +319,9 @@ Reshapes from prior plan:
   forms (`syntax`, `:`, `<-`, `,`, `()`, `#`, `_`, `{}`,
   `prim/forth`) are hardcoded; everything else flows from the
   registry built up by `syntax` declarations.
+- Parser AST work is tuple-first: signatures, tuple values, and
+  assignment patterns preserve shape and field names so later
+  checker/lowering stages can treat functions as tuple transforms.
 - `tuplet-checker` does not know what `+` or `if` are. It asks
   the registry.
 - `tuplet-prelude` is an explicit phase whose exit criterion is

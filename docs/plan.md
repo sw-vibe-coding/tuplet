@@ -5,6 +5,13 @@
 > If this plan disagrees with `docs/kernel.md`, the kernel doc
 > wins; raise the disagreement and update this file.
 >
+> **Tuple-first direction:** parser and downstream AST work should
+> treat Tuplet programs as tuple-shaped transforms first:
+> signatures, statements, macro inputs, and compiler pass state
+> carry named tuple structure instead of flattening into ad hoc
+> token groups. `docs/tuple-first.txt` is background design input;
+> this plan captures the actionable parts.
+>
 > **PoC milestone:** `docs/poc-goals.md` defines the single
 > demoable target for this project: a REPL where the user types
 > a `syntax` declaration that adds `do..while` and uses it. The
@@ -16,9 +23,9 @@
 
 `tuplet-scaffold` (Phase 0, in-progress) lays down the docs and
 toolchain wiring. From there, eight follow-up sagas build the
-PoC end-to-end: lexer -> registry-based parser -> registry-based
-checker -> stack IR -> reference interpreter -> Forth emitter ->
-**`lib/std.tup` prelude** -> demos. The seventh saga
+PoC end-to-end: lexer -> tuple-shaped registry parser ->
+tuple-aware checker -> stack IR -> reference interpreter ->
+Forth emitter -> **`lib/std.tup` prelude** -> demos. The seventh saga
 (`tuplet-prelude`) is what makes Tuplet "mostly written in
 itself"; the eighth proves it by running demos that depend on
 the prelude.
@@ -29,8 +36,8 @@ the prelude.
 |----|-------------------------------|-------|------------------------------------------------------------------------------|---------------|
 | 0  | `tuplet-scaffold`             | 0     | Docs (PRD, grammar, design, lowering, kernel) + toolchain smoke baselines.   | in-progress   |
 | 1  | `tuplet-lexer`                | 1     | Tokenize `.tup`; surface registry-callback for template literals.            | done          |
-| 2  | `tuplet-parser`               | 2     | `syntax` registry + longest-match template matcher producing AST.            | upcoming      |
-| 3  | `tuplet-checker`              | 3     | Name resolution + arity check against the registry; no hardcoded ops.        | upcoming      |
+| 2  | `tuplet-parser`               | 2     | Tuple-shaped AST + `syntax` registry + longest-match template matcher.       | active        |
+| 3  | `tuplet-checker`              | 3     | Name resolution + tuple/arity check against the registry; no hardcoded ops.  | upcoming      |
 | 4  | `tuplet-ir`                   | 4     | AST -> stack IR including `IPrimForth` and anonymous-verb thunks.            | upcoming      |
 | 5  | `tuplet-interp`               | 5     | Minimal reference interpreter over IR; oracle for emitter cross-checks.      | upcoming      |
 | 6  | `tuplet-forth-emit`           | 6     | IR -> Forth into `work/generated/*.fs`; cor24-run round-trip via reg-rs.     | upcoming      |
@@ -104,10 +111,12 @@ the parser uses to register new literal tokens during parsing
 
 ### 2. `tuplet-parser`
 
-**Goal.** Build AST per `docs/design.md`, with a `syntax`
-registry and longest-match template matcher. The parser knows
-no operators or control-flow keywords -- those come from the
-registry.
+**Goal.** Build tuple-shaped AST per `docs/design.md`, with a
+`syntax` registry and longest-match template matcher. The parser
+knows no operators or control-flow keywords -- those come from
+the registry. Kernel forms are parsed into named, tuple-like AST
+nodes instead of anonymous token lists wherever the shape is
+known.
 
 **Entrance criteria.**
 - `tuplet-lexer` complete; lexer can register literal tokens.
@@ -117,8 +126,14 @@ registry.
 - `src/parser.ml` parses kernel forms (`syntax`, `:`, `<-`,
   comma, parens, `#`, `_`, `{}`, `prim/forth`) without any
   registry entries.
+- Tuple literals, tuple type/signature groups, and tuple-pattern
+  assignment LHS shapes are represented explicitly enough that
+  checker/lowering can preserve field names and arity.
 - After processing one `syntax` declaration, subsequent code
   that matches the template parses to the documented AST.
+- Registry entries initially store token/template slices, but the
+  planned macro representation is tuple-shaped AST, not permanent
+  raw string lists.
 - Longest-match-wins, first-declared-wins-on-ties: tested with
   a fixture that registers two overlapping templates.
 - AST-dump format is deterministic (s-expr or similar).
@@ -129,6 +144,9 @@ registry.
 **Key deliverables.**
 - `src/parser.ml`, `src/ast.ml`, `src/registry.ml`.
 - `tests/parser/*.tup` + `*.expected.ast`.
+- Parser docs describing the tuple-shaped AST contract: syntax
+  declarations, tuple signatures, tuple value groups, tuple
+  patterns, and registry handoff.
 
 **Primary risks.**
 - Template matching in the OCaml subset may need data
@@ -136,12 +154,17 @@ registry.
   for assoc-list fallback; profile only if needed.
 - Registry mutation during parse complicates error recovery.
   Keep parser single-pass; on error, abort and report.
+- If host limits block the tuple-shaped split-module parser, file
+  upstream issues against `sw-embed/sw-cor24-ocaml`; do not
+  preserve local concatenation or flattening workarounds.
 
 ### 3. `tuplet-checker`
 
-**Goal.** Name resolution and arity checking on the registry-based
-AST. No hardcoded operators; every check goes through the
-registry.
+**Goal.** Name resolution and tuple/arity checking on the
+registry-based AST. No hardcoded operators; every check goes
+through the registry. Function signatures are treated as
+tuple-to-tuple transforms, with named output fields preserved for
+diagnostics and later lowering.
 
 **Entrance criteria.**
 - `tuplet-parser` complete; AST + registry stable.

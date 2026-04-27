@@ -1,8 +1,10 @@
 # Tuplet -- Design
 
-Low-level design for the Tuplet PoC: compiler pipeline, AST, stack
-IR, and the builtin verb registry. Complements `docs/prd.md` (what
-Tuplet is) and `docs/grammar.md` (the surface syntax).
+Low-level design for the Tuplet PoC: compiler pipeline,
+tuple-shaped AST, stack IR, and the syntax/verb registries.
+Complements `docs/prd.md` (what Tuplet is), `docs/grammar.md`
+(the surface syntax), and `docs/tuple-first.txt` (tuple-first
+design background).
 
 ## Pipeline
 
@@ -45,17 +47,36 @@ tests: every program that compiles to Forth also runs in the
 in-process interpreter, and reg-rs compares the two outputs to
 catch emitter regressions.
 
-## AST types
+## Tuple-First AST Direction
+
+Tuplet should treat programs as tuple-shaped transforms before it
+treats them as operator trees. A function signature is conceptually
+an input tuple mapped to an output tuple:
+
+```text
+Power (n: Int, e: Int) -> (p: Int)
+```
+
+Parser and checker work should preserve that tuple shape:
+
+- Tuple field names are semantic, not just comments.
+- Assignment LHS forms are tuple patterns, not merely identifier
+  lists.
+- Syntax declarations and macro inputs should become tuple-shaped
+  AST nodes once the registry skeleton is stable.
+- Compiler passes can later be modeled as tuple transforms, e.g.
+  `(source) -> (source, tokens, diagnostics)`.
+
+The first parser milestones may still dump shallow `STMT` and
+`GROUP` nodes while the host parser matures. Those are scaffolding,
+not the final AST contract.
+
+## AST Types
 
 Primary form (idiomatic OCaml):
 
 ```ocaml
 type name = string
-
-type op =
-  | OpAdd | OpSub | OpMul
-  | OpMax  | OpMin  | OpDiv
-  | OpMax2 | OpMin2 | OpDiv2
 
 type expr =
   | EInt    of int
@@ -63,39 +84,60 @@ type expr =
   | EPct    of int            (* 0..100 *)
   | ESymbol of string         (* Red, Green, Blue, ... *)
   | EName   of name
-  | EBinary of expr * op * expr
-  | ECall   of name * expr list
-  | ETuple  of expr list      (* comma-separated RHS, e.g., 3, 9 *)
+  | ECall   of name * tuple_expr
+  | EApplySyntax of name * tuple_expr
+  | ETuple  of tuple_expr
 
-type pattern =
-  | PName  of name            (* single lvalue: scalar or tuple-var *)
-  | PTuple of name list       (* destructuring: a, b, c *)
+and tuple_field =
+  | FPos   of expr
+  | FNamed of name * expr
 
-type field = { f_name : name }
+and tuple_expr = tuple_field list
 
-type sigdecl = {
-  s_name    : name;
-  s_inputs  : field list;
-  s_outputs : field list;
+type tuple_pattern_field =
+  | PFName   of name
+  | PFRename of name * name
+  | PFOpen
+
+type tuple_pattern = tuple_pattern_field list
+
+type syntax_decl = {
+  sy_mode      : string;       (* expand or verb *)
+  sy_template  : string list;  (* registry skeleton; AST later *)
+  sy_expansion : string list;  (* registry skeleton; AST later *)
 }
 
-type tupdecl = {
-  t_name   : name;            (* e.g. "coord2" *)
-  t_fields : field list;      (* length must match name's arity *)
+type signature_decl = {
+  s_name    : name;
+  s_inputs  : tuple_pattern;
+  s_outputs : tuple_pattern;
 }
 
 type stmt =
-  | SDecl      of tupdecl     (* coord2 -> (x y) *)
-  | SSignature of sigdecl     (* plot(x y color c?) -> (success?) *)
-  | SAssign    of pattern * expr
+  | SSyntax    of syntax_decl
+  | SSignature of signature_decl
+  | SAssign    of tuple_pattern * expr
   | SExpr      of expr
   | SComment   of string
 
 type program = stmt list
 ```
 
-Name resolution produces a symbol table mapping each name to one of:
-`SymScalar`, `SymTuple of arity`, `SymVerb of in_arity * out_arity`.
+Earlier fixed-grammar sketches used explicit binary operators:
+
+```ocaml
+type old_expr =
+  | EBinary of old_expr * string * old_expr
+  | ECall   of name * expr list
+```
+
+That shape is no longer the parser target. Operators and control
+flow arrive through the syntax registry/prelude; the parser should
+not bake in `+`, `if`, `while`, or similar constructs.
+
+Name resolution produces a symbol table mapping each name to tuple
+shape information such as scalar, named tuple, or verb
+`input_tuple -> output_tuple`.
 
 ### OCaml-subset compatibility (sw-cor24-ocaml)
 
