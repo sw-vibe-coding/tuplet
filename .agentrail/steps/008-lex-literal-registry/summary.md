@@ -1,1 +1,1 @@
-BLOCKED: blocked on sw-embed/sw-cor24-ocaml#13
+Literal registry hook added; registered identifiers dump as LIT; 3 registry baselines; full tuplet_lex sweep green
