@@ -1,2 +1,2 @@
-let bad_group_tokens = [TIdent "call"; TLParen; TIdent "x"; TEOF]
-let _ = dump_program (parse bad_group_tokens)
+let bad_group_tokens = [Parser.TIdent "call"; Parser.TLParen; Parser.TIdent "x"; Parser.TEOF]
+let _ = Ast.dump_program (Parser.parse bad_group_tokens)

@@ -1,0 +1,24 @@
+PROGRAM
+STMT   syntax-verb
+GROUP  template
+ITEM   ident:if
+ITEM   slot
+ITEM   ident:then
+ITEM   slot
+ENDGROUP
+GROUP  expansion
+ITEM   ident:branch
+ENDGROUP
+ENDSTMT
+END
+REGISTRY
+ENTRY  0 verb
+TEMPLATE
+ITEM   ident:if
+ITEM   slot
+ITEM   ident:then
+ITEM   slot
+EXPANSION
+ITEM   ident:branch
+ENDENTRY
+ENDREGISTRY

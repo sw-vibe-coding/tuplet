@@ -1,2 +1,2 @@
-let sample_tokens = [TMint; TIdent "coord2"; TRArrow; TLParen; TIdent "x"; TIdent "y"; TRParen; THash "ignored"; TLiteral "if"; TEOF]
-let _ = dump_program (parse sample_tokens)
+let sample_tokens = [Parser.TMint; Parser.TIdent "coord2"; Parser.TRArrow; Parser.TLParen; Parser.TIdent "x"; Parser.TIdent "y"; Parser.TRParen; Parser.THash "ignored"; Parser.TLiteral "if"; Parser.TEOF]
+let _ = Ast.dump_program (Parser.parse sample_tokens)

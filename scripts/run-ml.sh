@@ -20,18 +20,7 @@ for p in "$@"; do
   [ -r "${p}" ] || { echo "run-ml.sh: cannot read ${p}" >&2; exit 2; }
 done
 
-if [ "$#" -eq 1 ]; then
-  raw="$(bash "${HOME}/github/sw-embed/sw-cor24-ocaml/scripts/run-ocaml.sh" "$@")"
-else
-  tmpdir="$(mktemp -d /tmp/tuplet-run-ml.XXXXXX)"
-  tmp="${tmpdir}/input.ml"
-  trap 'rm -rf "$tmpdir"' EXIT
-  for p in "$@"; do
-    cat "$p" >> "$tmp"
-    printf '\n' >> "$tmp"
-  done
-  raw="$(bash "${HOME}/github/sw-embed/sw-cor24-ocaml/scripts/run-ocaml.sh" "$tmp")"
-fi
+raw="$(bash "${HOME}/github/sw-embed/sw-cor24-ocaml/scripts/run-ocaml.sh" "$@")"
 
 # Strip echoes. For each raw output line:
 #   - If it starts with "> ": treat as runtime echo prefix.
@@ -83,6 +72,7 @@ for my $line (split /\n/, $raw, -1) {
             }
         }
         $rest =~ s/^\s+//;
+        next if $rest =~ /^let __module = "[^"]*"$/;
         $out .= $rest . "\n" if $rest ne "";
     } else {
         $out .= $line . "\n";

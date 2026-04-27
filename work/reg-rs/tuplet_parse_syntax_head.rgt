@@ -1,4 +1,4 @@
-command = "bash /Users/mike/github/sw-vibe-coding/tuplet/scripts/run-ml.sh /Users/mike/github/sw-vibe-coding/tuplet/src/ast.ml /Users/mike/github/sw-vibe-coding/tuplet/src/parser.ml /Users/mike/github/sw-vibe-coding/tuplet/src/parser_syntax_main.ml"
+command = "bash /Users/mike/github/sw-vibe-coding/tuplet/scripts/run-ml.sh /Users/mike/github/sw-vibe-coding/tuplet/src/ast.ml /Users/mike/github/sw-vibe-coding/tuplet/src/registry.ml /Users/mike/github/sw-vibe-coding/tuplet/src/parser.ml /Users/mike/github/sw-vibe-coding/tuplet/src/parser_syntax_main.ml"
 timeout = 60
 exit_code = 0
 desc = "tuplet parse: syntax declaration head split"

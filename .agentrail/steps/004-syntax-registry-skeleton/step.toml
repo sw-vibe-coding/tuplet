@@ -1,6 +1,6 @@
 number = 4
 slug = "syntax-registry-skeleton"
-status = "in-progress"
+status = "completed"
 description = """
 # Step: syntax-registry-skeleton
 
@@ -8,4 +8,5 @@ Add the first parser-owned syntax registry ..."""
 role = "production"
 context_files = []
 created_at = "2026-04-27T12:08:03"
-commits = []
+completed_at = "2026-04-27T16:25:00"
+commits = ["6ad22f9d8a09c9be7e36fd24fd6193ffb367b7bf"]

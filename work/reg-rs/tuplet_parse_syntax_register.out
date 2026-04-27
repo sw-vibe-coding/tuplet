@@ -1,0 +1,34 @@
+PROGRAM
+STMT   syntax-expand
+GROUP  template
+ITEM   ident:do
+ITEM   slot
+ITEM   ident:while
+ITEM   slot
+ITEM   ident:end
+ENDGROUP
+GROUP  expansion
+ITEM   slot
+ITEM   int:1
+ITEM   slot
+ITEM   int:2
+ITEM   lit:again
+ENDGROUP
+ENDSTMT
+END
+REGISTRY
+ENTRY  0 expand
+TEMPLATE
+ITEM   ident:do
+ITEM   slot
+ITEM   ident:while
+ITEM   slot
+ITEM   ident:end
+EXPANSION
+ITEM   slot
+ITEM   int:1
+ITEM   slot
+ITEM   int:2
+ITEM   lit:again
+ENDENTRY
+ENDREGISTRY

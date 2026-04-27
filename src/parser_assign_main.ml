@@ -1,2 +1,2 @@
-let assign_tokens = [TIdent "n"; TLArrow; TInt 1; TComma; TLBrace; TIdent "n"; TInt 2; TRBrace; TEOF]
-let _ = dump_program (parse assign_tokens)
+let assign_tokens = [Parser.TIdent "n"; Parser.TLArrow; Parser.TInt 1; Parser.TComma; Parser.TLBrace; Parser.TIdent "n"; Parser.TInt 2; Parser.TRBrace; Parser.TEOF]
+let _ = Ast.dump_program (Parser.parse assign_tokens)

@@ -34,7 +34,9 @@ lexer token surface and a `parse` function over a token list.
 For now it parses one kernel-form statement from the token stream,
 returning the remaining token stream explicitly from
 `parse_statement`. Comments are skipped as trivia and EOF
-terminates the program.
+terminates the program. The parser is split from `src/ast.ml` and
+`src/registry.ml`, relying on the host's multi-file module path
+rather than concatenating sources.
 
 Unknown lexer tokens are parser errors:
 
@@ -43,10 +45,11 @@ ERROR  unknown-token:64
 ```
 
 `src/parser_main.ml`, `src/parser_assign_main.ml`,
-`src/parser_syntax_main.ml`, and `src/parser_error_main.ml` are
-smoke drivers with test token streams. Later parser steps will
-replace these test streams with real lexer handoff, registry-driven
-template parsing, and tuple-shaped AST nodes.
+`src/parser_syntax_main.ml`, `src/parser_error_main.ml`, and the
+syntax-registry drivers are smoke drivers with test token streams.
+Later parser steps will replace these test streams with real lexer
+handoff, registry-driven template matching, and tuple-shaped AST
+nodes.
 
 ## Token Stream Contract
 
@@ -71,8 +74,12 @@ The parser contract for this phase is:
 - `TMint` followed by `TIdent "syntax"` or `TLiteral "syntax"`
   parses as a syntax declaration head. The parser splits tokens
   before `expand` or `TRArrow` into `GROUP  template` and tokens
-  after it into `GROUP  expansion`; it does not register or apply
-  the template yet.
+  after it into `GROUP  expansion`.
+- Parsed syntax declarations are inserted into `src/registry.ml`
+  with declaration order, mode (`expand` or `verb`), template
+  token slice, and expansion token slice. The registry is a
+  skeleton: it stores and dumps entries, but does not yet drive
+  template matching for later statements.
 
 ## Tuple-First Direction
 
@@ -84,9 +91,9 @@ should evolve toward named tuple-shaped nodes:
   names and positional fields.
 - Assignment LHS forms are tuple patterns, not only identifier
   lists.
-- Syntax declarations initially register template/expansion token
-  slices, but later macro work should store and rewrite tuple-shaped
-  AST where possible.
+- Syntax declarations currently register template/expansion token
+  slices. Later macro work should store and rewrite tuple-shaped AST
+  where possible.
 - Compiler pass APIs can later carry tuple-shaped state such as
   `(source, tokens, diagnostics, ast, ...)`.
 
