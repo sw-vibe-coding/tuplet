@@ -130,6 +130,27 @@ folds `TMinus` followed by `TInt` into a negative literal.
 | 95   | `_`  | `TUnderscore`|
 | 42   | `*`  | `TMint`      |
 
+## Unicode Lexing
+
+The kernel glyph aliases listed in `docs/glyphs.md` fold to the
+same parser-facing tokens as their ASCII spellings. The current
+`sw-cor24-ocaml` runner feeds Unicode runtime input to `getc` as
+the glyph codepoint's low byte, so the lexer matches those stable
+runtime byte values directly:
+
+| Glyph | Runtime byte | Fold | Token |
+|-------|--------------|------|-------|
+| BULLET | 34 | `*` | `TMint` |
+| BLACK SMALL SQUARE | 170 | `*` | `TMint` |
+| LEFTWARDS ARROW | 144 | `<-` | `TLArrow` |
+| LEFTWARDS LONG ARROW | 245 | `<-` | `TLArrow` |
+| RIGHTWARDS ARROW | 146 | `->` | `TRArrow` |
+| RIGHTWARDS DOUBLE ARROW | 210 | `->>` | `TRArrow` then `TUnknown 62` |
+
+The wider suggested glyph table remains user-extension territory
+for later `*syntax` declarations; lexer-level folding is limited
+to these kernel aliases.
+
 ## Per-let if-chain depth limit
 
 Discovered while adding identifier dispatch: the host appears

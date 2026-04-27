@@ -1,6 +1,6 @@
 number = 7
 slug = "lex-unicode-aliases"
-status = "blocked"
+status = "in-progress"
 description = """
 # Step: lex-unicode-aliases
 

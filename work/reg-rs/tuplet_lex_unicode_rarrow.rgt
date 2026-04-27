@@ -1,0 +1,4 @@
+command = "bash /Users/mike/github/sw-vibe-coding/tuplet/scripts/run-lexer-fixture.sh /Users/mike/github/sw-vibe-coding/tuplet/tests/lexer/unicode_rarrow.input"
+timeout = 60
+exit_code = 0
+desc = "tuplet lex_unicode: right arrow"
