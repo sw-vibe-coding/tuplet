@@ -23,8 +23,9 @@ done
 if [ "$#" -eq 1 ]; then
   raw="$(bash "${HOME}/github/sw-embed/sw-cor24-ocaml/scripts/run-ocaml.sh" "$@")"
 else
-  tmp="$(mktemp /tmp/tuplet-run-ml.XXXXXX.ml)"
-  trap 'rm -f "$tmp"' EXIT
+  tmpdir="$(mktemp -d /tmp/tuplet-run-ml.XXXXXX)"
+  tmp="${tmpdir}/input.ml"
+  trap 'rm -rf "$tmpdir"' EXIT
   for p in "$@"; do
     cat "$p" >> "$tmp"
     printf '\n' >> "$tmp"

@@ -1,0 +1,12 @@
+PROGRAM
+STMT   assign
+ATOM   ident:n
+ATOM   larrow
+ATOM   int:1
+ATOM   comma
+GROUP  brace
+ITEM   ident:n
+ITEM   int:2
+ENDGROUP
+ENDSTMT
+END

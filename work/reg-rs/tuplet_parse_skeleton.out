@@ -1,26 +1,12 @@
 PROGRAM
-STMT
+STMT   mint
 ATOM   mint
-ENDSTMT
-STMT
 ATOM   ident:coord2
-ENDSTMT
-STMT
 ATOM   rarrow
-ENDSTMT
-STMT
-ATOM   lparen
-ENDSTMT
-STMT
-ATOM   ident:x
-ENDSTMT
-STMT
-ATOM   ident:y
-ENDSTMT
-STMT
-ATOM   rparen
-ENDSTMT
-STMT
+GROUP  paren
+ITEM   ident:x
+ITEM   ident:y
+ENDGROUP
 ATOM   lit:if
 ENDSTMT
 END

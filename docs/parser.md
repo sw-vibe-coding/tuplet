@@ -7,23 +7,27 @@ or error dump output.
 
 ## Current Shape
 
-`src/ast.ml` defines the initial dumpable AST. A successful flat
-token stream dumps as statement nodes:
+`src/ast.ml` defines the initial dumpable AST. A successful
+kernel-form token stream dumps as statement nodes with structured
+children:
 
 ```
 PROGRAM
-STMT
+STMT   mint
 ATOM   mint
-ENDSTMT
-STMT
 ATOM   ident:coord2
+ATOM   rarrow
+GROUP  paren
+ITEM   ident:x
+ITEM   ident:y
+ENDGROUP
 ENDSTMT
 END
 ```
 
 `src/parser.ml` defines a parser-facing token type mirroring the
 lexer token surface and a `parse` function over a token list.
-For now it consumes one non-comment token per flat statement,
+For now it parses one kernel-form statement from the token stream,
 returning the remaining token stream explicitly from
 `parse_statement`. Comments are skipped as trivia and EOF
 terminates the program.
@@ -34,10 +38,11 @@ Unknown lexer tokens are parser errors:
 ERROR  unknown-token:64
 ```
 
-`src/parser_main.ml` and `src/parser_error_main.ml` are smoke
-drivers with test token streams. Later parser steps will replace
-these test streams with real lexer handoff and kernel grammar
-parsing.
+`src/parser_main.ml`, `src/parser_assign_main.ml`,
+`src/parser_syntax_main.ml`, and `src/parser_error_main.ml` are
+smoke drivers with test token streams. Later parser steps will
+replace these test streams with real lexer handoff and registry
+driven template parsing.
 
 ## Token Stream Contract
 
@@ -54,7 +59,16 @@ The parser contract for this phase is:
 - `THash` is trivia and never appears in the AST.
 - `TEOF` terminates the program.
 - `TUnknown` terminates parsing with a deterministic error dump.
-- All other tokens are accepted as single-token flat statements.
+- `TLParen` and `TLBrace` open shallow structured groups.
+- `TComma` and `TUnderscore` are preserved as kernel atoms.
+- A stream containing `TLArrow` dumps as `STMT   assign`.
+- A stream beginning with `TMint` dumps as `STMT   mint`, unless
+  it is the syntax declaration head.
+- `TMint` followed by `TIdent "syntax"` or `TLiteral "syntax"`
+  parses as a syntax declaration head. The parser splits tokens
+  before `expand` or `TRArrow` into `GROUP  template` and tokens
+  after it into `GROUP  expansion`; it does not register or apply
+  the template yet.
 
 ## Boundaries
 
