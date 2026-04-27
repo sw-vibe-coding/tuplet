@@ -28,7 +28,7 @@ the prelude.
 | #  | Saga                          | Phase | One-line goal                                                                | Status        |
 |----|-------------------------------|-------|------------------------------------------------------------------------------|---------------|
 | 0  | `tuplet-scaffold`             | 0     | Docs (PRD, grammar, design, lowering, kernel) + toolchain smoke baselines.   | in-progress   |
-| 1  | `tuplet-lexer`                | 1     | Tokenize `.tup`; surface registry-callback for template literals.            | upcoming      |
+| 1  | `tuplet-lexer`                | 1     | Tokenize `.tup`; surface registry-callback for template literals.            | done          |
 | 2  | `tuplet-parser`               | 2     | `syntax` registry + longest-match template matcher producing AST.            | upcoming      |
 | 3  | `tuplet-checker`              | 3     | Name resolution + arity check against the registry; no hardcoded ops.        | upcoming      |
 | 4  | `tuplet-ir`                   | 4     | AST -> stack IR including `IPrimForth` and anonymous-verb thunks.            | upcoming      |

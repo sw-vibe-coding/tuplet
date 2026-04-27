@@ -189,8 +189,36 @@ Pre-registration "keywords" (e.g., `if`, `then`, `else`,
 `while`) lex as `TIdent` -- the lexer doesn't know about
 keywords. Once a `*syntax T expand E` declaration registers
 a literal token, the parser tells the lexer to switch its
-classification (handled by the dynamic literal registry --
-that's a future step).
+classification via the dynamic literal registry.
+
+## Dynamic Literal Registry
+
+The parser can call `add_literal <bytes>` before a lexing pass
+to register template literal words introduced by earlier
+`*syntax` declarations. Completed identifiers are compared
+against the registered byte lists. A match dumps as:
+
+```
+LIT    if
+```
+
+Unregistered names still dump as `IDENT`. The registry is
+append-only for a lexer run; callers that need a different
+literal set start a fresh run and register the needed literals
+before lexing source.
+
+`scripts/run-lexer-fixture.sh` also supports a test-only
+registration prelude in fixture bytes:
+
+- SOH (`0x01`) begins literal registrations.
+- Space (`0x20`) separates literal names.
+- STX (`0x02`) ends registrations and normal source lexing
+  begins.
+
+For example, bytes for `0x01 if then 0x02 if else 0x03`
+register `if` and `then`, then lex `if else` as `LIT if`,
+`IDENT else`, `EOF`. Real parser integration should call
+`add_literal` directly rather than emitting this prelude.
 
 ## Source-ingestion vs runtime-input gotcha
 

@@ -1,0 +1,4 @@
+LIT    if
+LIT    then
+IDENT  else
+EOF

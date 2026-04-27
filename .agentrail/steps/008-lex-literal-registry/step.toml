@@ -1,6 +1,6 @@
 number = 8
 slug = "lex-literal-registry"
-status = "blocked"
+status = "in-progress"
 description = """
 # Step: lex-literal-registry
 
