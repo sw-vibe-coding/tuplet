@@ -1,0 +1,20 @@
+PROGRAM
+STMT   syntax-match
+GROUP  mode
+ITEM   expand
+ENDGROUP
+GROUP  template
+ITEM   ident:if
+ITEM   slot
+ITEM   ident:then
+ITEM   slot
+ENDGROUP
+GROUP  slots
+ITEM   ident:cond
+ITEM   ident:body
+ENDGROUP
+GROUP  expansion
+ITEM   ident:long
+ENDGROUP
+ENDSTMT
+END

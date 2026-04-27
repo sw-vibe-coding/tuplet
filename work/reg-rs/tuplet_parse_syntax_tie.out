@@ -1,0 +1,17 @@
+PROGRAM
+STMT   syntax-match
+GROUP  mode
+ITEM   expand
+ENDGROUP
+GROUP  template
+ITEM   ident:pick
+ITEM   slot
+ENDGROUP
+GROUP  slots
+ITEM   ident:value
+ENDGROUP
+GROUP  expansion
+ITEM   ident:first
+ENDGROUP
+ENDSTMT
+END

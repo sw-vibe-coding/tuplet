@@ -78,8 +78,13 @@ The parser contract for this phase is:
 - Parsed syntax declarations are inserted into `src/registry.ml`
   with declaration order, mode (`expand` or `verb`), template
   token slice, and expansion token slice. The registry is a
-  skeleton: it stores and dumps entries, but does not yet drive
-  template matching for later statements.
+  skeleton that stores and dumps entries.
+- Later parses in the same process consult the registry before
+  falling back to kernel parsing. The current matcher is a narrow
+  first slice: `_` captures one token, longest matching template
+  wins, and first-declared wins on ties. Matched statements dump
+  as `STMT   syntax-match` with mode, template, slots, and
+  expansion groups.
 
 ## Tuple-First Direction
 
@@ -92,8 +97,9 @@ should evolve toward named tuple-shaped nodes:
 - Assignment LHS forms are tuple patterns, not only identifier
   lists.
 - Syntax declarations currently register template/expansion token
-  slices. Later macro work should store and rewrite tuple-shaped AST
-  where possible.
+  slices and can match later token streams. Later macro work should
+  store and rewrite tuple-shaped AST where possible, including
+  multi-token slot expressions.
 - Compiler pass APIs can later carry tuple-shaped state such as
   `(source, tokens, diagnostics, ast, ...)`.
 

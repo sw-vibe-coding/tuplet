@@ -1,0 +1,12 @@
+number = 5
+slug = "longest-match-template-parser"
+status = "completed"
+description = """
+# Step: longest-match-template-parser
+
+Use the parser-owned syntax registry to match later token streams, choosing the longest matching template and preserving first-declared wins on ties."""
+role = "production"
+context_files = []
+created_at = "2026-04-27T16:55:00"
+completed_at = "2026-04-27T17:08:00"
+commits = []
