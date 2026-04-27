@@ -1,6 +1,6 @@
 number = 7
 slug = "lex-unicode-aliases"
-status = "in-progress"
+status = "completed"
 description = """
 # Step: lex-unicode-aliases
 
@@ -8,4 +8,5 @@ Fold the Unicode kernel glyphs from `docs/glyphs..."""
 role = "legacy"
 context_files = []
 created_at = "2026-04-26T14:43:08"
-commits = []
+completed_at = "2026-04-26T18:57:25"
+commits = ["64b478473fa31dde2b2dc2521ae29d1a406e0216"]

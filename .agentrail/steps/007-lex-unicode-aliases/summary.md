@@ -1,1 +1,1 @@
-BLOCKED: blocked on sw-embed/sw-cor24-ocaml#12
+Unicode kernel glyph folding; 6 reg-rs baselines; full tuplet_lex sweep green

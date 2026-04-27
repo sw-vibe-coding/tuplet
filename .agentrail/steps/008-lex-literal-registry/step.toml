@@ -1,0 +1,11 @@
+number = 8
+slug = "lex-literal-registry"
+status = "pending"
+description = """
+# Step: lex-literal-registry
+
+Add a runtime literal registry that the parser ..."""
+role = "legacy"
+context_files = []
+created_at = "2026-04-26T18:57:25"
+commits = []
