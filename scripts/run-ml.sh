@@ -20,7 +20,17 @@ for p in "$@"; do
   [ -r "${p}" ] || { echo "run-ml.sh: cannot read ${p}" >&2; exit 2; }
 done
 
-raw="$(bash "${HOME}/github/sw-embed/sw-cor24-ocaml/scripts/run-ocaml.sh" "$@")"
+if [ "$#" -eq 1 ]; then
+  raw="$(bash "${HOME}/github/sw-embed/sw-cor24-ocaml/scripts/run-ocaml.sh" "$@")"
+else
+  tmp="$(mktemp /tmp/tuplet-run-ml.XXXXXX.ml)"
+  trap 'rm -f "$tmp"' EXIT
+  for p in "$@"; do
+    cat "$p" >> "$tmp"
+    printf '\n' >> "$tmp"
+  done
+  raw="$(bash "${HOME}/github/sw-embed/sw-cor24-ocaml/scripts/run-ocaml.sh" "$tmp")"
+fi
 
 # Strip echoes. For each raw output line:
 #   - If it starts with "> ": treat as runtime echo prefix.

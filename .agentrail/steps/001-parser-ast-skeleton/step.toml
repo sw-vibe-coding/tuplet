@@ -1,6 +1,6 @@
 number = 1
 slug = "parser-ast-skeleton"
-status = "pending"
+status = "in-progress"
 description = """
 # Step: parser-ast-skeleton
 

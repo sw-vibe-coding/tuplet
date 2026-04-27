@@ -1,0 +1,4 @@
+type token = TIdent of string | TInt of int | TPct of int | TLArrow | TRArrow | TLParen | TRParen | TLBrace | TRBrace | TComma | TUnderscore | THash of string | TLiteral of string | TEOF | TMint
+let token_name t = match t with TIdent s -> "ident:" ^ s | TInt n -> "int:" ^ string_of_int n | TPct n -> "pct:" ^ string_of_int n | TLArrow -> "larrow" | TRArrow -> "rarrow" | TLParen -> "lparen" | TRParen -> "rparen" | TLBrace -> "lbrace" | TRBrace -> "rbrace" | TComma -> "comma" | TUnderscore -> "slot" | THash s -> "comment:" ^ s | TLiteral s -> "lit:" ^ s | TEOF -> "eof" | TMint -> "mint"
+let rec parse_tokens toks acc = match toks with [] -> AProgram (List.rev acc) | h :: t -> (match h with TEOF -> AProgram (List.rev acc) | THash _ -> parse_tokens t acc | _ -> parse_tokens t (AToken (token_name h) :: acc))
+let parse toks = parse_tokens toks []

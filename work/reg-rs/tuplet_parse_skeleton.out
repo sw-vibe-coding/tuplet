@@ -1,0 +1,10 @@
+PROGRAM
+TOKEN  mint
+TOKEN  ident:coord2
+TOKEN  rarrow
+TOKEN  lparen
+TOKEN  ident:x
+TOKEN  ident:y
+TOKEN  rparen
+TOKEN  lit:if
+END
