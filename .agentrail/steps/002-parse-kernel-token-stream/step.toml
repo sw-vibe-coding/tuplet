@@ -1,6 +1,6 @@
 number = 2
 slug = "parse-kernel-token-stream"
-status = "in-progress"
+status = "completed"
 description = """
 # Step: parse-kernel-token-stream
 
@@ -8,4 +8,5 @@ Replace the parser skeleton fixed sample t..."""
 role = "production"
 context_files = []
 created_at = "2026-04-27T11:19:39"
-commits = []
+completed_at = "2026-04-27T11:41:00"
+commits = ["9100daad891abd5991a86e60db9d2dbe46a72fde"]

@@ -1,0 +1,11 @@
+number = 3
+slug = "parse-kernel-forms"
+status = "pending"
+description = """
+# Step: parse-kernel-forms
+
+Evolve the flat token-stream parser into a small ..."""
+role = "production"
+context_files = []
+created_at = "2026-04-27T11:41:00"
+commits = []
