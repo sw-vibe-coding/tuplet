@@ -1,6 +1,6 @@
 number = 1
 slug = "parser-ast-skeleton"
-status = "in-progress"
+status = "completed"
 description = """
 # Step: parser-ast-skeleton
 
@@ -8,4 +8,5 @@ Create the minimum parser saga skeleton: AST tok..."""
 role = "production"
 context_files = []
 created_at = "2026-04-27T11:11:41"
-commits = []
+completed_at = "2026-04-27T11:19:39"
+commits = ["86448ae78ce55d70fe608a6b06f00982ac24da7b"]
