@@ -104,7 +104,7 @@ raw="$("${cor24_run}" \
   --load-binary "${image}@0x080000" \
   --patch "0x${code_ptr}=0x040000" \
   --patch "0x${heap_limit}=0x03F000" \
-  --entry 0 -u "${uart_input}" --speed 0 -n 500000000 2>&1 | \
+  --entry 0 -u "${uart_input}" --speed 0 -n 3000000000 2>&1 | \
   awk '
     /^UART output:/ { in_out = 1; sub(/^UART output: /, ""); }
     /^Executed / { in_out = 0 }
