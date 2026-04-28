@@ -11,7 +11,9 @@ ITEM   slot
 ITEM   ident:end
 ENDGROUP
 GROUP  slots
+ITEM   slot-start
 ITEM   ident:work
+ITEM   slot-start
 ITEM   ident:again
 ENDGROUP
 GROUP  expansion

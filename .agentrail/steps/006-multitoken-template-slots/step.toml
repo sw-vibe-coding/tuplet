@@ -1,0 +1,12 @@
+number = 6
+slug = "multitoken-template-slots"
+status = "completed"
+description = """
+# Step: multitoken-template-slots
+
+Allow registry template slots to capture token spans up to the next literal delimiter, enough for do/while and if/then style demo syntax."""
+role = "production"
+context_files = []
+created_at = "2026-04-27T17:12:00"
+completed_at = "2026-04-27T17:30:00"
+commits = []

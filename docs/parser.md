@@ -81,10 +81,11 @@ The parser contract for this phase is:
   skeleton that stores and dumps entries.
 - Later parses in the same process consult the registry before
   falling back to kernel parsing. The current matcher is a narrow
-  first slice: `_` captures one token, longest matching template
-  wins, and first-declared wins on ties. Matched statements dump
-  as `STMT   syntax-match` with mode, template, slots, and
-  expansion groups.
+  first slice: `_` captures the token span up to the next template
+  literal, longest matching template wins, and first-declared wins
+  on ties. Matched statements dump as `STMT   syntax-match` with
+  mode, template, slots, and expansion groups. Slot captures are
+  delimited by `slot-start` markers in the current dump format.
 
 ## Tuple-First Direction
 
@@ -98,8 +99,8 @@ should evolve toward named tuple-shaped nodes:
   lists.
 - Syntax declarations currently register template/expansion token
   slices and can match later token streams. Later macro work should
-  store and rewrite tuple-shaped AST where possible, including
-  multi-token slot expressions.
+  store and rewrite tuple-shaped AST where possible, replacing the
+  temporary flat slot dump with explicit tuple-shaped slot nodes.
 - Compiler pass APIs can later carry tuple-shaped state such as
   `(source, tokens, diagnostics, ast, ...)`.
 

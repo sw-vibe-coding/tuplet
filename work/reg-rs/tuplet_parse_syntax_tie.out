@@ -8,6 +8,7 @@ ITEM   ident:pick
 ITEM   slot
 ENDGROUP
 GROUP  slots
+ITEM   slot-start
 ITEM   ident:value
 ENDGROUP
 GROUP  expansion

@@ -4,19 +4,26 @@ GROUP  mode
 ITEM   expand
 ENDGROUP
 GROUP  template
-ITEM   ident:if
+ITEM   ident:do
 ITEM   slot
-ITEM   ident:then
+ITEM   ident:while
 ITEM   slot
+ITEM   ident:end
 ENDGROUP
 GROUP  slots
 ITEM   slot-start
-ITEM   ident:cond
+ITEM   ident:work
+ITEM   ident:hard
 ITEM   slot-start
-ITEM   ident:body
+ITEM   ident:x
+ITEM   int:0
+ITEM   ident:gt
 ENDGROUP
 GROUP  expansion
-ITEM   ident:long
+ITEM   slot
+ITEM   int:1
+ITEM   slot
+ITEM   int:2
 ENDGROUP
 ENDSTMT
 END
