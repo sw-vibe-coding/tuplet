@@ -16,23 +16,27 @@ fixture="${1:?usage: run-lexer-fixture.sh <fixture.input>}"
 [ -r "${fixture}" ] || { echo "run-lexer-fixture.sh: cannot read ${fixture}" >&2; exit 2; }
 
 src_path="/Users/mike/github/sw-vibe-coding/tuplet/src/lexer.ml"
+main_path="/Users/mike/github/sw-vibe-coding/tuplet/src/lexer_dump_main.ml"
 [ -r "${src_path}" ] || { echo "run-lexer-fixture.sh: cannot read ${src_path}" >&2; exit 2; }
+[ -r "${main_path}" ] || { echo "run-lexer-fixture.sh: cannot read ${main_path}" >&2; exit 2; }
 
-raw="$(OCAML_STDIN="$(cat "${fixture}")" bash "${HOME}/github/sw-embed/sw-cor24-ocaml/scripts/run-ocaml.sh" "${src_path}")"
+raw="$(OCAML_STDIN="$(cat "${fixture}")" bash "${HOME}/github/sw-embed/sw-cor24-ocaml/scripts/run-ocaml.sh" "${src_path}" "${main_path}")"
 
 clean="$(printf '%s' "${raw}" | perl -e '
 my $raw;
 { local $/; $raw = <STDIN>; }
 
 my @src_lines;
-open(my $fh, "<", $ARGV[0]) or die "cannot open $ARGV[0]: $!";
-while (my $line = <$fh>) {
-    chomp $line;
-    $line =~ s/^\s+//;
-    $line =~ s/\s+$//;
-    push @src_lines, $line if $line ne "";
+for my $path (@ARGV) {
+    open(my $fh, "<", $path) or die "cannot open $path: $!";
+    while (my $line = <$fh>) {
+        chomp $line;
+        $line =~ s/^\s+//;
+        $line =~ s/\s+$//;
+        push @src_lines, $line if $line ne "";
+    }
+    close $fh;
 }
-close $fh;
 my @by_len = sort { length($b) <=> length($a) } @src_lines;
 
 my $out = "";
@@ -56,6 +60,7 @@ for my $line (split /\n/, $raw, -1) {
             }
         }
         $rest =~ s/^\s+//;
+        next if $rest =~ /^let __module = "[^"]*"$/;
         $out .= $rest . "\n" if $rest ne "";
     } else {
         $out .= $line . "\n";
@@ -63,6 +68,6 @@ for my $line (split /\n/, $raw, -1) {
 }
 $out =~ s/\n+$/\n/;
 print $out;
-' "${src_path}")"
+' "${src_path}" "${main_path}")"
 
 printf '%s\n' "${clean}"

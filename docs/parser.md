@@ -51,6 +51,13 @@ Later parser steps will replace these test streams with real lexer
 handoff, registry-driven template matching, and tuple-shaped AST
 nodes.
 
+The lexer is now importable without side effects: `src/lexer.ml`
+defines tokenization and `src/lexer_dump_main.ml` owns the token
+dump entrypoint. The real lexer-to-parser acceptance path is still
+gated on `sw-embed/sw-cor24-ocaml#24`, because the bridge needs to
+evaluate qualified constructors from both `Lexer` and `Parser`
+modules while converting byte-list payloads into parser strings.
+
 ## Token Stream Contract
 
 The parser accepts the same token variant surface as the lexer:

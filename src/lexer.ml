@@ -32,4 +32,3 @@ let add_nonempty bs = match bs with [] -> () | _ -> add_literal bs
 let rec read_reg_word acc = let c = getc () in if c = 2 then (List.rev acc, 0) else if c = 32 then (List.rev acc, 1) else read_reg_word (c :: acc)
 let rec read_registrations u = let pair = read_reg_word [] in let _ = add_nonempty (fst pair) in if snd pair = 0 then () else read_registrations ()
 let start_lexer u = let first = getc () in if first = 1 then let _ = read_registrations () in dump_tokens (lex_loop 0 []) else dump_tokens (lex_loop first [])
-let _ = start_lexer ()

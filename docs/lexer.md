@@ -45,9 +45,16 @@ round-tripping (which would strip `\x00`).
 ### Driver
 
 `scripts/run-lexer-fixture.sh <fixture.input>` feeds a fixture
-file's bytes via `OCAML_STDIN`, runs `src/lexer.ml`, strips the
-Pascal runtime's source-echo prefixes, and prints just the
-emitted tokens. reg-rs baselines drive this script per fixture.
+file's bytes via `OCAML_STDIN`, runs `src/lexer.ml` plus
+`src/lexer_dump_main.ml`, strips the Pascal runtime's source-echo
+prefixes, and prints just the emitted tokens. reg-rs baselines
+drive this script per fixture.
+
+`src/lexer.ml` intentionally has no top-level `start_lexer` call:
+it is the reusable lexer module. `src/lexer_dump_main.ml` is the
+dump CLI entrypoint. Keeping those separate lets later parser
+acceptance tests import the lexer without dumping tokens as a
+side effect.
 
 ## Token representation
 

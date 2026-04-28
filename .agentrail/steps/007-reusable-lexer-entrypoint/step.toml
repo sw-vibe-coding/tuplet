@@ -1,0 +1,12 @@
+number = 7
+slug = "reusable-lexer-entrypoint"
+status = "completed"
+description = """
+# Step: reusable-lexer-entrypoint
+
+Split the lexer dump driver from the reusable lexer module so parser acceptance can import the lexer without token-dump side effects."""
+role = "production"
+context_files = []
+created_at = "2026-04-28T01:40:00"
+completed_at = "2026-04-28T01:48:00"
+commits = ["f96c42a5a68c240c697069d9cae90143058b3de7"]
