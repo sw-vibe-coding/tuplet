@@ -1,0 +1,7 @@
+PROGRAM
+STMT   assign
+ATOM   ident:foo
+ATOM   larrow
+ATOM   int:42
+ENDSTMT
+END

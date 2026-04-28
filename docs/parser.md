@@ -53,10 +53,15 @@ nodes.
 
 The lexer is now importable without side effects: `src/lexer.ml`
 defines tokenization and `src/lexer_dump_main.ml` owns the token
-dump entrypoint. The real lexer-to-parser acceptance path is still
-gated on `sw-embed/sw-cor24-ocaml#24`, because the bridge needs to
-evaluate qualified constructors from both `Lexer` and `Parser`
-modules while converting byte-list payloads into parser strings.
+dump entrypoint. `src/lex_bridge.ml` converts lexer tokens with
+byte-list payloads into parser tokens with string payloads. The
+single-source memory-backed handoff is covered by
+`tuplet_parse_memory_assignment`.
+
+Multi-source syntax acceptance is still gated on
+`sw-embed/sw-cor24-ocaml#26`: memory-loaded lexer bytes are readable,
+but converting syntax-sized memory-backed token lists currently
+truncates before the `expand` delimiter.
 
 ## Token Stream Contract
 

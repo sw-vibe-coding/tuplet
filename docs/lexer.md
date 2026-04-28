@@ -56,6 +56,12 @@ dump CLI entrypoint. Keeping those separate lets later parser
 acceptance tests import the lexer without dumping tokens as a
 side effect.
 
+The lexer can also read from a memory-loaded fixture instead of UART.
+`Lexer.use_memory_input 524288` switches `lexer_getc` to read bytes via
+the OCaml host's `peek` primitive, with the fixture loaded at
+`0x080000`. This mirrors the batch-image pattern used by other COR24
+interpreters and keeps source fixtures separate from UART output.
+
 ## Token representation
 
 The PoC uses idiomatic OCaml variants -- now supported upstream
