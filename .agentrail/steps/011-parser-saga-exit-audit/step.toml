@@ -1,0 +1,11 @@
+number = 11
+slug = "parser-saga-exit-audit"
+status = "pending"
+description = """
+# Step: parser-saga-exit-audit
+
+Audit the tuplet-parser saga against docs/pla..."""
+role = "production"
+context_files = []
+created_at = "2026-05-01T16:52:44"
+commits = []

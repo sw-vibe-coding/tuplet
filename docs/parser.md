@@ -65,6 +65,12 @@ declaration; the next line is parsed against that registry by
 `tuplet_parse_memory_syntax` validates that real lexer tokens can
 flow through the bridge and produce a `syntax-match` AST.
 
+Tuple-shaped kernel forms now have both parser-only and
+memory-backed source regressions. `tuplet_parse_signature` and
+`tuplet_parse_memory_signature` cover `*coord2 -> (x y)`.
+`tuplet_parse_tuple_assign` and
+`tuplet_parse_memory_tuple_assign` cover `a, b <- coord2`.
+
 ## Token Stream Contract
 
 The parser accepts the same token variant surface as the lexer:

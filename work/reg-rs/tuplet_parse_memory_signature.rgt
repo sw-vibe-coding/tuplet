@@ -1,0 +1,4 @@
+command = "bash /Users/mike/github/sw-vibe-coding/tuplet/scripts/run-lex-parse-fixture.sh /Users/mike/github/sw-vibe-coding/tuplet/tests/parser/lex_parse_signature.input"
+timeout = 180
+exit_code = 0
+desc = "tuplet parse memory-backed tuple signature source"
