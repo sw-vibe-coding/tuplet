@@ -1,0 +1,11 @@
+PROGRAM
+STMT   assign
+GROUP  pattern
+ITEM   ident:a
+ITEM   ident:b
+ENDGROUP
+GROUP  expr
+ITEM   ident:coord2
+ENDGROUP
+ENDSTMT
+END

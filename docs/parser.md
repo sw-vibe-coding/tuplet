@@ -85,6 +85,12 @@ The parser contract for this phase is:
 - A stream containing `TLArrow` dumps as `STMT   assign`.
 - A stream beginning with `TMint` dumps as `STMT   mint`, unless
   it is the syntax declaration head.
+- A stream shaped as `TMint TIdent TRArrow ( ... )` dumps as
+  `STMT   signature`, preserving the minted name and output tuple
+  fields in named groups.
+- A comma-separated LHS before `<-` dumps as `STMT   assign` with
+  `GROUP  pattern` and `GROUP  expr`, preserving tuple-pattern
+  arity for the checker.
 - `TMint` followed by `TIdent "syntax"` or `TLiteral "syntax"`
   parses as a syntax declaration head. The parser splits tokens
   before `expand` or `TRArrow` into `GROUP  template` and tokens

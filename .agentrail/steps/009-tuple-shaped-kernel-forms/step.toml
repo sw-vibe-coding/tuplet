@@ -1,0 +1,12 @@
+number = 9
+slug = "tuple-shaped-kernel-forms"
+status = "completed"
+description = """
+# Step: tuple-shaped-kernel-forms
+
+Evolve parser scaffolding toward the tuple..."""
+role = "production"
+context_files = []
+created_at = "2026-05-01T16:31:38"
+completed_at = "2026-05-01T16:35:00"
+commits = ["596d8f4785ca269cc09dc42a03da0495888f8620"]
