@@ -1,30 +1,39 @@
-# Lexer Parser Handoff Blocker
+# Lexer Parser Handoff
 
-The real-source parser acceptance path is gated on
-`sw-embed/sw-cor24-ocaml#26`.
+Real-source lexer-to-parser handoff is unblocked and covered by
+memory-backed regressions.
 
-Validated state before blocking:
+Implemented:
 
-- Upstream `sw-cor24-ocaml` is rebuilt at `0b7230b` plus the local
-  uncommitted upstream hex-literal parser edit already present in that
-  worktree.
-- Issue #24 is closed and verified: the minimized constructor bridge
-  now prints `larrow` for `Lexer.TLArrow -> Parser.TLArrow`.
-- Issue #25 is closed and verified: `peek`/`poke` pass upstream, and
-  Tuplet can load fixture bytes at `0x080000`.
-- Single-source memory-backed lexer-to-parser handoff works for an
-  assignment fixture. The committed regression is
-  `tuplet_parse_memory_assignment`.
-- Multi-source syntax fixtures should not be forced through UART. The
-  intended path is now memory-backed: parse the first line as a syntax
-  declaration, then parse the remaining memory image against the
-  updated registry.
-- That intended path is gated on #26: memory lexer dump sees all tokens,
-  and literal token conversion works, but converting a syntax-sized
-  memory-backed token list truncates/stalls before `ident:expand`.
-- Lexer-only and parser-only regression slices still pass:
-  `tuplet_lex_ident_simple` and `tuplet_parse_syntax_multislot`.
+- `scripts/run-ml-memory.sh` stages a terminated memory image before
+  loading fixture bytes at `0x080000`, so the lexer no longer depends
+  on incidental memory contents after a fixture.
+- `scripts/run-ml-memory.sh` now passes an explicit configurable
+  `cor24-run` wall limit (`TUPLET_COR24_WALL_SECONDS`, default 180)
+  because the GC-enabled OCaml host needs more than the emulator's
+  default wall-time budget for full Tuplet stacks.
+- `src/lex_bridge.ml` converts lexer byte-list payload tokens into the
+  parser's string-payload token type.
+- `src/lex_parse_main.ml` validates one-pass real-source parsing for
+  assignment input.
+- `src/lex_parse_register_main.ml` validates the syntax path: parse
+  the first memory-backed line as a syntax declaration, then parse the
+  following line against the updated registry.
+- `scripts/repro-ocaml-issue28.sh` remains as the upstream host repro
+  proving the two-pass memory-backed token path now works.
 
-No local workaround was committed. The next step after #26 is fixed is
-to add the memory-backed syntax declaration plus matching statement
-regression.
+Regressions:
+
+- `tuplet_parse_memory_assignment` parses `foo <- 42` from
+  memory-loaded source and dumps the assignment AST.
+- `tuplet_parse_memory_syntax` parses a memory-loaded `* syntax ...`
+  declaration followed by `do body while cond end` and dumps the
+  expected `syntax-match` AST.
+
+Upstream blockers verified fixed:
+
+- `sw-cor24-ocaml#28`: two-pass memory-backed Tuplet parse no longer
+  traps after syntax registration.
+- `sw-cor24-ocaml#29`: mid-eval GC/reclaim now lets the standalone
+  Tuplet repro print `1275`; Tuplet closed the issue after validating
+  assignment and syntax memory regressions against host `11e2264`.

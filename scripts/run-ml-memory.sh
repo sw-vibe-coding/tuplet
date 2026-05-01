@@ -15,12 +15,18 @@ for p in "$@"; do
   [ -r "${p}" ] || { echo "run-ml-memory.sh: cannot read ${p}" >&2; exit 2; }
 done
 
+input_image="$(mktemp "${TMPDIR:-/tmp}/tuplet-memory-input.XXXXXX")"
+trap 'rm -f "${input_image}"' EXIT
+cp "${image}" "${input_image}"
+printf '\003' >> "${input_image}"
+
 repo="/Users/mike/github/sw-vibe-coding/tuplet"
 ocaml_repo="${HOME}/github/sw-embed/sw-cor24-ocaml"
 build_dir="${ocaml_repo}/build"
 cor24_run="${ocaml_repo}/vendor/sw-em24/$(. "${ocaml_repo}/vendor/active.env" && echo "${SW_EM24_VERSION}")/bin/cor24-run"
 if [ ! -f "${cor24_run}" ]; then cor24_run="$(command -v cor24-run 2>/dev/null || true)"; fi
 [ -n "${cor24_run}" ] || { echo "run-ml-memory.sh: cor24-run not found" >&2; exit 2; }
+cor24_wall_seconds="${TUPLET_COR24_WALL_SECONDS:-180}"
 
 module_name_for_file() {
   local path base stem first rest
@@ -101,10 +107,10 @@ uart_input="${ml_input}"$'\x04'
 raw="$("${cor24_run}" \
   --load-binary "${build_dir}/pvm.bin@0" \
   --load-binary "${build_dir}/ocaml.p24m@0x040000" \
-  --load-binary "${image}@0x080000" \
+  --load-binary "${input_image}@0x080000" \
   --patch "0x${code_ptr}=0x040000" \
   --patch "0x${heap_limit}=0x03F000" \
-  --entry 0 -u "${uart_input}" --speed 0 -n 3000000000 2>&1 | \
+  --entry 0 -u "${uart_input}" --speed 0 -n 3000000000 -t "${cor24_wall_seconds}" 2>&1 | \
   awk '
     /^UART output:/ { in_out = 1; sub(/^UART output: /, ""); }
     /^Executed / { in_out = 0 }

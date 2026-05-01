@@ -58,10 +58,12 @@ byte-list payloads into parser tokens with string payloads. The
 single-source memory-backed handoff is covered by
 `tuplet_parse_memory_assignment`.
 
-Multi-source syntax acceptance is still gated on
-`sw-embed/sw-cor24-ocaml#26`: memory-loaded lexer bytes are readable,
-but converting syntax-sized memory-backed token lists currently
-truncates before the `expand` delimiter.
+Memory-backed syntax acceptance is also covered. The first line of
+`tests/parser/lex_parse_syntax.input` registers a syntax
+declaration; the next line is parsed against that registry by
+`scripts/run-lex-parse-register-fixture.sh`. The regression
+`tuplet_parse_memory_syntax` validates that real lexer tokens can
+flow through the bridge and produce a `syntax-match` AST.
 
 ## Token Stream Contract
 

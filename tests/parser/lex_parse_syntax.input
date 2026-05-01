@@ -1,0 +1,2 @@
+* syntax do _ while _ end expand _ 1 _ 2
+do body while cond end
