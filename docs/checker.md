@@ -6,6 +6,11 @@ intentionally small: it supports the parser-complete tuple and call
 shapes needed to start demo parity work without pulling in IR,
 interpretation, or Forth emission.
 
+This saga exits with deterministic checker dumps rather than a final
+typed-AST encoding. The final typed-AST node representation is still a
+downstream design item for IR/lowering; the current checker output is
+the stable contract for this slice.
+
 ## Current Scope
 
 Supported statement shapes:

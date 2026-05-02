@@ -37,7 +37,7 @@ the prelude.
 | 0  | `tuplet-scaffold`             | 0     | Docs (PRD, grammar, design, lowering, kernel) + toolchain smoke baselines.   | in-progress   |
 | 1  | `tuplet-lexer`                | 1     | Tokenize `.tup`; surface registry-callback for template literals.            | done          |
 | 2  | `tuplet-parser`               | 2     | Tuple-shaped AST + `syntax` registry + longest-match template matcher.       | done          |
-| 3  | `tuplet-checker`              | 3     | Name resolution + tuple/arity check against the registry; no hardcoded ops.  | active        |
+| 3  | `tuplet-checker`              | 3     | Name resolution + tuple/arity check against the registry; no hardcoded ops.  | done          |
 | 4  | `tuplet-ir`                   | 4     | AST -> stack IR including `IPrimForth` and anonymous-verb thunks.            | upcoming      |
 | 5  | `tuplet-interp`               | 5     | Minimal reference interpreter over IR; oracle for emitter cross-checks.      | upcoming      |
 | 6  | `tuplet-forth-emit`           | 6     | IR -> Forth into `work/generated/*.fs`; cor24-run round-trip via reg-rs.     | upcoming      |
