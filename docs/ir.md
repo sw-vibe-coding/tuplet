@@ -21,6 +21,8 @@ stack instructions.
 
 ## Example
 
+Tuple declaration plus destructuring assignment:
+
 ```text
 IR
 DECLARE ident:coord2 inputs:0 outputs:2
@@ -32,6 +34,23 @@ ENDIR
 
 The store order is reversed for tuple destructuring because the last
 field is on top of the stack.
+
+Shallow calls splice tuple-valued arguments by emitting the tuple load
+before scalar pushes and the final call:
+
+```text
+IR
+DECLARE ident:plot inputs:4 outputs:1
+DECLARE ident:coord2 inputs:0 outputs:2
+LOAD_TUPLE ident:coord2 arity:2
+PUSH_INT 7
+PUSH_PCT 50
+CALL ident:plot inputs:4 outputs:1
+ENDIR
+```
+
+Checker rejection is fail-fast. `Ir.lower` runs `Checker.check` before
+emitting IR and returns the checker error unchanged.
 
 ## Deferrals
 

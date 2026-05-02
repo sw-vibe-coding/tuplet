@@ -1,0 +1,8 @@
+IR
+DECLARE ident:plot inputs:4 outputs:1
+DECLARE ident:coord2 inputs:0 outputs:2
+LOAD_TUPLE ident:coord2 arity:2
+PUSH_INT 7
+PUSH_PCT 50
+CALL ident:plot inputs:4 outputs:1
+ENDIR
