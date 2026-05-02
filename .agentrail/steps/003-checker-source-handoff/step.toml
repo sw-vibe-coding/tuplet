@@ -1,6 +1,6 @@
 number = 3
 slug = "checker-source-handoff"
-status = "pending"
+status = "blocked"
 description = "Wire checker acceptance to real source fixtures through lexer -> parser -> ch..."
 role = "legacy"
 context_files = []

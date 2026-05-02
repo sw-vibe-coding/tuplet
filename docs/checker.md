@@ -29,6 +29,14 @@ Parser-backed coverage currently includes tuple assignment pass,
 unbound RHS name failure, tuple-pattern arity mismatch failure, and
 call arity pass with tuple splicing.
 
+Real-source checker handoff is currently blocked upstream. The
+memory-backed parser can dump the source AST, and checker unit tests
+can allocate and run, but loading the checker module together with the
+memory-backed lexer/parser path makes a later trivial allocation fail
+with `EVAL ERROR`. The in-tree repro is
+`scripts/repro-ocaml-memory-alloc-after-parse.sh`; upstream tracking is
+`sw-embed/sw-cor24-ocaml#30`.
+
 ## Rules
 
 - Assignment arity: the number of names in the `pattern` group must

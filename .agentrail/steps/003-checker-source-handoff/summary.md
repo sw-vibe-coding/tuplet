@@ -1,0 +1,1 @@
+BLOCKED: Blocked by sw-embed/sw-cor24-ocaml#30: with the checker module loaded, memory-backed lexer/parser output can be dumped, but any later allocation/traversal fails with EVAL ERROR. In-tree repro: scripts/repro-ocaml-memory-alloc-after-parse.sh.

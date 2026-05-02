@@ -1,0 +1,3 @@
+*plot(x y color transparency) -> (success)
+*coord2 -> (x y)
+plot(coord2 7 50%)
