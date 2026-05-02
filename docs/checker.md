@@ -29,13 +29,12 @@ Parser-backed coverage currently includes tuple assignment pass,
 unbound RHS name failure, tuple-pattern arity mismatch failure, and
 call arity pass with tuple splicing.
 
-Real-source checker handoff is currently blocked upstream. The
-memory-backed parser can dump the source AST, and checker unit tests
-can allocate and run, but loading the checker module together with the
-memory-backed lexer/parser path makes a later trivial allocation fail
-with `EVAL ERROR`. The in-tree repro is
-`scripts/repro-ocaml-memory-alloc-after-parse.sh`; upstream tracking is
-`sw-embed/sw-cor24-ocaml#30`.
+Real-source checker handoff is currently blocked upstream. The first
+`sw-embed/sw-cor24-ocaml#30` fix made the allocation-after-parse repro
+pass, but the full source checker path still traps when the checker is
+run over a memory-backed parsed program. The current in-tree repro is
+`scripts/repro-ocaml-issue30-source-check-trap.sh`; upstream tracking
+remains `sw-embed/sw-cor24-ocaml#30`.
 
 ## Rules
 
