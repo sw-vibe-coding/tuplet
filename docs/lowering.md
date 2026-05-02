@@ -78,7 +78,7 @@ has the `(n d -- q r)` stack effect that `div2` needs.
 
 ## Lowering per surface construct
 
-### Tuple declaration: `name -> (f1 f2 ... fN)`
+### Tuple declaration: `▪nameₙ ───‣ ⎛f1 f2 ... fN⎠`
 
 ```
 CREATE <name>-f1 0 ,
@@ -109,27 +109,27 @@ CREATE x-cell 0 ,
 The `-cell` suffix on the backing address disambiguates from the
 accessor words.
 
-### Signature declaration: `name(inputs) -> (outputs)`
+### Signature declaration: `▪name⎛inputs⎠ ───‣ ⎛outputs⎠`
 
 Emits nothing. Signatures are compile-time metadata for the arity
 checker. The verb's runtime body is either a builtin (shipped in
 the prelude, see below) or runtime-linked.
 
-### Scalar assignment: `x <- expr`
+### Scalar assignment: `x ⟵ expr`
 
 ```
 <forth for expr>   \ leaves one value on the stack
 x!
 ```
 
-### Destructuring assignment: `a, b, ..., k <- expr`
+### Destructuring assignment: `a , b , ... , k ⟵ expr`
 
 ```
 <forth for expr>   \ leaves N values on the stack (top = last name)
 k!  ...  b!  a!    \ reverse order: top pops into the last name
 ```
 
-### Tuple-var assignment: `coord2 <- expr`
+### Tuple-var assignment: `coord₂ ⟵ expr`
 
 Same form as destructuring, using the generated `coord2!` word:
 
@@ -138,7 +138,7 @@ Same form as destructuring, using the generated `coord2!` word:
 coord2!
 ```
 
-### Call: `f(args)` (splicing is the default)
+### Call: `f⎛args⎠` (splicing is the default)
 
 ```
 <forth for arg1>
@@ -208,9 +208,9 @@ return value consumed by the caller's `IStore`.
 Source (same as `docs/design.md`):
 
 ```
-coord2 -> (x y)
-coord2 <- 3, 9
-success? <- plot(coord2 Red 50%)
+▪coord₂ ───‣ ⎛x y⎠
+coord₂ ⟵ 3 , 9
+successˀ ⟵ plot⎛coord₂ Red 50%⎠
 ```
 
 IR:
@@ -225,10 +225,10 @@ IStore      "success?"
 ```
 
 Lowered Forth (prelude omitted for brevity; symbol table resolves
-`Red` -> `82`):
+`Red` to `82`; glyph names are normalized before emission):
 
 ```forth
-\ --- declaration: coord2 -> (x y) ---
+\ --- declaration: ▪coord₂ ───‣ ⎛x y⎠ ---
 CREATE coord2-x 0 ,
 CREATE coord2-y 0 ,
 : coord2!  ( x y -- )   coord2-y ! coord2-x ! ;

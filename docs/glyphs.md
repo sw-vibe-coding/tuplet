@@ -19,9 +19,9 @@ docs, demos, and tests do not drift back to ASCII-first examples. See
 ## Minimal alphabet
 
 Every form below has an ASCII fallback. The lexer folds the
-Unicode form to its ASCII canonical at lex time, so AST
-output and error messages stay ASCII regardless of how the
-user typed it.
+Unicode form to the same parser-facing internal token at lex time,
+so AST output and error messages can stay normalized regardless of
+how the user typed it.
 
 ### Mint operator
 

@@ -119,7 +119,7 @@ since `0x00` is not a valid Tuplet source byte). If the
 post-digit byte is `%` (37) the token is `TPct`, otherwise
 `TInt` and the lookahead byte starts the next token.
 
-## Multi-byte tokens (`<-`, `->`)
+## Multi-byte tokens (`⟵`, `───‣`, ASCII `<-`, `->`)
 
 Lookahead-driven. After reading `<` (60), peek the next byte;
 if it's `-` (45) emit `TLArrow`. Otherwise `<` is unknown and
@@ -145,7 +145,7 @@ folds `TMinus` followed by `TInt` into a negative literal.
 
 ## Unicode Lexing
 
-The kernel glyph aliases listed in `docs/glyphs.md` fold to the
+The kernel glyph aliases listed in `docs/notation.md` fold to the
 same parser-facing tokens as their ASCII spellings. The current
 `sw-cor24-ocaml` runner feeds Unicode runtime input to `getc` as
 the glyph codepoint's low byte, so the lexer matches those stable
@@ -159,6 +159,19 @@ runtime byte values directly:
 | LEFTWARDS LONG ARROW | 245 | `<-` | `TLArrow` |
 | RIGHTWARDS ARROW | 146 | `->` | `TRArrow` |
 | RIGHTWARDS DOUBLE ARROW | 210 | `->>` | `TRArrow` then `TUnknown 62` |
+
+Current explicit deferrals:
+
+- Shell parens `⎛` and `⎠` are canonical source delimiters, but the
+  executable lexer/parser path still primarily accepts ASCII `(` and
+  `)`.
+- The heavy mapping sequence `───‣` is canonical, but complete
+  four-codepoint sequence recognition is still deferred. Existing
+  regressions exercise the normalized parser path and simpler arrow
+  folds.
+- Subscript arity suffixes such as `₂` are canonical docs notation.
+  The parser still derives arity from ASCII trailing digits after
+  normalization.
 
 The wider suggested glyph table remains user-extension territory
 for later `▪syntax` declarations; lexer-level folding is limited

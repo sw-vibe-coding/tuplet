@@ -2,18 +2,18 @@
 # Both Ok and Err are mintable; `handle ... ok ... err ... end`
 # is a syntax extension that pattern-matches the result.
 
-*Ok x  := ( 1 , x )
-*Err m := ( 0 , m )
+▪Ok x  := ⎛1 , x⎠
+▪Err m := ⎛0 , m⎠
 
-*safe_div (n d) -> (r) <-
+▪safe_div ⎛n d⎠ ───‣ ⎛r⎠ ⟵
   if d = 0 then
     Err "div by zero"
   else
     Ok (n div d)
   end
 
-*r1 <- safe_div 10 2
-*r2 <- safe_div 10 0
+▪r₁ ⟵ safe_div 10 2
+▪r₂ ⟵ safe_div 10 0
 
-handle r1 ok n   -> print_int n         err m -> print m end   # 5
-handle r2 ok n   -> print_int n         err m -> print m end   # "div by zero"
+handle r₁ ok n   ⟶ print_int n         err m ⟶ print m end   # 5
+handle r₂ ok n   ⟶ print_int n         err m ⟶ print m end   # "div by zero"

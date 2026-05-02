@@ -14,17 +14,17 @@ COR24 Forth runtime.
 ## Goals
 
 - First-class named tuple bundles with a declared arity
-  (e.g. `coord2` produces 2 values, `point4` produces 4).
-- Multi-output verbs (e.g. `max2`, `min2`, `div2`) with explicit
+  (e.g. `coord₂` produces 2 values, `point₄` produces 4).
+- Multi-output verbs (e.g. `max₂`, `min₂`, `div₂`) with explicit
   arity in their name.
-- Multi-value destructuring assignment: `a, b <- coord2`.
-- Call-site splicing: `plot(coord2 Red 50%)` expands to four
+- Multi-value destructuring assignment: `a , b ⟵ coord₂`.
+- Call-site splicing: `plot⎛coord₂ Red 50%⎠` expands to four
   arguments without plot being overloaded.
 - Static arity checking at compile time -- every expression has a
   known output arity, every call has a known input arity.
 - Lowering to Forth, exploiting its native multi-output stack words.
-- ASCII surface syntax as the primary form, with Unicode aliases
-  accepted for authoring comfort.
+- Glyph-first canonical source notation, with ASCII fallbacks kept
+  for bootstrap fixtures and constrained authoring environments.
 
 ## Non-goals (initial PoC)
 
@@ -43,24 +43,26 @@ COR24 Forth runtime.
 name in expression position produces that many values on the stack.
 
 ```
-coord2 <- 3, 9
+▪coord₂ ───‣ ⎛x y⎠
+coord₂ ⟵ 3 , 9
 ```
 
 **Verb signature.** Written with the mapping operator (Unicode
-`---*` / ASCII `->`). Input and output value lists are parenthesized.
+`───‣` / ASCII `->`). Input and output value lists use shell
+parentheses in canonical source.
 
 ```
-plot (x y color transparency) -> (success)
-coord2 () -> (x y)
+▪plot ⎛x y color transparency⎠ ───‣ ⎛successˀ⎠
+▪coord₂ ───‣ ⎛x y⎠
 ```
 
 **Multi-value assignment.** LHS may be a comma-separated list of
 names matching the RHS arity.
 
 ```
-a, b <- coord2
-q, r <- a max2 b
-integer, fractional <- a div2 b
+a , b ⟵ coord₂
+q , r ⟵ a max₂ b
+integer , fractional ⟵ a div₂ b
 ```
 
 **Call-site splicing.** In a call, each argument contributes its
@@ -68,45 +70,48 @@ own arity to the callee's input list. Splicing is the default; a
 tuple variable is spread, not boxed.
 
 ```
-success <- plot(coord2 Red 50%)
+successˀ ⟵ plot⎛coord₂ Red 50%⎠
 ```
 
-Here `coord2` spreads to two values; `Red` and `50%` are one each;
+Here `coord₂` spreads to two values; `Red` and `50%` are one each;
 `plot` consumes four inputs total and produces one.
 
 ## Surface syntax
 
 Tuplet has two syntactic surfaces:
 
-- **ASCII (primary).** Easy to type, parse, and diff. File
-  extension `.tup`.
-- **Unicode (aliases).** Matches the notation in
-  `docs/research.txt` -- `<-` is `<-` (Unicode `left-arrow`), `->`
-  is the heavy mapping arrow, `(` `)` are shell-bracket glyphs,
-  `max2` has a subscript-2 glyph form, etc.
+- **Canonical glyph notation.** Source-facing docs, demos, and new
+  fixtures use `▪`, `⟵`, `───‣`, `⎛⎠`, and subscript arity suffixes
+  such as `coord₂`.
+- **ASCII fallback notation.** Easy to type, parse, and diff. It is
+  valid for bootstrap tests and constrained environments: `*`, `<-`,
+  `->`, `()`, and ASCII digits in names.
 
-The full grammar lives in `docs/grammar.md` (next step).
+The canonical glyph table lives in `docs/notation.md`; the full
+grammar lives in `docs/grammar.md`.
 
 ## Example programs
 
 ```
 # Tuple init and destructuring
-coord2 <- 3, 9
-a, b <- coord2
+▪coord₂ ───‣ ⎛x y⎠
+coord₂ ⟵ 3 , 9
+a , b ⟵ coord₂
 
 # Multi-output verb returning max then min
-q, r <- 3 max2 5
+q , r ⟵ 3 max₂ 5
 
 # Integer and fractional parts of division
-integer, fractional <- 7 div2 3
+integer , fractional ⟵ 7 div₂ 3
 
 # Call-site splice with a 2-arity bundle
-success <- plot(coord2 Red 50%)
+successˀ ⟵ plot⎛coord₂ Red 50%⎠
 
 # Signature-first style: declare then use
-plot (x y color transparency) -> (success)
-coord2 <- 3, 9
-success <- plot(coord2 Red 50%)
+▪plot ⎛x y color transparency⎠ ───‣ ⎛successˀ⎠
+▪coord₂ ───‣ ⎛x y⎠
+coord₂ ⟵ 3 , 9
+successˀ ⟵ plot⎛coord₂ Red 50%⎠
 ```
 
 ## Implementation targets
@@ -141,10 +146,11 @@ The PoC is successful when:
 
 ## Risks
 
-- **Unicode parsing.** The integer-subset OCaml host has limited
+- **Glyph parsing.** The integer-subset OCaml host has limited
   string/char facilities; mixing UTF-8 glyphs with ASCII requires
-  careful lexer design. Mitigation: author tests and core examples
-  in ASCII; treat Unicode as an optional alias pass.
+  careful lexer design. Mitigation: keep ASCII fallback fixtures
+  explicit, but treat glyph notation as the source-facing contract,
+  not an optional alias pass.
 - **Splicing ambiguity.** Default splicing means a tuple variable
   always spreads. Passing a tuple as a single value (e.g. a future
   higher-order form) has no syntax yet; this is a deferred design

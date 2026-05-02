@@ -2,12 +2,12 @@
 # self-reference inside the body. Demonstrates that user-
 # defined verbs are first-class.
 
-*fact (n) -> (r) <-
+▪fact ⎛n⎠ ───‣ ⎛r⎠ ⟵
   if n <= 1 then
     1
   else
     n * fact (n - 1)
   end
 
-*answer <- fact 5
+▪answer ⟵ fact 5
 # expected: answer = 120

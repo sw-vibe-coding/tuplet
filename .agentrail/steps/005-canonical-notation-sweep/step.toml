@@ -1,8 +1,9 @@
 number = 5
 slug = "canonical-notation-sweep"
-status = "pending"
+status = "completed"
 description = "Continue canonical notation alignment across remaining docs, tests, demos, an..."
 role = "legacy"
 context_files = []
 created_at = "2026-05-01T19:08:29"
-commits = []
+completed_at = "2026-05-01T19:17:39"
+commits = ["703e6a96885f560cc4c99c160af95a47c38950fb"]

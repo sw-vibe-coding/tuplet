@@ -1,0 +1,1 @@
+Implement or further narrow full canonical glyph parser support for source fixtures: shell parens ⎛ ⎠, subscript arity suffixes like ₂, and the full heavy mapping sequence ───‣. Keep ASCII fallback fixtures explicit, keep checker source handoff blocked until sw-cor24-ocaml#30 is fixed, and add focused reg-rs coverage for each newly supported glyph path.

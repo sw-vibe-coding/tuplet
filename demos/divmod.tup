@@ -1,5 +1,5 @@
 # divmod.tup -- integer quotient and remainder via the
-# multi-output verb div2.
+# multi-output verb div₂.
 
-*q, *r <- 7 div2 3
+q , r ⟵ 7 div₂ 3
 # expected: q = 2, r = 1

@@ -2,8 +2,8 @@
 # Shows that even ergonomic operators are user-extensions, not
 # language features.
 
-*syntax _ |> _ expand    _1  _2
+▪syntax _ |> _ expand    _1  _2
 
 # Square then double, written left-to-right:
-*x <- 5 |> ( fun n -> n * n ) |> ( fun n -> n + n )
+▪x ⟵ 5 |> ⎛fun n ⟶ n * n⎠ |> ⎛fun n ⟶ n + n⎠
 # x = 50

@@ -67,11 +67,15 @@ flow through the bridge and produce a `syntax-match` AST.
 
 Tuple-shaped kernel forms now have both parser-only and
 memory-backed source regressions. `tuplet_parse_signature` and
-`tuplet_parse_memory_signature` cover `▪coord₂ ───‣ ⎛x y⎠`
-normalized to the current internal token stream.
+`tuplet_parse_memory_signature` cover the canonical signature shape
+`▪coord₂ ───‣ ⎛x y⎠` after normalization to the current internal
+token stream.
 `tuplet_parse_verb_signature` covers a verb signature with input and
-output tuples, `▪max₂⎛a b⎠ ───‣ ⎛q r⎠`. `tuplet_parse_tuple_assign`
-and `tuplet_parse_memory_tuple_assign` cover `a, b <- coord2`.
+output tuples, canonically `▪max₂⎛a b⎠ ───‣ ⎛q r⎠`.
+`tuplet_parse_tuple_assign` and `tuplet_parse_memory_tuple_assign`
+cover `a , b ⟵ coord₂`, currently exercised through ASCII fallback
+fixture spelling until shell parens, subscript digits, and the heavy
+mapping arrow are implemented end-to-end in source lexing.
 `tuplet_parse_call` covers call argument tuple shape, and
 `tuplet_parse_tuple_expr` covers a top-level tuple expression shape.
 
@@ -152,6 +156,10 @@ implementation.
 Known parser gaps are:
 
 - `prim/forth` and colon-kernel forms are not yet represented.
+- Canonical shell parens `⎛` and `⎠`, subscript arity suffixes such
+  as `₂`, and the full heavy mapping arrow sequence `───‣` are not
+  fully accepted by the source lexer/parser path yet; current tests
+  use normalized token streams or explicit ASCII fallback fixtures.
 - Call forms and tuple expression groups are represented as shallow
   tuple groups; nested expressions still need fuller AST structure.
 - Syntax registry entries still dump raw token/template slices rather

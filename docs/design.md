@@ -54,7 +54,7 @@ treats them as operator trees. A function signature is conceptually
 an input tuple mapped to an output tuple:
 
 ```text
-Power (n: Int, e: Int) -> (p: Int)
+▪ Power ⎛nːℤ eːℤ⎠ ───‣ ⎛pːℤ⎠
 ```
 
 Parser and checker work should preserve that tuple shape:
@@ -137,7 +137,8 @@ not bake in `+`, `if`, `while`, or similar constructs.
 
 Name resolution produces a symbol table mapping each name to tuple
 shape information such as scalar, named tuple, or verb
-`input_tuple -> output_tuple`.
+`input_tuple -> output_tuple` internally, surfaced as
+`input_tuple ───‣ output_tuple` in canonical source.
 
 ### OCaml-subset compatibility (sw-cor24-ocaml)
 
@@ -203,9 +204,9 @@ type instr =
 | `IBinOp op`              | `( a b -- r1 ... rk )`, k from op arity |
 
 **Tuple order convention.** Fields are pushed in declaration order:
-for `coord2 -> (x y)`, after `ILoadTuple ("coord2", 2)` the stack
+for `▪coord₂ ───‣ ⎛x y⎠`, after `ILoadTuple ("coord2", 2)` the stack
 top is `y` and `x` is directly below. `IStoreTuple` consumes them in
-the same reading order (so the source `coord2 <- 3, 9` pushes 3
+the same reading order (so the source `coord₂ ⟵ 3 , 9` pushes 3
 then 9, then stores).
 
 ## Builtin verb registry
@@ -220,10 +221,10 @@ Shipped with the PoC. All arities are static.
 | `max`   | 2  | 1   | `max(a, b)`                              |
 | `min`   | 2  | 1   | `min(a, b)`                              |
 | `div`   | 2  | 1   | Integer division, truncates.             |
-| `max2`  | 2  | 2   | Returns `(hi, lo)` -- first is >=.       |
-| `min2`  | 2  | 2   | Returns `(lo, hi)` -- first is <=.       |
-| `div2`  | 2  | 2   | Returns `(quotient, remainder)`.         |
-| `plot`  | 4  | 1   | `(x y color c?) -> (success?)`; the PoC  |
+| `max₂`  | 2  | 2   | Returns `(hi, lo)` -- first is >=.       |
+| `min₂`  | 2  | 2   | Returns `(lo, hi)` -- first is <=.       |
+| `div₂`  | 2  | 2   | Returns `(quotient, remainder)`.         |
+| `plot`  | 4  | 1   | `⎛x y color cˀ⎠ ───‣ ⎛successˀ⎠`; the PoC |
 |         |    |     | backend prints the args and returns 1.   |
 
 Colors (`Red`, `Green`, `Blue`) are ESymbol literals resolved to
@@ -235,10 +236,13 @@ A stable symbol->int table lives alongside the Forth emitter.
 Source:
 
 ```
-coord2 -> (x y)
-coord2 <- 3, 9
-success? <- plot(coord2 Red 50%)
+▪coord₂ ───‣ ⎛x y⎠
+coord₂ ⟵ 3 , 9
+successˀ ⟵ plot⎛coord₂ Red 50%⎠
 ```
+
+The compiler normalizes glyph source names to internal spellings such
+as `coord2` and `success?` before checker, IR, and Forth lowering.
 
 ### AST (pseudo-OCaml)
 
@@ -258,15 +262,16 @@ success? <- plot(coord2 Red 50%)
 ### Stack IR
 
 ```
-; SDecl coord2 -> (x y)            -- no IR emitted; just updates
+; SDecl coord2 -> (x y)            -- normalized from glyph source;
+;                                     no IR emitted; just updates
 ;                                     the symbol table (SymTuple 2).
 
-; coord2 <- 3, 9
+; coord2 <- 3, 9                   -- normalized from coord₂ ⟵ 3 , 9
 IPushInt 3
 IPushInt 9
 IStoreTuple ("coord2", 2)
 
-; success? <- plot(coord2 Red 50%)
+; success? <- plot(coord2 Red 50%) -- normalized from canonical source
 ILoadTuple  ("coord2", 2)          ; pushes 3 then 9
 IPushSymbol "Red"                  ; resolves to int at emit
 IPushPct    50
