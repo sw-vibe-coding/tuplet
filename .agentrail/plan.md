@@ -1,35 +1,34 @@
-# Saga: tuplet-checker
+# Saga: tuplet-ir
 
 ## Goal
 
-Implement the first Tuplet checker over the parser AST, starting with name resolution and tuple arity checks for the parser-complete subset.
+Lower the checked Tuplet AST subset into a deterministic stack IR, staying within the parser/checker-complete kernel slice before any interpreter or Forth emitter work.
 
 ## Source of truth
 
-- docs/plan.md -- saga 3 entrance and exit criteria.
-- docs/grammar.md -- arity rules and tuple/call semantics.
-- docs/design.md -- checker and typed-AST expectations.
-- docs/parser-saga-exit-audit.md -- parser subset and explicit deferrals.
-- docs/tuplet-implementation-parity-plan.md -- demo-parity priorities.
+- docs/plan.md -- phase 4 entrance and exit criteria.
+- docs/design.md -- Stack IR instruction set and tuple order convention.
+- docs/lowering.md -- future Forth mapping; use only as downstream guidance.
+- docs/checker.md -- checker output and current supported AST subset.
+- docs/kernel.md -- prim/forth and anonymous-verb boundaries.
 
 ## In scope
 
-- src/checker.ml and a deterministic checker dump driver.
-- Tuple variable/signature environment from parser signature nodes.
-- Name resolution for tuple variables and call callees in the supported parser subset.
-- Arity checks for tuple-pattern assignment and shallow call argument tuple shapes.
-- Stable pass/fail reg-rs baselines.
-- Checker docs explaining current scope and parser deferrals.
+- IR data representation in the OCaml subset.
+- Deterministic IR dump driver and reg-rs baselines.
+- Lowering for the checker-complete subset: tuple signatures, tuple-pattern assignment, shallow calls, integer/percent/symbol/name atoms, and tuple loads/stores.
+- Clear docs for current IR scope and deferrals.
 
 ## Out of scope
 
-- IR lowering.
-- Interpretation or Forth emission.
-- prim/forth and colon forms until lexer/parser deferrals are resolved.
-- Full macro expansion beyond raw syntax-match slot spans.
+- Forth emission.
+- Reference interpreter.
+- Prelude implementation.
+- Full macro expansion or nested expression semantics beyond the current parser/checker AST.
+- Anonymous-verb thunks and prim/forth until represented by parser/checker.
 
 ## End state
 
-- Checker pass fixtures produce deterministic typed/check dumps.
-- Checker fail fixtures produce deterministic diagnostics for unbound names and arity mismatch.
-- coord2 and basic tuple destructuring are checked deterministically.
+- Representative checked/parser-backed programs lower to stable IR dumps.
+- At minimum: coord2 tuple declaration + assignment, tuple destructuring, call-site tuple splicing shape, and fail-fast behavior when checker rejects input.
+- IR docs identify exactly what is ready for the next saga and what is still deferred.
