@@ -1,0 +1,9 @@
+PROGRAM
+STMT   tuple
+GROUP  expr
+ITEM   ident:x
+ITEM   ident:y
+ITEM   int:7
+ENDGROUP
+ENDSTMT
+END

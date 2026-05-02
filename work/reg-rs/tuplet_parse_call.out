@@ -1,0 +1,12 @@
+PROGRAM
+STMT   call
+GROUP  callee
+ITEM   ident:plot
+ENDGROUP
+GROUP  args
+ITEM   ident:coord2
+ITEM   ident:Red
+ITEM   pct:50
+ENDGROUP
+ENDSTMT
+END

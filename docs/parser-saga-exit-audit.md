@@ -26,16 +26,16 @@ DiscoveryOne implementations.
 | Kernel `syntax` form | Pass | `tuplet_parse_syntax_register`, `tuplet_parse_syntax_verb_register`, and `tuplet_parse_memory_syntax`. |
 | Kernel `<-`, comma, parens, braces, `#`, `_` | Partial | Existing token and shallow group parsing covers these shapes. The parser still emits scaffolding `ATOM` and `GROUP` nodes for several forms. |
 | Kernel `:` and `prim/forth` | Gap | The lexer/parser do not yet have a real colon form or string-backed `prim/forth` form. This blocks prelude/Forth escape parity. |
-| Tuple signature groups | Partial | `*coord2 -> (x y)` is parsed and memory-backed. Verb signatures with input and output tuples, such as `*max2 (a b) -> (q r)`, are not yet represented. |
+| Tuple signature groups | Pass for first checker slice | `*coord2 -> (x y)` is parsed and memory-backed. Verb signatures with input and output tuples, such as `*max2(a b) -> (q r)`, are covered by `tuplet_parse_verb_signature`. |
 | Tuple-pattern assignment LHS | Pass for current checker slice | `a, b <- coord2` parses as a `pattern` group and memory-backed fixture. Checker can validate arity from this shape. |
-| Tuple literals and expression groups | Gap | Parenthesized groups are shallow. Call forms and tuple-valued expression groups are not yet tuple-shaped enough for checker/lowering parity. |
+| Tuple literals and expression groups | Partial | `tuplet_parse_call` and `tuplet_parse_tuple_expr` lock shallow tuple-shaped groups. Nested expression semantics still belong to checker/lowering work. |
 | Syntax declaration then later code parses documented AST | Pass for current matcher | Registry-backed syntax matching works, including multi-slot captures from real source. |
 | Registry stores temporary token/template slices | Pass as skeleton | Current registry stores string token slices. This is intentionally temporary and must evolve before macro expansion is considered complete. |
 | Tuple-shaped macro representation | Gap | Syntax match dumps still expose raw template, slot, and expansion lists rather than tuple-shaped macro AST. |
 | Longest-match wins / first-declared ties | Pass | Covered by `tuplet_parse_syntax_longest` and `tuplet_parse_syntax_tie`. |
 | Deterministic AST dump | Pass | Existing parser baselines are stable reg-rs outputs. |
 | Unknown-token errors | Pass | Covered by `tuplet_parse_unknown_error`. |
-| Unmatched-template errors | Gap / design decision | No registered-template miss diagnostic exists today; the parser falls back to kernel parsing when no syntax template matches. |
+| Unmatched-template errors | Deferred by design | `tuplet_parse_syntax_no_match` locks the current behavior: a registered-template miss falls back to kernel parsing. A future syntax strictness rule can replace this with a diagnostic. |
 
 ## Regression Slice
 
@@ -46,6 +46,10 @@ The audit regression slice is:
 - `tuplet_parse_memory_signature`
 - `tuplet_parse_memory_tuple_assign`
 - `tuplet_parse_memory_syntax`
+- `tuplet_parse_verb_signature`
+- `tuplet_parse_call`
+- `tuplet_parse_tuple_expr`
+- `tuplet_parse_syntax_no_match`
 - `tuplet_parse_syntax_longest`
 - `tuplet_parse_syntax_tie`
 - `tuplet_parse_unknown_error`
@@ -67,24 +71,20 @@ Checker work should not assume support yet for:
 
 - `prim/forth`;
 - colon definitions;
-- verb signatures with input tuples;
-- call expressions;
-- tuple literal semantics;
+- nested call expressions;
+- tuple literal semantics beyond shallow tuple shape;
 - tuple-shaped macro expansion.
 
 ## Recommended Next Parser Cleanup
 
-Before declaring parser parity, add one focused parser cleanup step:
+The remaining parser deferrals are:
 
-1. Add or explicitly defer `prim/forth "WORD"` and colon-kernel forms.
-2. Add a real-source fixture for a multi-output verb signature with an
-   input tuple.
-3. Add call and tuple-expression parse fixtures, even if the checker
-   initially rejects them.
-4. Decide whether an unmatched registered template should be a parser
-   error or a kernel fallback, then lock that behavior with a baseline.
-5. Replace or annotate raw syntax slot dumps with the intended
-   tuple-shaped macro representation.
+1. `prim/forth "WORD"` requires lexer support for string literals and
+   a settled representation for the slash-bearing keyword.
+2. Colon-kernel forms require lexer support for `:` and a decision on
+   whether colon is surface Tuplet or only emitted Forth.
+3. Raw syntax slot dumps should later be replaced or annotated with
+   the intended tuple-shaped macro representation.
 
-After that, the saga can either close as parser-complete or hand a
-small, explicit deferral list to the parity plan.
+Those deferrals should not block the first checker slice, but they
+must be resolved before the prelude and Forth emitter sagas.

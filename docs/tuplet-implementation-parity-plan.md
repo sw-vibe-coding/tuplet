@@ -49,8 +49,8 @@ labeled honestly.
 | Tuple variable signature `*coord2 -> (x y)` | `forthlet`, `tuplet-rs` | Parsed from real source | Executed |
 | Tuple assignment/destructuring `a, b <- coord2` | `forthlet`, `tuplet-rs` | Parsed from real source | Executed |
 | Typed scalar variables | `forthlet`, `DiscoveryOne` | Not implemented | Checked |
-| Tuple-valued operators `max2`, `min2`, `div2` | `forthlet` | Not implemented | Executed |
-| Call-site tuple splicing `plot(coord2 Red 50%)` | `forthlet` | Not implemented | Checked first |
+| Tuple-valued operators `max2`, `min2`, `div2` | `forthlet` | Verb signature parsed | Executed |
+| Call-site tuple splicing `plot(coord2 Red 50%)` | `forthlet` | Call tuple shape parsed | Checked first |
 | Flow notation / pipes | `forthlet` | Not implemented | Parsed first |
 | Approximate predicates | `forthlet` | Not implemented | Parsed first |
 | Power demo | `forthlet`, `tuplet-rs`, `DiscoveryOne` | Not executable | Demoed |

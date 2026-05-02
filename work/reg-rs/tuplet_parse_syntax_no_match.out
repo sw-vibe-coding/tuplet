@@ -1,0 +1,9 @@
+PROGRAM
+STMT   kernel
+ATOM   ident:do
+ATOM   ident:work
+ATOM   ident:until
+ATOM   ident:done
+ATOM   ident:end
+ENDSTMT
+END

@@ -3,6 +3,8 @@ STMT   signature
 GROUP  name
 ITEM   ident:coord2
 ENDGROUP
+GROUP  inputs
+ENDGROUP
 GROUP  outputs
 ITEM   ident:x
 ITEM   ident:y

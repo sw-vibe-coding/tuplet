@@ -68,8 +68,11 @@ flow through the bridge and produce a `syntax-match` AST.
 Tuple-shaped kernel forms now have both parser-only and
 memory-backed source regressions. `tuplet_parse_signature` and
 `tuplet_parse_memory_signature` cover `*coord2 -> (x y)`.
-`tuplet_parse_tuple_assign` and
-`tuplet_parse_memory_tuple_assign` cover `a, b <- coord2`.
+`tuplet_parse_verb_signature` covers a verb signature with input and
+output tuples, `*max2(a b) -> (q r)`. `tuplet_parse_tuple_assign`
+and `tuplet_parse_memory_tuple_assign` cover `a, b <- coord2`.
+`tuplet_parse_call` covers call argument tuple shape, and
+`tuplet_parse_tuple_expr` covers a top-level tuple expression shape.
 
 ## Token Stream Contract
 
@@ -93,10 +96,17 @@ The parser contract for this phase is:
   it is the syntax declaration head.
 - A stream shaped as `TMint TIdent TRArrow ( ... )` dumps as
   `STMT   signature`, preserving the minted name and output tuple
-  fields in named groups.
+  fields in named groups. The input tuple is emitted as an empty
+  `inputs` group for uniform checker consumption.
+- A stream shaped as `TMint TIdent ( ... ) TRArrow ( ... )` dumps
+  as `STMT   signature` with `inputs` and `outputs` groups.
 - A comma-separated LHS before `<-` dumps as `STMT   assign` with
   `GROUP  pattern` and `GROUP  expr`, preserving tuple-pattern
   arity for the checker.
+- A stream shaped as `TIdent ( ... )` dumps as `STMT   call` with
+  `callee` and `args` groups.
+- A stream beginning with `TLParen` dumps as `STMT   tuple` with an
+  `expr` group.
 - `TMint` followed by `TIdent "syntax"` or `TLiteral "syntax"`
   parses as a syntax declaration head. The parser splits tokens
   before `expand` or `TRArrow` into `GROUP  template` and tokens
@@ -141,11 +151,13 @@ implementation.
 Known parser gaps are:
 
 - `prim/forth` and colon-kernel forms are not yet represented.
-- Verb signatures with input and output tuples are not yet parsed.
-- Call forms and tuple expression groups are still shallow.
+- Call forms and tuple expression groups are represented as shallow
+  tuple groups; nested expressions still need fuller AST structure.
 - Syntax registry entries still dump raw token/template slices rather
   than tuple-shaped macro AST.
-- Unmatched-template behavior is not locked by a negative baseline.
+- Unmatched registered syntax templates intentionally fall back to
+  kernel parsing today; `tuplet_parse_syntax_no_match` locks that
+  behavior.
 
 ## Boundaries
 
