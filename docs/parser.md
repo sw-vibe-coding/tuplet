@@ -130,8 +130,25 @@ should evolve toward named tuple-shaped nodes:
 - Compiler pass APIs can later carry tuple-shaped state such as
   `(source, tokens, diagnostics, ast, ...)`.
 
+## Current Gaps Before Full Parser Parity
+
+`docs/parser-saga-exit-audit.md` records the detailed parser-saga
+audit. In short, the parser is ready for a narrow first checker slice
+covering tuple signatures, tuple-pattern assignment, and registered
+syntax matches from real source. It is not yet a full parser-parity
+implementation.
+
+Known parser gaps are:
+
+- `prim/forth` and colon-kernel forms are not yet represented.
+- Verb signatures with input and output tuples are not yet parsed.
+- Call forms and tuple expression groups are still shallow.
+- Syntax registry entries still dump raw token/template slices rather
+  than tuple-shaped macro AST.
+- Unmatched-template behavior is not locked by a negative baseline.
+
 ## Boundaries
 
-This skeleton intentionally does not implement template matching,
-checking, IR lowering, tuple-space coordination, or Forth emission.
-Those belong to later parser and downstream sagas.
+This skeleton intentionally does not implement checking, IR lowering,
+tuple-space coordination, or Forth emission. Those belong to downstream
+sagas.

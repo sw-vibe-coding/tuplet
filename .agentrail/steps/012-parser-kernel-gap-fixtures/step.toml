@@ -1,0 +1,8 @@
+number = 12
+slug = "parser-kernel-gap-fixtures"
+status = "pending"
+description = "Close the last parser-saga gaps before checker by adding focused regressions/..."
+role = "legacy"
+context_files = []
+created_at = "2026-05-01T17:05:19"
+commits = []
