@@ -4,13 +4,13 @@
 # uses it to count from 1 to 3. The whole construct is a
 # library, not a built-in.
 
-*syntax do _ while _ end expand
+▪syntax do _ while _ end expand
   prim/forth "BEGIN"  _1  _2  prim/forth "0= UNTIL"
 
-*n <- 0
+▪n ⟵ 0
 
 do
-  n <- n + 1
+  n ⟵ n + 1
   n prim/forth "."
   prim/forth "SPACE"
 while  n < 3  end

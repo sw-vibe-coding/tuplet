@@ -12,10 +12,9 @@ tiers:
    doesn't privilege them; they're just code points the user
    community has agreed feel right.
 
-Markdown ASCII-only policy is in effect, so glyphs are named
-by codepoint here rather than embedded. See
-`docs/emacs-inputs.md` and `docs/cli-inputs.md` for how to
-type them.
+Tuplet is glyph-first. This file embeds canonical glyphs directly so
+docs, demos, and tests do not drift back to ASCII-first examples. See
+`docs/notation.md` for the concise source of truth.
 
 ## Minimal alphabet
 
@@ -28,22 +27,22 @@ user typed it.
 
 | Role | Canonical Unicode | Aliases | ASCII fallback |
 |------|-------------------|---------|----------------|
-| Mint | BULLET (U+2022)   | BLACK SMALL SQUARE (U+25AA), MIDDLE DOT (U+00B7) | `*` (proposed) |
+| Mint | BLACK SMALL SQUARE `▪` (U+25AA) | none; `•` is not mint | `*` |
 
 ### Arrows
 
 | Role            | Canonical Unicode               | Aliases              | ASCII |
 |-----------------|---------------------------------|----------------------|-------|
-| Assign          | LEFTWARDS ARROW (U+2190)        | LEFTWARDS LONG ARROW (U+27F5) | `<-`  |
-| Map / signature | RIGHTWARDS ARROW (U+2192)       | LEFTWARDS BLACK ARROWHEAD-style HEAVY MAPPING ARROW (U+2500 x3 + U+2023) | `->` |
-| Test arrow      | RIGHTWARDS DOUBLE ARROW (U+21D2)| -                   | `->>` |
+| Assign          | LONG LEFTWARDS ARROW `⟵` (U+27F5) | LEFTWARDS ARROW (U+2190) | `<-`  |
+| Map / signature | HEAVY MAPPING ARROW `───‣` (U+2500 x3 + U+2023) | RIGHTWARDS ARROW (U+2192) | `->` |
+| Test arrow      | RIGHTWARDS ARROW `⟶` (U+27F6) | RIGHTWARDS ARROW (U+2192) | `->>` |
 
 ### Brackets
 
 | Role           | Canonical Unicode                    | Aliases | ASCII |
 |----------------|--------------------------------------|---------|-------|
-| Group / call   | LEFT/RIGHT PARENTHESIS UPPER HOOK    | LEFT WHITE PARENTHESIS (U+2985) / RIGHT (U+2986) | `(` `)` |
-|                | (U+239B / U+239E)                    |         |       |
+| Group / call   | LEFT/RIGHT PARENTHESIS UPPER HOOK `⎛` `⎠` | LEFT/RIGHT WHITE PARENTHESIS | `(` `)` |
+| Operator action | MEDIUM FLATTENED PARENTHESIS `❪` `❫` | none | deferred |
 | Block / xt lit | LEFT/RIGHT CURLY BRACKET UPPER HOOK  | -       | `{` `}` |
 |                | (U+23A7 / U+23AB)                    |         |       |
 
@@ -77,7 +76,7 @@ The lexer doesn't bake these in; they're either:
 - characters the lexer treats as identifier-extension
   characters (so they can appear inside a name like
   `if<U+2248>`, the approx-equal-conditional verb), OR
-- characters the user puts in a `*syntax` template's literal
+- characters the user puts in a `▪syntax` template's literal
   positions, which the lexer surfaces as `TLiteral` once
   registered.
 
@@ -150,17 +149,15 @@ lowercase) is fair game for identifiers. Common conventions:
 ## Conventions
 
 - **Mint glyph first.** A name introduction always begins with
-  the mint glyph (`*` ASCII or U+2022). The rest of the name
+  the mint glyph (`▪`, or `*` in ASCII fallback files). The rest of the name
   may use any combination of identifier characters above.
 - **Arity in the name.** Trailing subscript or ASCII digit
-  encodes how many values the verb produces. `coord2` always
-  pushes 2.
+  encodes how many values the verb produces. `coord₂` and its folded
+  internal spelling `coord2` always push 2.
 - **`?` for predicates.** A name ending in `?` is conventionally
   boolean-valued. `success?`, `is_empty?`.
-- **ASCII for portability.** Source files exchanged between
-  contributors use ASCII. The Unicode forms are entirely for
-  authoring comfort -- the lexer folds them at read time, so
-  semantics never depend on which form was typed.
+- **Canonical examples use glyphs.** ASCII is a fallback for tooling
+  and bootstrap tests, not the language's primary presentation.
 
 ## Why a small alphabet matters
 
@@ -171,7 +168,7 @@ top of this file) and pushes everything else into either:
 
 - ordinary identifier characters (Greek letters, mathy glyphs
   appearing inside names), or
-- `TLiteral` tokens registered at `*syntax` declaration time
+- `TLiteral` tokens registered at `▪syntax` declaration time
   (operators in user templates).
 
 The wider palette in this doc is **convention**, not

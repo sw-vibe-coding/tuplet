@@ -1,0 +1,8 @@
+number = 5
+slug = "canonical-notation-sweep"
+status = "pending"
+description = "Continue canonical notation alignment across remaining docs, tests, demos, an..."
+role = "legacy"
+context_files = []
+created_at = "2026-05-01T19:08:29"
+commits = []

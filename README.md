@@ -12,18 +12,19 @@ COR24 runtime.
 Tuplet's distinguishing feature is that **almost everything
 is user-extensible**. The kernel is ~10 forms; everything
 else (`if/then/else`, `while`, every operator, every helper)
-lives in `lib/std.tup` as a `*syntax` declaration that
+lives in `lib/std.tup` as a `▪syntax` declaration that
 ordinary Tuplet users can read, replace, or write more of.
 
-The single mechanism is **mint** (`*`):
+The single mechanism is **mint** (`▪`, with `*` as an ASCII
+fallback):
 
 ```
-*syntax do _ while _ end expand
+▪syntax do _ while _ end expand
   prim/forth "BEGIN"  _1  _2  prim/forth "0= UNTIL"
 
-*n <- 0
+▪n ⟵ 0
 do
-  n <- n + 1
+  n ⟵ n + 1
   n prim/forth "."
   prim/forth "SPACE"
 while  n < 3  end
@@ -46,6 +47,7 @@ the arc and `docs/poc-goals.md` for the demo target.
   demoable target.
 - [`docs/prd.md`](docs/prd.md) -- product requirements.
 - [`docs/grammar.md`](docs/grammar.md) -- surface syntax.
+- [`docs/notation.md`](docs/notation.md) -- authoritative glyphs.
 - [`docs/kernel.md`](docs/kernel.md) -- the kernel/prelude
   boundary.
 - [`docs/design.md`](docs/design.md) -- AST and stack IR.

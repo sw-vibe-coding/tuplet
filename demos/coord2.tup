@@ -1,12 +1,12 @@
 # coord2.tup -- tuple-var declaration and destructuring.
 
 # Variant A: mint and initialize separately.
-*coord2 -> (x y)        # mint a 2-output tuple variable
-coord2 <- 3, 9          # store both fields at once
-a, b <- coord2          # destructure into local scalars
+▪coord₂ ───‣ ⎛x y⎠      # mint a 2-output tuple variable
+coord₂ ⟵ 3 , 9          # store both fields at once
+a , b ⟵ coord₂          # destructure into local scalars
 # expected: a = 3, b = 9
 
 # Variant B: mint and initialize in one statement.
-*point2 -> (px py) <- 7, 11
-px, py <- point2
+▪point₂ ───‣ ⎛px py⎠ ⟵ 7 , 11
+px , py ⟵ point₂
 # expected: px = 7, py = 11

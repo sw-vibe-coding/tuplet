@@ -1,4 +1,4 @@
 command = "bash /Users/mike/github/sw-vibe-coding/tuplet/scripts/run-lexer-fixture.sh /Users/mike/github/sw-vibe-coding/tuplet/tests/lexer/unicode_bullet.input"
 timeout = 60
 exit_code = 0
-desc = "tuplet lex_unicode: bullet"
+desc = "tuplet lex_unicode: bullet is not mint"

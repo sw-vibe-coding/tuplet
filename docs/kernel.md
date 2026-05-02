@@ -88,15 +88,15 @@ because the prelude itself is parsed using them.
 
 | Form                                  | Role                              | Why kernel                                                       |
 |---------------------------------------|-----------------------------------|------------------------------------------------------------------|
-| `*` (or BULLET U+2022 / BLACK SMALL SQUARE U+25AA) | **mint operator**: introduces every new name binding | The DSL user reaches for this every time they extend the language. Cannot itself be defined in the language; it's the act of definition. |
-| `*syntax T -> V` / `*syntax T expand E` | declare new template + expansion (minted)         | Bootstraps every other declaration.                            |
-| `*NAME -> ( ... ) <- BODY`            | mint a verb / tuple-var with body | The way to bind a name to executable code or storage.            |
-| `<-`                                  | assignment (to existing name)     | Used in every later declaration; must be hard-coded to parse them. |
+| `▪` (ASCII fallback `*`)              | **mint operator**: introduces every new name binding | The DSL user reaches for this every time they extend the language. Cannot itself be defined in the language; it's the act of definition. |
+| `▪syntax T ───‣ V` / `▪syntax T expand E` | declare new template + expansion (minted)      | Bootstraps every other declaration.                            |
+| `▪NAME ───‣ ⎛...⎠ ⟵ BODY`             | mint a verb / tuple-var with body | The way to bind a name to executable code or storage.            |
+| `⟵`                                  | assignment (to existing name)     | Used in every later declaration; must be hard-coded to parse them. |
 | `,`                                   | value separator                   | Required by parser to delimit slots and value lists.             |
-| `(` `)`                               | grouping / call delimiters        | Required by parser; grammar can't parse `syntax` without them.   |
+| `⎛` `⎠`                               | grouping / call delimiters        | Required by parser; grammar can't parse `syntax` without them.   |
 | `{` `}` (Unicode aliases U+23A7/U+23AB) | block delimiters / anonymous verb | Group multi-statement bodies; also serve as anonymous-verb literals (`{ EXPR }` -> xt). |
 | `#`                                   | line comment                      | Required so the kernel itself can be commented.                  |
-| `_` (inside `*syntax T ...`)          | template slot marker              | Has no meaning except inside `syntax`; cannot be defined later.  |
+| `_` (inside `▪syntax T ...`)          | template slot marker              | Has no meaning except inside `syntax`; cannot be defined later.  |
 | `prim/forth "WORD"`                   | raw Forth escape                  | The bridge to the runtime; nothing the prelude calls would work without it. |
 | `prim/X` namespace                    | exposed Forth primitives          | Each `prim/X` is a thin wrapper the prelude can wrap further.    |
 

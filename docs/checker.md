@@ -16,7 +16,7 @@ Supported statement shapes:
 
 The checker builds a signature environment as it walks the program.
 Each signature binds one name to an input arity and an output arity.
-Tuple variable signatures such as `*coord2 -> (x y)` are represented
+Tuple variable signatures such as `▪coord₂ ───‣ ⎛x y⎠` are represented
 with input arity `0` and output arity `2`.
 
 The checker now has two layers of coverage:

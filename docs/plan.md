@@ -63,7 +63,10 @@ section.
 - **Commit the full `.agentrail/` delta with each step.** Stage
   everything modified or new under `.agentrail/`, not just the
   step you thought you were touching.
-- **`markdown-checker` clean on every changed `.md`.**
+- **Markdown validation is contextual.** Glyph-facing language docs
+  intentionally contain non-ASCII Tuplet source notation and will fail
+  the old ASCII-only `markdown-checker`; non-language docs should still
+  stay clean where practical.
 - **reg-rs baseline policy.** `*.rgt` (test definition) and
   `*.out` (golden output) are tracked; `*.tdb` and `*.lock` are
   ignored. New tests live under `work/reg-rs/` via

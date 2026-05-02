@@ -153,15 +153,15 @@ runtime byte values directly:
 
 | Glyph | Runtime byte | Fold | Token |
 |-------|--------------|------|-------|
-| BULLET | 34 | `*` | `TMint` |
-| BLACK SMALL SQUARE | 170 | `*` | `TMint` |
+| BLACK SMALL SQUARE `▪` | 170 or UTF-8 `226 150 170` | `*` | `TMint` |
+| BULLET `•` | 34 in legacy low-byte path | none | `TUnknown` |
 | LEFTWARDS ARROW | 144 | `<-` | `TLArrow` |
 | LEFTWARDS LONG ARROW | 245 | `<-` | `TLArrow` |
 | RIGHTWARDS ARROW | 146 | `->` | `TRArrow` |
 | RIGHTWARDS DOUBLE ARROW | 210 | `->>` | `TRArrow` then `TUnknown 62` |
 
 The wider suggested glyph table remains user-extension territory
-for later `*syntax` declarations; lexer-level folding is limited
+for later `▪syntax` declarations; lexer-level folding is limited
 to these kernel aliases.
 
 ## Per-let if-chain depth limit
@@ -196,11 +196,11 @@ token's leading byte.
 Letters (`A`-`Z` or `a`-`z`), digits, and `_` form the
 continuation; trailing `?` is allowed once at the end. The
 parser later interprets a trailing digit run as an arity
-suffix (`coord2` -> arity 2).
+suffix (`coord₂`, folded internally as `coord2`, has arity 2).
 
 Pre-registration "keywords" (e.g., `if`, `then`, `else`,
 `while`) lex as `TIdent` -- the lexer doesn't know about
-keywords. Once a `*syntax T expand E` declaration registers
+keywords. Once a `▪syntax T expand E` declaration registers
 a literal token, the parser tells the lexer to switch its
 classification via the dynamic literal registry.
 
@@ -208,7 +208,7 @@ classification via the dynamic literal registry.
 
 The parser can call `add_literal <bytes>` before a lexing pass
 to register template literal words introduced by earlier
-`*syntax` declarations. Completed identifiers are compared
+`▪syntax` declarations. Completed identifiers are compared
 against the registered byte lists. A match dumps as:
 
 ```

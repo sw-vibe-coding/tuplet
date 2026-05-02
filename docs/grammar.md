@@ -1,8 +1,8 @@
 # Tuplet -- Surface Grammar
 
-This document specifies the Tuplet surface syntax. ASCII is the
-primary form; a small Unicode alias table is given for authoring in
-the research notation.
+This document specifies the Tuplet surface syntax. Canonical source is
+glyph-first; ASCII spellings are fallbacks used by bootstrap tests and
+low-level fixtures.
 
 ## File extension
 
@@ -24,20 +24,19 @@ the research notation.
 - **Percent literals.** An integer literal immediately followed by
   `%`. Examples: `50%`, `100%`.
 - **Punctuation.** `,` `(` `)`
-- **Mint operator.** Canonical Unicode: `BULLET` (U+2022).
-  Aliases also recognized by the lexer: `BLACK SMALL
-  SQUARE` (U+25AA). ASCII fallback **proposed `*`**
-  (small filled mark; needs user confirmation -- alternatives:
-  `!`, `mint `, `def `). The mint operator must precede every
+- **Mint operator.** Canonical Unicode: `▪` BLACK SMALL SQUARE
+  (U+25AA). ASCII fallback: `*`. `•` BULLET (U+2022) is not
+  mint. The mint operator must precede every
   NEW name binding: tuple-var declaration, verb signature,
   user-defined verb body, `syntax` declaration. Example:
-  `*coord2 -> (x y)` mints the tuple variable; subsequent
-  `coord2 <- 3, 9` is an ordinary assignment. Without the mint
+  `▪coord₂ ───‣ ⎛x y⎠` mints the tuple variable; subsequent
+  `coord₂ ⟵ 3 , 9` is an ordinary assignment. Without the mint
   operator, references to unbound names are errors. This is
   the construct the DSL user reaches for whenever they want
   to extend the language.
-- **Assignment.** `<-`
-- **Mapping (signature arrow).** `->`
+- **Assignment.** Canonical `⟵`; ASCII fallback `<-`.
+- **Mapping (signature arrow).** Canonical `───‣`; ASCII fallback
+  `->`.
 - **Binary operators.** Symbolic: `+`, `-`, `*` (caveat: `*` may
   alias the mint operator depending on the chosen ASCII fallback;
   context-sensitive lexing or a different fallback resolves it).
@@ -50,11 +49,11 @@ Accepted by the lexer as exact synonyms for their ASCII forms:
 
 | ASCII  | Unicode |
 |--------|---------|
-| `*` (TBD) | mint operator: BULLET (U+2022) -- also accepts BLACK SMALL SQUARE (U+25AA) |
-| `<-`   | LEFTWARDS ARROW         (U+27F5 or U+2190) |
-| `->`   | heavy mapping arrow     (U+2500 x3 + U+2023) |
-| `(`    | shell-bracket left      (U+239B or U+2983) |
-| `)`    | shell-bracket right     (U+239E or U+2984) |
+| `*`    | mint operator `▪` BLACK SMALL SQUARE (U+25AA) |
+| `<-`   | assignment arrow `⟵` LEFTWARDS LONG ARROW (U+27F5) |
+| `->`   | mapping arrow `───‣` (U+2500 x3 + U+2023) |
+| `(`    | tuple/call open `⎛` LEFT PARENTHESIS UPPER HOOK (U+239B) |
+| `)`    | tuple/call close `⎠` RIGHT PARENTHESIS UPPER HOOK (U+23A0) |
 | `{`    | LEFT CURLY BRACKET UPPER HOOK  (U+23A7) -- block start (TBD) |
 | `}`    | RIGHT CURLY BRACKET UPPER HOOK (U+23AB) -- block end (TBD)   |
 | `max`  | wedge up                (U+22CF) |
@@ -85,7 +84,7 @@ declaration  ::= mint name "->" "(" field-list ")" [ "<-" expr-list ]
 field-list   ::= name { name }
 
 signature    ::= mint name "(" [ field-list ] ")" "->" "(" field-list ")" [ "<-" expr ]
-mint         ::= "*" | "U+2022" | "U+25AA"   (* mint operator *)
+mint         ::= "▪" | "*"                   (* mint operator *)
 
 assignment   ::= lvalue "<-" expr
 lvalue       ::= name { "," name }
@@ -150,8 +149,8 @@ splice.
 Example:
 
 ```
-success <- plot(coord2 Red 50%)
-# coord2 -> 2 values, Red -> 1, 50% -> 1; plot expects 4.
+successˀ ⟵ plot⎛coord₂ Red 50%⎠
+# coord₂ maps to 2 values, Red maps to 1, 50% maps to 1; plot expects 4.
 ```
 
 **Open question (TODO).** There is no current syntax to pass a
@@ -168,44 +167,44 @@ in the PoC.
 
 ```
 # 1a. Tuple var: mint and initialize separately.
-*coord2 -> (x y)        # mint the tuple variable
-coord2 <- 3, 9          # ordinary assignment to existing
-a, b <- coord2          # destructure
+▪coord₂ ───‣ ⎛x y⎠      # mint the tuple variable
+coord₂ ⟵ 3 , 9          # ordinary assignment to existing
+a , b ⟵ coord₂          # destructure
 ```
 
 ```
 # 1b. Tuple var: mint and initialize in one statement.
-*coord2 -> (x y) <- 3, 9
+▪coord₂ ───‣ ⎛x y⎠ ⟵ 3 , 9
 ```
 ```
 
 ```
 # 2. Multi-output operator.
-q, r <- 3 max2 5        # q=5, r=3
+q , r ⟵ 3 max₂ 5        # q=5, r=3
 ```
 
 ```
 # 3. Integer + fractional parts.
-integer, fractional <- 7 div2 3
+integer , fractional ⟵ 7 div₂ 3
 ```
 
 ```
 # 4. Call-site splice.
-*plot(x y color transparency) -> (success?)   # mint verb signature
-*coord2 -> (x y)                               # mint tuple var
-coord2 <- 3, 9
-success? <- plot(coord2 Red 50%)
+▪plot⎛x y color transparency⎠ ───‣ ⎛successˀ⎠   # mint verb signature
+▪coord₂ ───‣ ⎛x y⎠                               # mint tuple var
+coord₂ ⟵ 3 , 9
+successˀ ⟵ plot⎛coord₂ Red 50%⎠
 ```
 
 ```
 # 5. User-defined verb (mint with body).
-*add(a b) -> (sum) <- a + b
-n <- add(2 3)            # n = 5
+▪add⎛a b⎠ ───‣ ⎛sum⎠ ⟵ a + b
+n ⟵ add⎛2 3⎠            # n = 5
 ```
 
 ```
 # 6. Mint a syntax extension (the heart of the PoC).
-*syntax do _ while _ end expand
+▪syntax do _ while _ end expand
   prim/forth "BEGIN" _1 _2 prim/forth "UNTIL"
 ```
 
@@ -213,7 +212,7 @@ n <- add(2 3)            # n = 5
 
 ```
 # 1. Arity mismatch on assignment LHS.
-q <- a max2 b           # RHS arity 2, LHS arity 1
+q ⟵ a max₂ b           # RHS arity 2, LHS arity 1
 ```
 
 ```
@@ -223,16 +222,16 @@ plot(coord2 Red)        # arity 2 + 1 = 3, plot needs 4
 
 ```
 # 3. Tuple var mint with wrong field count for name arity.
-*coord2 -> (x y z)      # name declares arity 2, fields list has 3
+▪coord₂ ───‣ ⎛x y z⎠   # name declares arity 2, fields list has 3
 ```
 
 ```
 # 5. Missing mint operator on first declaration.
-coord2 -> (x y)         # `coord2` not yet bound; mint required
+coord₂ ───‣ ⎛x y⎠      # `coord₂` not yet bound; mint required
 ```
 
 ```
 # 4. Line-spanning statement.
-coord2 <- 3,
+coord₂ ⟵ 3 ,
          9              # statements don't span lines in the PoC
 ```

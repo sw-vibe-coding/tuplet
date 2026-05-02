@@ -4,7 +4,7 @@ How to type Tuplet's Unicode glyphs in Emacs without copying-
 and-pasting. Three approaches, in order of "minimum setup":
 
 1. **Built-in TeX input method** -- enable, type
-   `\bullet`, `\to`, `\alpha`, etc. Works for many but not
+   `\blacksquare`, `\to`, `\alpha`, etc. Works for many but not
    all Tuplet glyphs.
 2. **Built-in Agda input method** -- broader coverage; ships
    with `agda2-mode` and is widely available.
@@ -33,10 +33,10 @@ Toggle on/off with `C-\`.
 
 | You type      | You get (codepoint)    | Tuplet role             |
 |---------------|------------------------|-------------------------|
-| `\bullet`     | U+2022                 | mint                    |
-| `\leftarrow`  | U+2190                 | assign                  |
-| `\to`         | U+2192                 | map / signature         |
-| `\Rightarrow` | U+21D2                 | test arrow              |
+| `\blacksquare`| U+25AA                 | mint                    |
+| `\leftarrow`  | U+27F5                 | assign                  |
+| `\to`         | U+2500 U+2500 U+2500 U+2023 | map / signature   |
+| `\rightarrow` | U+27F6                 | test arrow              |
 | `\approx`     | U+2248                 | approx-equal            |
 | `\neq`        | U+2260                 | not-equal               |
 | `\leq`        | U+2264                 | leq                     |

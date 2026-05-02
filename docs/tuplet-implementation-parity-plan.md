@@ -43,11 +43,11 @@ labeled honestly.
 | Idea | Source repo with strongest example | Tuplet status now | Target parity level |
 |---|---|---|---|
 | Mint operator and arrows | all | Lexed and parsed | Demoed |
-| Dynamic `*syntax` declarations | `DiscoveryOne`, `tuplet`, `tuplet-rs` | Parsed from real source | Demoed |
+| Dynamic `▪syntax` declarations | `DiscoveryOne`, `tuplet`, `tuplet-rs` | Parsed from real source | Demoed |
 | `do _ while _ end` | `DiscoveryOne` | Parsed and syntax-matched | Demoed |
 | `unless _ do _ end` | `DiscoveryOne` | Not covered | Parsed first, later demoed |
-| Tuple variable signature `*coord2 -> (x y)` | `forthlet`, `tuplet-rs` | Parsed from real source | Executed |
-| Tuple assignment/destructuring `a, b <- coord2` | `forthlet`, `tuplet-rs` | Parsed from real source | Executed |
+| Tuple variable signature `▪coord₂ ───‣ ⎛x y⎠` | `forthlet`, `tuplet-rs` | Parsed from real source | Executed |
+| Tuple assignment/destructuring `a , b ⟵ coord₂` | `forthlet`, `tuplet-rs` | Parsed from real source | Executed |
 | Typed scalar variables | `forthlet`, `DiscoveryOne` | Not implemented | Checked |
 | Tuple-valued operators `max2`, `min2`, `div2` | `forthlet` | Verb signature parsed | Executed |
 | Call-site tuple splicing `plot(coord2 Red 50%)` | `forthlet` | Call tuple shape parsed | Checked first |
@@ -83,7 +83,7 @@ checker or runtime semantics.
 Priority fixtures:
 
 - `unless _ do _ end` syntax declaration and use site.
-- Multi-output verb signature shape, such as `*max2 (a b) -> (q r)`.
+- Multi-output verb signature shape, such as `▪max₂ ⎛a b⎠ ───‣ ⎛q r⎠`.
 - Tuple literal and tuple expression groups.
 - Call forms with zero, one, and many arguments.
 - Named tuple fields if still wanted before checker.

@@ -1,0 +1,1 @@
+Started canonical notation alignment. Added docs/notation.md, made black small square ▪ the canonical mint, removed bullet-as-mint lexer behavior, added minimal UTF-8 memory-source folding for ▪ and common arrows, updated high-signal docs/demos/fixtures, and rebased the bullet lexer baseline to prove • is not mint.

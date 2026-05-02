@@ -15,8 +15,8 @@ Concretely:
 
 ```
 $ tuplet repl
-> *n <- 0                                  # mint n; initialize
-> *syntax do _ while _ end expand
+> ▪n ⟵ 0                                  # mint n; initialize
+> ▪syntax do _ while _ end expand
 .   prim/forth "BEGIN"  _1  _2  prim/forth "UNTIL"
 > do
 .   n <- n + 1                             # ordinary assign (no mint)
@@ -29,8 +29,8 @@ $ tuplet repl
 > #
 ```
 
-The `*` (canonical Unicode BULLET U+2022; alias BLACK SMALL
-SQUARE U+25AA) is the **mint operator** -- the user reaches
+The `▪` (BLACK SMALL SQUARE U+25AA, ASCII fallback `*`) is the
+**mint operator** -- the user reaches
 for it whenever they add a new name or syntax to the language.
 Once the mint operator and the block delimiters (`{ }`, with
 Unicode aliases U+23A7/U+23AB) exist, nothing else in the
@@ -44,13 +44,13 @@ can produce that output, with the user typing all of it
 
 Even `if/then/else` is meant to be **user-minted**, not built
 in -- it lives in `lib/std.tup` (the prelude, saga 7) as a
-`*syntax` declaration, not in the compiler. The same is true
+`▪syntax` declaration, not in the compiler. The same is true
 for `while`, `match`, every operator, and every conditional
 family. The PoC demonstrates the **mechanism** by exercising
 `do..while`; once the mechanism works, sealed conditionals
 like `if/then/else` and user-defined variants
 (`if-approx`, `if-close?`, math-style `_ if _ else _`)
-all become "just more `*syntax`" entries in `.tup` files.
+all become "just more `▪syntax`" entries in `.tup` files.
 
 See `docs/dsl-examples.md` for a catalog of the kinds of
 extensions DSL users are expected to write, and the design
@@ -82,22 +82,22 @@ form below has spec text in the existing scaffold docs.
 
 | Form                              | Why it's needed                                      |
 |-----------------------------------|------------------------------------------------------|
-| **Mint operator `*`** (Unicode U+2022) | Every new binding (`*n <- 0`, `*syntax ...`).   |
+| **Mint operator `▪`** (ASCII fallback `*`) | Every new binding (`▪n ⟵ 0`, `▪syntax ...`).   |
 | Integer literals                  | The `0`, `1`, `3` in the scenario.                   |
 | Identifier (ASCII letters + digits) | Variable name `n`.                                 |
-| Scalar mint+init `*name <- expr`  | First binding of a name with initial value.          |
-| Scalar assignment `name <- expr`  | Updates to an already-minted name (`n <- n + 1`).    |
+| Scalar mint+init `▪name ⟵ expr`  | First binding of a name with initial value.          |
+| Scalar assignment `name ⟵ expr`  | Updates to an already-minted name (`n ⟵ n + 1`).    |
 | Binary `+` and `<`                | Arithmetic and the loop test.                        |
 | Bare expression statement         | The `n` line at the end (print scalar).              |
 | `prim/forth "WORD"` raw escape    | Used inside the `syntax` expansion.                  |
-| `*syntax T expand E` declaration  | The whole point of the demo.                         |
+| `▪syntax T expand E` declaration  | The whole point of the demo.                         |
 | Block delimiters `{` `}`          | Multi-statement loop body (the `do ... end` block).  |
 | Line comment `#`                  | Quality-of-life only.                                |
 
 Everything else from `docs/grammar.md` is **out of scope for the
 PoC milestone**, including:
 
-- Tuple variable declarations (`coord2 -> (x y)`).
+- Tuple variable declarations (`▪coord₂ ───‣ ⎛x y⎠`).
 - Multi-output verbs (`max2`, `min2`, `div2`).
 - Call-with-splice (`plot(coord2 Red 50%)`).
 - Anonymous verb literals `{...}`.

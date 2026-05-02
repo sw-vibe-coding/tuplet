@@ -67,9 +67,10 @@ flow through the bridge and produce a `syntax-match` AST.
 
 Tuple-shaped kernel forms now have both parser-only and
 memory-backed source regressions. `tuplet_parse_signature` and
-`tuplet_parse_memory_signature` cover `*coord2 -> (x y)`.
+`tuplet_parse_memory_signature` cover `▪coord₂ ───‣ ⎛x y⎠`
+normalized to the current internal token stream.
 `tuplet_parse_verb_signature` covers a verb signature with input and
-output tuples, `*max2(a b) -> (q r)`. `tuplet_parse_tuple_assign`
+output tuples, `▪max₂⎛a b⎠ ───‣ ⎛q r⎠`. `tuplet_parse_tuple_assign`
 and `tuplet_parse_memory_tuple_assign` cover `a, b <- coord2`.
 `tuplet_parse_call` covers call argument tuple shape, and
 `tuplet_parse_tuple_expr` covers a top-level tuple expression shape.

@@ -12,7 +12,7 @@ for the Emacs-specific path.
 ## Recommended: Espanso
 
 Espanso runs in the background, watches keystrokes, and
-expands a trigger like `:mint` into the bullet glyph. It
+expands a trigger like `:mint` into the mint glyph. It
 works in any program -- shells, editors, browsers, REPLs.
 
 ### Install
@@ -51,10 +51,10 @@ they don't collide with normal typing):
 
 | Prefix  | Family                                  | Example                |
 |---------|-----------------------------------------|------------------------|
-| `:mint` | Kernel mint                             | `:mint` -> U+2022      |
-| `:la`   | Left arrow                              | `:la` -> U+2190        |
-| `:ra`   | Right arrow                             | `:ra` -> U+2192        |
-| `:Ra`   | Right double arrow (test)               | `:Ra` -> U+21D2        |
+| `:mint` | Kernel mint                             | `:mint` -> U+25AA      |
+| `:la`   | Assignment arrow                        | `:la` -> U+27F5        |
+| `:ra`   | Mapping arrow                           | `:ra` -> U+2500 U+2500 U+2500 U+2023 |
+| `:Ra`   | Test arrow                              | `:Ra` -> U+27F6        |
 | `:gX`   | Greek lowercase (`:galpha`, `:grho`)    | `:galpha` -> U+03B1    |
 | `:GX`   | Greek uppercase (`:GSigma`, `:GPi`)     | `:GSigma` -> U+03A3    |
 | `:sN`   | Subscript digit (`:s2`, `:s3`, `:s4`)   | `:s2` -> U+2082        |
@@ -76,7 +76,7 @@ chat:
 filter_class: "(Code|iTerm2|Alacritty|Emacs|Terminal)"
 matches:
   - trigger: ":mint"
-    replace: "<U+2022>"   # bullet
+    replace: "▪"
   ...
 ```
 
@@ -117,7 +117,7 @@ cat scripts/tuplet-XCompose.example >> ~/.XCompose
 Each entry is one line of the form
 `<Multi_key> <chord> : "<glyph>" UXXXX # name`. Triggers use
 mnemonic chords -- e.g., Compose followed by `m i n t`
-produces U+2022 (bullet); Compose `l a` produces the assign
+produces U+25AA (black small square); Compose `l a` produces the assign
 arrow; Compose `g a` produces alpha. See the file for the
 full list (~25 entries).
 
@@ -137,8 +137,8 @@ register short triggers that expand to longer strings,
 including Unicode. It's lighter than a dedicated tool but
 slower and synced via iCloud.
 
-Triggers like `:mint` can replace with the BULLET glyph
-(U+2022) system-wide. Add each glyph from `docs/glyphs.md`
+Triggers like `:mint` can replace with the mint glyph `▪`
+(U+25AA) system-wide. Add each glyph from `docs/glyphs.md`
 as a row.
 
 Pros: zero install. Cons: small UI, no scoping, sync delays.
@@ -168,10 +168,10 @@ AHK scripts can map keystrokes to Unicode codepoints.
 Reference snippet:
 
 ```autohotkey
-::: mint:: SendInput {U+2022}    ; bullet
-::: la::   SendInput {U+2190}    ; assign
-::: ra::   SendInput {U+2192}    ; map
-::: Ra::   SendInput {U+21D2}    ; test arrow
+::: mint:: SendInput {U+25AA}    ; mint
+::: la::   SendInput {U+27F5}    ; assign
+::: ra::   SendInput {U+2500}{U+2500}{U+2500}{U+2023} ; map
+::: Ra::   SendInput {U+27F6}    ; test arrow
 ::: approx:: SendInput {U+2248}
 ::: leq::  SendInput {U+2264}
 ::: geq::  SendInput {U+2265}

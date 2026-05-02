@@ -8,8 +8,8 @@ exit criteria in `docs/plan.md` and the demo-parity path in
 
 The parser is ready to feed a narrow first checker slice:
 
-- tuple variable signatures shaped like `*coord2 -> (x y)`;
-- tuple-pattern assignment shaped like `a, b <- coord2`;
+- tuple variable signatures shaped like `▪coord₂ ───‣ ⎛x y⎠`;
+- tuple-pattern assignment shaped like `a , b ⟵ coord₂`;
 - syntax declarations and later syntax-match statements;
 - deterministic dumps and deterministic fatal parser errors;
 - memory-backed source handoff from the lexer into the parser.
@@ -26,8 +26,8 @@ DiscoveryOne implementations.
 | Kernel `syntax` form | Pass | `tuplet_parse_syntax_register`, `tuplet_parse_syntax_verb_register`, and `tuplet_parse_memory_syntax`. |
 | Kernel `<-`, comma, parens, braces, `#`, `_` | Partial | Existing token and shallow group parsing covers these shapes. The parser still emits scaffolding `ATOM` and `GROUP` nodes for several forms. |
 | Kernel `:` and `prim/forth` | Gap | The lexer/parser do not yet have a real colon form or string-backed `prim/forth` form. This blocks prelude/Forth escape parity. |
-| Tuple signature groups | Pass for first checker slice | `*coord2 -> (x y)` is parsed and memory-backed. Verb signatures with input and output tuples, such as `*max2(a b) -> (q r)`, are covered by `tuplet_parse_verb_signature`. |
-| Tuple-pattern assignment LHS | Pass for current checker slice | `a, b <- coord2` parses as a `pattern` group and memory-backed fixture. Checker can validate arity from this shape. |
+| Tuple signature groups | Pass for first checker slice | `▪coord₂ ───‣ ⎛x y⎠` is parsed and memory-backed via normalized tokens. Verb signatures with input and output tuples are covered by `tuplet_parse_verb_signature`. |
+| Tuple-pattern assignment LHS | Pass for current checker slice | `a , b ⟵ coord₂` parses as a `pattern` group once normalized. Checker can validate arity from this shape. |
 | Tuple literals and expression groups | Partial | `tuplet_parse_call` and `tuplet_parse_tuple_expr` lock shallow tuple-shaped groups. Nested expression semantics still belong to checker/lowering work. |
 | Syntax declaration then later code parses documented AST | Pass for current matcher | Registry-backed syntax matching works, including multi-slot captures from real source. |
 | Registry stores temporary token/template slices | Pass as skeleton | Current registry stores string token slices. This is intentionally temporary and must evolve before macro expansion is considered complete. |
