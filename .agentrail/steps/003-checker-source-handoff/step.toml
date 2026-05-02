@@ -1,0 +1,8 @@
+number = 3
+slug = "checker-source-handoff"
+status = "pending"
+description = "Wire checker acceptance to real source fixtures through lexer -> parser -> ch..."
+role = "legacy"
+context_files = []
+created_at = "2026-05-01T17:48:44"
+commits = []

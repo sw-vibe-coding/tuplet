@@ -1,8 +1,9 @@
 number = 2
 slug = "checker-parser-handoff"
-status = "pending"
+status = "completed"
 description = "Wire the checker scaffold to real parser output for the currently supported p..."
 role = "legacy"
 context_files = []
 created_at = "2026-05-01T17:18:31"
-commits = []
+completed_at = "2026-05-01T17:48:44"
+commits = ["076f124186c0e5ca86ff9c7c9ba38fd2076b55f0"]

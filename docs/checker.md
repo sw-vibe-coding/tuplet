@@ -19,6 +19,16 @@ Each signature binds one name to an input arity and an output arity.
 Tuple variable signatures such as `*coord2 -> (x y)` are represented
 with input arity `0` and output arity `2`.
 
+The checker now has two layers of coverage:
+
+- hand-built AST baselines for unit-level checker behavior; and
+- parser-backed baselines that run `src/parser.ml` first, then pass
+  the resulting AST to `src/checker.ml`.
+
+Parser-backed coverage currently includes tuple assignment pass,
+unbound RHS name failure, tuple-pattern arity mismatch failure, and
+call arity pass with tuple splicing.
+
 ## Rules
 
 - Assignment arity: the number of names in the `pattern` group must
@@ -56,6 +66,9 @@ ERROR  checker:arity-mismatch expected:1 actual:2
 This checker slice does not yet handle:
 
 - nested expression trees;
+- scalar assignment through parser-backed tests; the parser currently
+  gives the checker reliable tuple-pattern assignment groups only when
+  the LHS has comma shape;
 - syntax-match slot arity propagation;
 - `prim/forth` or colon forms;
 - final typed-AST node encoding;

@@ -1,0 +1,1 @@
+Added parser-backed checker drivers and baselines for tuple assignment pass, call arity pass, unbound RHS name failure, and tuple-pattern arity mismatch. Preserved hand-built AST checker unit baselines and documented parser-backed checker coverage plus the scalar-assignment parser deferral.
