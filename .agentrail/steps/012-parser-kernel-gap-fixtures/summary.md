@@ -1,1 +1,0 @@
-Added parser fixtures for verb signatures, call argument tuple shape, tuple expression shape, and unmatched syntax-template fallback. Documented prim/forth strings and colon forms as lexer-dependent deferrals before prelude/Forth emission, and verified the parser regression slice.

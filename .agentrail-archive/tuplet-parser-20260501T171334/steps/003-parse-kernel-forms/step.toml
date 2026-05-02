@@ -1,0 +1,12 @@
+number = 3
+slug = "parse-kernel-forms"
+status = "completed"
+description = """
+# Step: parse-kernel-forms
+
+Evolve the flat token-stream parser into a small ..."""
+role = "production"
+context_files = []
+created_at = "2026-04-27T11:41:00"
+completed_at = "2026-04-27T12:08:03"
+commits = ["7bc4e19cee0608aff8c1deecce052c823ffe67a4"]

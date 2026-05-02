@@ -1,0 +1,5 @@
+CHECK OK
+BIND ident:plot inputs:4 outputs:1
+BIND ident:coord2 inputs:0 outputs:2
+CALL ident:plot inputs:4 outputs:1
+ENDCHECK

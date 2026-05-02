@@ -1,35 +1,35 @@
-# Saga: tuplet-parser
+# Saga: tuplet-checker
 
 ## Goal
 
-Build the registry-based Tuplet parser described in docs/plan.md and docs/kernel.md. The parser consumes lexer tokens, parses kernel forms, maintains the syntax registry, and applies longest-match template expansion to produce a deterministic AST dump.
+Implement the first Tuplet checker over the parser AST, starting with name resolution and tuple arity checks for the parser-complete subset.
 
 ## Source of truth
 
-- docs/grammar.md -- surface grammar and lexical token meanings.
-- docs/kernel.md -- syntax declaration semantics, registry rules, and kernel/prelude split.
-- docs/design.md -- AST shape and downstream expectations.
-- docs/plan.md -- saga 2 entrance and exit criteria.
+- docs/plan.md -- saga 3 entrance and exit criteria.
+- docs/grammar.md -- arity rules and tuple/call semantics.
+- docs/design.md -- checker and typed-AST expectations.
+- docs/parser-saga-exit-audit.md -- parser subset and explicit deferrals.
+- docs/tuplet-implementation-parity-plan.md -- demo-parity priorities.
 
 ## In scope
 
-- AST data types and deterministic AST dump format.
-- Parser entry point over lexer token streams.
-- Kernel forms: syntax declarations, mint declarations/signatures, assignment arrows, comma-separated values, parens, comments, underscore slots, braces for anonymous verbs, and prim/forth token forms as far as specified by the kernel.
-- Syntax registry storing templates and expansions.
-- Longest-match-wins template matching, first-declared-wins on ties.
-- reg-rs baselines for parser skeleton, kernel-only programs, syntax registration, template expansion, ambiguity resolution, and parser errors.
+- src/checker.ml and a deterministic checker dump driver.
+- Tuple variable/signature environment from parser signature nodes.
+- Name resolution for tuple variables and call callees in the supported parser subset.
+- Arity checks for tuple-pattern assignment and shallow call argument tuple shapes.
+- Stable pass/fail reg-rs baselines.
+- Checker docs explaining current scope and parser deferrals.
 
 ## Out of scope
 
-- Type/arity checking.
 - IR lowering.
-- Forth emission.
-- Full prelude.
+- Interpretation or Forth emission.
+- prim/forth and colon forms until lexer/parser deferrals are resolved.
+- Full macro expansion beyond raw syntax-match slot spans.
 
 ## End state
 
-- src/parser.ml and supporting AST/registry files exist.
-- Parser can process one syntax declaration and parse later code using its template.
-- AST dumps are deterministic and covered by reg-rs baselines.
-- docs/plan.md marks tuplet-parser done when exit criteria are met.
+- Checker pass fixtures produce deterministic typed/check dumps.
+- Checker fail fixtures produce deterministic diagnostics for unbound names and arity mismatch.
+- coord2 and basic tuple destructuring are checked deterministically.

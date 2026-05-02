@@ -1,0 +1,1 @@
+Implemented explicit token-stream parsing for the parser skeleton. AST dumps now contain flat STMT/ATOM nodes, comments are skipped as trivia, EOF terminates the program, and unknown tokens produce deterministic ERROR dumps. Added an error smoke driver and reg-rs baseline, updated parser docs with the token stream contract, and verified parser/lexer smoke checks sequentially.

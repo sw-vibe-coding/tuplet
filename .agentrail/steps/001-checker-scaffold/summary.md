@@ -1,0 +1,1 @@
+Started tuplet-checker, added the first checker scaffold over parser AST nodes, documented the supported checker subset, and added pass/fail reg-rs baselines for tuple assignment, unbound names, arity mismatch, and call arity with tuple splicing.

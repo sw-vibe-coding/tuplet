@@ -1,1 +1,0 @@
-Tuple-shaped parser kernel forms: added signature AST dump for *coord2 -> (x y), tuple-pattern assignment dump for a, b <- coord2, parser docs, and reg-rs baselines.

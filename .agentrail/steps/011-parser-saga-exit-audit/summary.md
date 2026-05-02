@@ -1,1 +1,0 @@
-Documented the parser saga exit audit, validated the parser regression slice, and recorded that checker can start only on the current tuple signature/tuple assignment/syntax-match subset while parser parity gaps remain.

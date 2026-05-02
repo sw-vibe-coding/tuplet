@@ -1,0 +1,9 @@
+number = 1
+slug = "checker-scaffold"
+status = "completed"
+description = "Create the checker saga scaffold without changing parser behavior. Add src/ch..."
+role = "production"
+context_files = []
+created_at = "2026-05-01T17:13:51"
+completed_at = "2026-05-01T17:18:31"
+commits = ["d8b72e8765e5b5dc2ac74830cedd306751486ac6"]

@@ -1,1 +1,0 @@
-Implemented multi-token template slot matching. Registry slots now capture spans up to the next literal delimiter, preserve capture order, and emit `slot-start` markers in the temporary flat AST dump so downstream work can preserve slot boundaries. Verified this against the rebuilt OCaml host with top-level mutual recursion support.

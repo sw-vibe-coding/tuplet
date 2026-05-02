@@ -1,0 +1,12 @@
+number = 8
+slug = "lexer-parser-handoff"
+status = "completed"
+description = """
+# Step: lexer-parser-handoff
+
+Parse real Tuplet source by converting lexer tokens into parser tokens and feeding the existing registry parser."""
+role = "production"
+context_files = []
+created_at = "2026-04-28T01:58:00"
+completed_at = "2026-05-01T15:20:00"
+commits = []

@@ -1,0 +1,4 @@
+CHECK OK
+BIND ident:coord2 inputs:0 outputs:2
+ASSIGN arity:2
+ENDCHECK

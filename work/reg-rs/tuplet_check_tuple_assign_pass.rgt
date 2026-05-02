@@ -1,0 +1,4 @@
+command = "bash /Users/mike/github/sw-vibe-coding/tuplet/scripts/run-ml.sh /Users/mike/github/sw-vibe-coding/tuplet/src/ast.ml /Users/mike/github/sw-vibe-coding/tuplet/src/checker.ml /Users/mike/github/sw-vibe-coding/tuplet/src/checker_pass_main.ml"
+timeout = 60
+exit_code = 0
+desc = "tuplet check: tuple assignment pass"

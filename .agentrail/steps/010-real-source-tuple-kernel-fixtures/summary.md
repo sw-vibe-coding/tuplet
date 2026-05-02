@@ -1,1 +1,0 @@
-Real-source tuple kernel fixtures: memory-backed signature and tuple-pattern assignment inputs now pass through Lexer, Lex_bridge, and Parser with committed reg-rs baselines.

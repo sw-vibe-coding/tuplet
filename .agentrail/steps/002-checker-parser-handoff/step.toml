@@ -1,0 +1,8 @@
+number = 2
+slug = "checker-parser-handoff"
+status = "pending"
+description = "Wire the checker scaffold to real parser output for the currently supported p..."
+role = "legacy"
+context_files = []
+created_at = "2026-05-01T17:18:31"
+commits = []
