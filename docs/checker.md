@@ -19,22 +19,25 @@ Each signature binds one name to an input arity and an output arity.
 Tuple variable signatures such as `▪coord₂ ───‣ ⎛x y⎠` are represented
 with input arity `0` and output arity `2`.
 
-The checker now has two layers of coverage:
+The checker now has three layers of coverage:
 
 - hand-built AST baselines for unit-level checker behavior; and
 - parser-backed baselines that run `src/parser.ml` first, then pass
-  the resulting AST to `src/checker.ml`.
+  the resulting AST to `src/checker.ml`; and
+- memory-backed real-source baselines that run `lexer -> parser ->
+  checker` through `scripts/run-lex-check-fixture.sh`.
 
 Parser-backed coverage currently includes tuple assignment pass,
 unbound RHS name failure, tuple-pattern arity mismatch failure, and
-call arity pass with tuple splicing.
+call arity pass with tuple splicing. Real-source coverage currently
+includes tuple assignment pass, unbound RHS name failure, and
+tuple-pattern arity mismatch failure.
 
-Real-source checker handoff is currently blocked upstream. The first
-`sw-embed/sw-cor24-ocaml#30` fix made the allocation-after-parse repro
-pass, but the full source checker path still traps when the checker is
-run over a memory-backed parsed program. The current in-tree repro is
-`scripts/repro-ocaml-issue30-source-check-trap.sh`; upstream tracking
-remains `sw-embed/sw-cor24-ocaml#30`.
+Real-source checker handoff was unblocked by
+`sw-embed/sw-cor24-ocaml#30` commit `3f59686`, which moved the OCaml
+runner to a patchable PVM call stack. Tuplet's memory runner now reads
+`build/call_stack_base_addr.txt` and `build/call_stack_limit_addr.txt`
+from the local OCaml build and applies those stack patches.
 
 ## Rules
 

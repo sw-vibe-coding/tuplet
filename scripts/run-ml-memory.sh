@@ -90,6 +90,8 @@ source_for_repl() {
 
 code_ptr="$(cat "${build_dir}/code_ptr_addr.txt")"
 heap_limit="$(cat "${build_dir}/heap_limit_addr.txt")"
+call_stack_base="$(cat "${build_dir}/call_stack_base_addr.txt")"
+call_stack_limit="$(cat "${build_dir}/call_stack_limit_addr.txt")"
 
 ml_input=""
 if [ "$#" -eq 1 ]; then
@@ -110,6 +112,8 @@ raw="$("${cor24_run}" \
   --load-binary "${input_image}@0x080000" \
   --patch "0x${code_ptr}=0x040000" \
   --patch "0x${heap_limit}=0x03F000" \
+  --patch "0x${call_stack_base}=0x0FC000" \
+  --patch "0x${call_stack_limit}=0x100000" \
   --entry 0 -u "${uart_input}" --speed 0 -n 3000000000 -t "${cor24_wall_seconds}" 2>&1 | \
   awk '
     /^UART output:/ { in_out = 1; sub(/^UART output: /, ""); }

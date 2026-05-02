@@ -1,0 +1,4 @@
+command = "bash /Users/mike/github/sw-vibe-coding/tuplet/scripts/run-lex-check-fixture.sh /Users/mike/github/sw-vibe-coding/tuplet/tests/checker/source_arity_mismatch.input"
+timeout = 180
+exit_code = 0
+desc = "tuplet check source: memory-backed tuple arity mismatch failure"

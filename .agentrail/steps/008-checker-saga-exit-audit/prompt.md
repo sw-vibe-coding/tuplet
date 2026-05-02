@@ -1,0 +1,1 @@
+Audit the tuplet-checker saga exit criteria against docs/plan.md, docs/checker.md, and current reg-rs coverage. Confirm whether the checker saga can be archived or whether a final focused step is needed. Do not expand scope into IR, lowering, interpretation, or Forth emission.

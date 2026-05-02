@@ -1,6 +1,6 @@
 name = "tuplet-checker"
 status = "active"
-current_step = 7
+current_step = 8
 created_at = "2026-05-01T17:13:46"
 plan_file = ".agentrail/plan.md"
 retroactive = false
