@@ -1,0 +1,8 @@
+number = 2
+slug = "ir-call-and-failfast"
+status = "pending"
+description = "Extend the Tuplet IR scaffold beyond the coord2 assignment baseline without i..."
+role = "production"
+context_files = []
+created_at = "2026-05-02T15:57:09"
+commits = []

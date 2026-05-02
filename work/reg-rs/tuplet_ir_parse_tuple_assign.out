@@ -1,0 +1,6 @@
+IR
+DECLARE ident:coord2 inputs:0 outputs:2
+LOAD_TUPLE ident:coord2 arity:2
+STORE ident:b
+STORE ident:a
+ENDIR
