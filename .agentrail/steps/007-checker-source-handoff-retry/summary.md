@@ -1,0 +1,1 @@
+BLOCKED: Blocked on sw-embed/sw-cor24-ocaml#30: local retry on 11e2264 still fails real-source checker handoff with EVAL ERROR while parser-token checker and memory-backed parser-only baselines pass. Posted verification update: https://github.com/sw-embed/sw-cor24-ocaml/issues/30#issuecomment-4364224660

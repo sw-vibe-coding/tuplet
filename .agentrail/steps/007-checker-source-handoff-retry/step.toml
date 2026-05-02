@@ -1,6 +1,6 @@
 number = 7
 slug = "checker-source-handoff-retry"
-status = "pending"
+status = "blocked"
 description = "Retry checker source handoff only after sw-cor24-ocaml#30 is fixed and vendor..."
 role = "legacy"
 context_files = []
