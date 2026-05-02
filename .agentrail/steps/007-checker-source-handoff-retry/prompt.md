@@ -1,0 +1,1 @@
+Retry checker source handoff only after sw-cor24-ocaml#30 is fixed and vendored. Rebuild with the latest vendored dependencies, run memory-backed source checker fixtures without workaround limits, and keep any new upstream blocker reproducible in-tree before filing or updating issues.

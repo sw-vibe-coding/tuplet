@@ -1,0 +1,8 @@
+number = 7
+slug = "checker-source-handoff-retry"
+status = "pending"
+description = "Retry checker source handoff only after sw-cor24-ocaml#30 is fixed and vendor..."
+role = "legacy"
+context_files = []
+created_at = "2026-05-02T09:09:52"
+commits = []

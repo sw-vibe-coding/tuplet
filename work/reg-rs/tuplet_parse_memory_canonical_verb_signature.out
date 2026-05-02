@@ -1,0 +1,15 @@
+PROGRAM
+STMT   signature
+GROUP  name
+ITEM   ident:max2
+ENDGROUP
+GROUP  inputs
+ITEM   ident:a
+ITEM   ident:b
+ENDGROUP
+GROUP  outputs
+ITEM   ident:q
+ITEM   ident:r
+ENDGROUP
+ENDSTMT
+END

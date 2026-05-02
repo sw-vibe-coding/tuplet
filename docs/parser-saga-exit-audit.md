@@ -26,7 +26,7 @@ DiscoveryOne implementations.
 | Kernel `syntax` form | Pass | `tuplet_parse_syntax_register`, `tuplet_parse_syntax_verb_register`, and `tuplet_parse_memory_syntax`. |
 | Kernel `<-`, comma, parens, braces, `#`, `_` | Partial | Existing token and shallow group parsing covers these shapes. The parser still emits scaffolding `ATOM` and `GROUP` nodes for several forms. |
 | Kernel `:` and `prim/forth` | Gap | The lexer/parser do not yet have a real colon form or string-backed `prim/forth` form. This blocks prelude/Forth escape parity. |
-| Tuple signature groups | Pass for first checker slice | `▪coord₂ ───‣ ⎛x y⎠` is parsed and memory-backed via normalized tokens. Verb signatures with input and output tuples are covered by `tuplet_parse_verb_signature`. |
+| Tuple signature groups | Pass for first checker slice | `▪coord₂ ───‣ ⎛x y⎠` is parsed from real memory-backed UTF-8 source by `tuplet_parse_memory_canonical_signature`. Verb signatures with input and output tuples are covered by `tuplet_parse_verb_signature` and `tuplet_parse_memory_canonical_verb_signature`. |
 | Tuple-pattern assignment LHS | Pass for current checker slice | `a , b ⟵ coord₂` parses as a `pattern` group once normalized. Checker can validate arity from this shape. |
 | Tuple literals and expression groups | Partial | `tuplet_parse_call` and `tuplet_parse_tuple_expr` lock shallow tuple-shaped groups. Nested expression semantics still belong to checker/lowering work. |
 | Syntax declaration then later code parses documented AST | Pass for current matcher | Registry-backed syntax matching works, including multi-slot captures from real source. |

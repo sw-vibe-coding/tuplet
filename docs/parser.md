@@ -74,8 +74,11 @@ token stream.
 output tuples, canonically `▪max₂⎛a b⎠ ───‣ ⎛q r⎠`.
 `tuplet_parse_tuple_assign` and `tuplet_parse_memory_tuple_assign`
 cover `a , b ⟵ coord₂`, currently exercised through ASCII fallback
-fixture spelling until shell parens, subscript digits, and the heavy
-mapping arrow are implemented end-to-end in source lexing.
+fixture spelling for assignment-specific tests.
+`tuplet_parse_memory_canonical_signature` and
+`tuplet_parse_memory_canonical_verb_signature` cover shell parens,
+subscript arity suffixes, and the full heavy mapping arrow from real
+UTF-8 source bytes.
 `tuplet_parse_call` covers call argument tuple shape, and
 `tuplet_parse_tuple_expr` covers a top-level tuple expression shape.
 
@@ -157,9 +160,11 @@ Known parser gaps are:
 
 - `prim/forth` and colon-kernel forms are not yet represented.
 - Canonical shell parens `⎛` and `⎠`, subscript arity suffixes such
-  as `₂`, and the full heavy mapping arrow sequence `───‣` are not
-  fully accepted by the source lexer/parser path yet; current tests
-  use normalized token streams or explicit ASCII fallback fixtures.
+  as `₂`, and the full heavy mapping arrow sequence `───‣` are
+  accepted on the memory-backed source lexer/parser path. The older
+  UART low-byte lexer path still cannot carry every glyph; in
+  particular `─` has low byte `0`, which is the lexer's no-byte
+  sentinel.
 - Call forms and tuple expression groups are represented as shallow
   tuple groups; nested expressions still need fuller AST structure.
 - Syntax registry entries still dump raw token/template slices rather

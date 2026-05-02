@@ -160,18 +160,16 @@ runtime byte values directly:
 | RIGHTWARDS ARROW | 146 | `->` | `TRArrow` |
 | RIGHTWARDS DOUBLE ARROW | 210 | `->>` | `TRArrow` then `TUnknown 62` |
 
-Current explicit deferrals:
+Implemented canonical folds:
 
-- Shell parens `⎛` and `⎠` are canonical source delimiters, but the
-  executable lexer/parser path still primarily accepts ASCII `(` and
-  `)`.
-- The heavy mapping sequence `───‣` is canonical, but complete
-  four-codepoint sequence recognition is still deferred. Existing
-  regressions exercise the normalized parser path and simpler arrow
-  folds.
-- Subscript arity suffixes such as `₂` are canonical docs notation.
-  The parser still derives arity from ASCII trailing digits after
-  normalization.
+- Shell parens `⎛` and `⎠` fold to `TLParen` and `TRParen`.
+- The UTF-8 heavy mapping sequence `───‣` folds to `TRArrow` on the
+  memory-backed source path. The legacy UART low-byte path cannot
+  represent `─` because its low byte is `0`, the lexer's no-byte
+  sentinel.
+- Subscript arity suffixes such as `₂` fold to ASCII trailing digits
+  inside identifiers, so `coord₂` and `coord2` both dump as
+  `IDENT  coord2`.
 
 The wider suggested glyph table remains user-extension territory
 for later `▪syntax` declarations; lexer-level folding is limited
