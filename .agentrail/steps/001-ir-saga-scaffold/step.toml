@@ -1,9 +1,0 @@
-number = 1
-slug = "ir-saga-scaffold"
-status = "completed"
-description = "Start the tuplet-ir saga. Audit docs/design.md, docs/lowering.md, docs/checke..."
-role = "production"
-context_files = []
-created_at = "2026-05-02T13:36:58"
-completed_at = "2026-05-02T15:57:09"
-commits = ["756a7806b7a26b1d9f4e85857a3ed52ab7f9fb63"]

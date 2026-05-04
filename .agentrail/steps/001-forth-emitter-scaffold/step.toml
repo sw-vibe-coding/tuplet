@@ -1,0 +1,9 @@
+number = 1
+slug = "forth-emitter-scaffold"
+status = "completed"
+description = "Start the `tuplet-forth-emit` saga with a narrow parser-backed emitter scaffo..."
+role = "production"
+context_files = []
+created_at = "2026-05-04T09:23:05"
+completed_at = "2026-05-04T09:27:55"
+commits = ["0b070fdbf0677943abd8e90dd0866bd7d2b4d6f5"]

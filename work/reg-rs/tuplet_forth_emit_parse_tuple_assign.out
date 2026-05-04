@@ -1,0 +1,16 @@
+FORTH
+CREATE coord2-0 0 ,
+CREATE coord2-1 0 ,
+: coord2!  coord2-1 ! coord2-0 ! ;
+: coord2@  coord2-0 @ coord2-1 @ ;
+CREATE b-cell 0 ,
+: b!  b-cell ! ;
+: b@  b-cell @ ;
+CREATE a-cell 0 ,
+: a!  a-cell ! ;
+: a@  a-cell @ ;
+BODY
+coord2@
+b!
+a!
+ENDFORTH

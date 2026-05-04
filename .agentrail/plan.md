@@ -1,34 +1,31 @@
-# Saga: tuplet-ir
+# Saga: tuplet-forth-emit
 
 ## Goal
 
-Lower the checked Tuplet AST subset into a deterministic stack IR, staying within the parser/checker-complete kernel slice before any interpreter or Forth emitter work.
+Emit deterministic Forth from the parser-backed IR subset that Tuplet can already lower, then grow it into a runnable cor24 Forth demo path without depending on the source-backed OCaml memory runner blocked by `sw-cor24-ocaml#33`.
 
 ## Source of truth
 
-- docs/plan.md -- phase 4 entrance and exit criteria.
-- docs/design.md -- Stack IR instruction set and tuple order convention.
-- docs/lowering.md -- future Forth mapping; use only as downstream guidance.
-- docs/checker.md -- checker output and current supported AST subset.
-- docs/kernel.md -- prim/forth and anonymous-verb boundaries.
+- `docs/lowering.md` defines the intended IR-to-Forth mapping.
+- `docs/ir.md` defines the currently implemented IR dump subset.
+- `docs/design.md` provides stack order and tuple splicing semantics.
+- `docs/poc-goals.md` defines the later REPL milestone, but this saga starts with generated Forth files and deterministic baselines.
 
 ## In scope
 
-- IR data representation in the OCaml subset.
-- Deterministic IR dump driver and reg-rs baselines.
-- Lowering for the checker-complete subset: tuple signatures, tuple-pattern assignment, shallow calls, integer/percent/symbol/name atoms, and tuple loads/stores.
-- Clear docs for current IR scope and deferrals.
+- Forth emitter scaffold for the checker-complete parser-backed IR subset.
+- Deterministic Forth dumps for tuple declarations, scalar stores, tuple loads, scalar literals, percent literals, and shallow calls.
+- Focused reg-rs baselines for the existing coord2 assignment and plot call-splicing IR fixtures.
+- A later step to run generated Forth under `sw-cor24-forth`/`cor24-run` if kernel/runtime wiring permits.
 
 ## Out of scope
 
-- Forth emission.
-- Reference interpreter.
-- Prelude implementation.
-- Full macro expansion or nested expression semantics beyond the current parser/checker AST.
-- Anonymous-verb thunks and prim/forth until represented by parser/checker.
+- Source-backed IR/Forth demos while `sw-cor24-ocaml#33` remains open.
+- Full prelude, macro expansion, `prim/forth`, thunks, and do/while REPL.
+- Editing sibling repos or locally raising runtime limits.
 
 ## End state
 
-- Representative checked/parser-backed programs lower to stable IR dumps.
-- At minimum: coord2 tuple declaration + assignment, tuple destructuring, call-site tuple splicing shape, and fail-fast behavior when checker rejects input.
-- IR docs identify exactly what is ready for the next saga and what is still deferred.
+- Parser-backed checked programs can lower to IR and then to stable Forth text.
+- The generated Forth for the current call-splicing demo is either runnable under `cor24-run` with a reg-rs baseline or blocked by a clearly diagnosed upstream issue.
+- Docs identify exactly what can be demoed and what remains gated.

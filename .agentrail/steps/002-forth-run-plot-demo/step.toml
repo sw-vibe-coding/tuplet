@@ -1,0 +1,8 @@
+number = 2
+slug = "forth-run-plot-demo"
+status = "pending"
+description = "Turn the deterministic Forth text scaffold into a runnable parser-backed demo..."
+role = "production"
+context_files = []
+created_at = "2026-05-04T09:27:55"
+commits = []

@@ -259,8 +259,13 @@ The Tuplet CLI emits one `.fs` file per compiled program:
 work/generated/<basename>.fs
 ```
 
-`work/generated/` is created on demand and gitignored. The file is
-a self-contained Forth source: prelude + generated program body.
+`work/generated/` is created on demand and gitignored. The first
+emitter slice produces deterministic Forth text from parser-backed IR
+dumps; writing files and running them under `cor24-run` comes next.
+The current IR dump carries tuple arity but not tuple field names, so
+the scaffold emits numbered tuple backing cells such as `coord2-0` and
+`coord2-1`. Field-named backing cells return when the IR carries field
+metadata.
 
 The test harness (a later step, likely `tuplet-run.sh`) will
 concatenate the kernel `forth.s` and the generated `.fs` and feed
