@@ -1,0 +1,10 @@
+=== input ===
+CREATE foo 42 ,
+foo .S
+foo @ .
+=== output (post-UART output:) ===
+UART output:  ok
+<0>  ok
+? 42 ? 
+
+Executed 50000000 instructions

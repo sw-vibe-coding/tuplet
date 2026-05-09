@@ -1,6 +1,6 @@
 number = 2
 slug = "forth-run-plot-demo"
-status = "pending"
+status = "in-progress"
 description = "Turn the deterministic Forth text scaffold into a runnable parser-backed demo..."
 role = "production"
 context_files = []

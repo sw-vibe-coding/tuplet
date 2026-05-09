@@ -1,0 +1,4 @@
+command = "bash /Users/mike/github/sw-vibe-coding/tuplet/scripts/repro-cor24-forth-create-variable.sh"
+timeout = 30
+exit_code = 0
+desc = "minimal cor24-forth CREATE-variable repro for sw-cor24-forth#6"

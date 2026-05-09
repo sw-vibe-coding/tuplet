@@ -1,0 +1,4 @@
+command = "bash /Users/mike/github/sw-vibe-coding/tuplet/scripts/tuplet-forth-run.sh forth_run_parse_call /Users/mike/github/sw-vibe-coding/tuplet/src/forth_parse_call_main.ml"
+timeout = 60
+exit_code = 0
+desc = "tuplet forth run: emit + cor24-run plot call demo (currently blocked on sw-cor24-forth#6 -- baseline shows ? error from CREATE'd cells)"

@@ -261,28 +261,43 @@ work/generated/<basename>.fs
 
 `work/generated/` is created on demand and gitignored. The first
 emitter slice produces deterministic Forth text from parser-backed IR
-dumps; writing files and running them under `cor24-run` comes next.
-The current IR dump carries tuple arity but not tuple field names, so
-the scaffold emits numbered tuple backing cells such as `coord2-0` and
-`coord2-1`. Field-named backing cells return when the IR carries field
-metadata.
+dumps; `scripts/tuplet-forth-run.sh` writes the file and pipes it
+through `cor24-run` against the `sw-cor24-forth` kernel. The current
+IR dump carries tuple arity but not tuple field names, so the scaffold
+emits numbered tuple backing cells such as `coord2-0` and `coord2-1`.
+Field-named backing cells return when the IR carries field metadata.
 
-The test harness (a later step, likely `tuplet-run.sh`) will
-concatenate the kernel `forth.s` and the generated `.fs` and feed
-the composite to `cor24-run`, exactly mirroring the smoke test in
-`docs/tooling-smoke.md`. The harness captures the UART output and
-hands it to reg-rs for baseline comparison.
+`scripts/tuplet-forth-run.sh` is the harness: it concatenates
+`prelude/tuplet-prelude.fs` with the emitter output, writes
+`work/generated/<basename>.fs`, and feeds each non-empty line through
+the `forth.s` REPL via UART, capturing post-`UART output:` text.
 
 ## Upstream dependencies
 
-No blockers. The following are optional enhancements that would
-slightly simplify the Tuplet emitter if added to
-`sw-cor24-forth`; none affect correctness:
+### Blocking the runnable demo
 
-- `VARIABLE <name>` as kernel sugar for `CREATE <name> 0 ,`.
+- **`sw-embed/sw-cor24-forth#6`** -- in the bare `forth.s` kernel,
+  `CREATE name N ,` does not produce a callable variable: the
+  primitive builds the dictionary header but writes no CFA, so calling
+  the new word pushes nothing. The kernel exposes neither `VARIABLE`,
+  `LITERAL`, `[']`, nor `DOES>`, so the prelude has no path to build a
+  variable in user space either. This blocks every Tuplet program with
+  tuple/scalar storage from running end-to-end on `cor24-run`. Repro:
+  `scripts/repro-cor24-forth-create-variable.sh`. Status as of
+  2026-05-08: filed, awaiting upstream.
+
+When #6 is resolved (any of the four asks suffices), the runner script
+needs no change beyond possibly swapping `CREATE name 0 ,` for
+`VARIABLE name` in `src/forth_emit.ml` if upstream lands option (2) or
+adjusting the `ICall` lowering to use `LITERAL` if option (1).
+
+### Optional polish (non-blocking)
+
+The following would slightly simplify the Tuplet emitter; none affect
+correctness:
+
 - `/` as kernel sugar for `/MOD SWAP DROP`.
 - `MOD` as kernel sugar for `/MOD DROP`.
 - `2DUP` as kernel sugar for `OVER OVER`.
 
-If these are filed as enhancement issues upstream, record the
-issue numbers here. Not filed at this time.
+Not filed at this time.
